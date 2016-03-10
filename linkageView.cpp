@@ -1238,7 +1238,7 @@ CFRect CLinkageView::GetDocumentArea( bool bWithDimensions, bool bSelectedOnly )
 				DocumentArea += DrawDimensions( &NullRenderer, pDoc->GetViewLayers(), pConnector, true, true );
 		}
 
-		DocumentArea += DrawGroundDimensions( &NullRenderer, pDoc->GetViewLayers(), true, true );
+		DocumentArea += DrawGroundDimensions( &NullRenderer, pDoc, pDoc->GetViewLayers(), true, true );
 	}
 	return DocumentArea.GetRect();
 }
@@ -1543,7 +1543,7 @@ void CLinkageView::DrawMechanism( CRenderer* pRenderer )
 			DrawDimensions( pRenderer, pDoc->GetViewLayers(), pConnector, true, true );
 	}
 
-	DrawGroundDimensions( pRenderer, pDoc->GetViewLayers(), true, true );
+	DrawGroundDimensions( pRenderer, pDoc, pDoc->GetViewLayers(), true, true );
 
 	if( m_bSnapOn || m_bGridSnap )
 		DrawSnapLines( pRenderer );
@@ -1622,10 +1622,20 @@ void CLinkageView::DrawMechanism( CRenderer* pRenderer )
 	}
 }
 
+CFPoint CLinkageView::ComputeNextPartLocation( CLink *pPartsLink, CFPoint ThisPartsPoint )
+{
+	return CFPoint();
+}
+
 void CLinkageView::DrawPartsList( CRenderer* pRenderer )
 {
 	CLinkageDoc* pDoc = GetDocument();
 	ASSERT_VALID(pDoc);
+
+	CFRect Area;
+	pDoc->GetDocumentArea( Area );
+	//pRenderer->DrawRect( Scale( Area ) );
+
 	CLinkageDoc *pPartsDoc = pDoc->GetPartsDocument( false );
 	pDoc = 0; // Don't use this elsewhere in this function!
 
@@ -1650,226 +1660,62 @@ void CLinkageView::DrawPartsList( CRenderer* pRenderer )
 			pLink->ComputeHull();
 	}
 
-	ConnectorList* pConnectors = pPartsDoc->GetConnectorList();
-	Position = pConnectors->GetHeadPosition();
-	while( Position != NULL )
-	{
-		CConnector* pConnector = pConnectors->GetNext( Position );
-		if( pConnector == 0 )
-			continue;
-		DebugDrawConnector( pRenderer, pPartsDoc->GetViewLayers(), pConnector, m_bShowLabels );
-	}
+//	ConnectorList* pConnectors = pPartsDoc->GetConnectorList();
 
-	static const int Steps = 2;
-	static const int LayersOnStep[Steps] = { CLinkageDoc::DRAWINGLAYER, CLinkageDoc::MECHANISMLAYER };
+//	static const int Steps = 2;
+//	static const int LayersOnStep[Steps] = { CLinkageDoc::DRAWINGLAYER, CLinkageDoc::MECHANISMLAYER };
 
-	for( int Step = 0; Step < 2; ++Step )
-	{
-		int StepLayers = LayersOnStep[Step];
-		Position = pLinkList->GetHeadPosition();
-		while( Position != NULL )
-		{
-			CLink* pLink = pLinkList->GetNext( Position );
-			if( pLink != 0  && ( pLink->GetLayers() & StepLayers ) != 0 )
-				DrawLink( pRenderer, pPartsDoc->GetGearConnections(), pPartsDoc->GetViewLayers(), pLink, false, false, true );
-		}
-	}
+	/*
+	 * The parts list has no overlapping parts. The order of the drawing is simplied
+	 * as compared to the normal editor drawing order.
+	 */
+
+	CFPoint PartPoint = Area.TopLeft();
+	CFPoint SaveScrollPosition = m_ScrollPosition;
 
 	Position = pLinkList->GetHeadPosition();
-	while( Position != NULL )
-	{
-		CLink* pLink = pLinkList->GetNext( Position );
-		if( pLink != 0  )
-			DebugDrawLink( pRenderer, pPartsDoc->GetViewLayers(), pLink, false, true, true );
-	}
-
-	for( int Step = 0; Step < 2; ++Step )
-	{
-		int StepLayers = LayersOnStep[Step];
-
-		Position = pLinkList->GetHeadPosition();
-		while( Position != NULL )
-		{
-			CLink* pLink = pLinkList->GetNext( Position );
-			if( pLink != 0 && ( pLink->GetLayers() & StepLayers ) != 0 )
-				DrawLink( pRenderer, pPartsDoc->GetGearConnections(), pPartsDoc->GetViewLayers(), pLink, m_bShowLabels, true, false );
-		}
-
-		if( m_MouseAction == ACTION_STRETCH && Step == 1 )
-		{
-			/*
-			 * Draw a box just for stretching that shows the stretch extents.
-			 */
-		 
-			CLinkageDoc* pDoc = GetDocument();
-			ASSERT_VALID(pDoc);
-			CFRect Rect = GetDocumentAdjustArea( true );
-			if( fabs( Rect.Height() ) > 0 && fabs( Rect.Width() ) > 0 )
-			{
-				CPen Pen( PS_DOT, 1, COLOR_STRETCHDOTS );
-				CPen *pOldPen = pRenderer->SelectObject( &Pen );
-				pRenderer->DrawRect( Scale( Rect ) );
-				pRenderer->SelectObject( pOldPen );
-			}
-		}
-
-		if( Step == 1 )
-		{
-			Position = pConnectors->GetHeadPosition();
-			while( Position != NULL )
-			{
-				CConnector* pConnector = pConnectors->GetNext( Position );
-				if( pConnector == 0 )
-					continue;
-
-				DrawMotionPath( pRenderer, pConnector );
-			}
-		}
-
-		Position = pConnectors->GetHeadPosition();
-		while( Position != NULL )
-		{
-			CConnector* pConnector = pConnectors->GetNext( Position );
-			if( pConnector != 0 && ( pConnector->GetLayers() & StepLayers ) != 0 )
-				DrawSliderTrack( pRenderer, pPartsDoc->GetViewLayers(), pConnector );
-		}
-
-		Position = pLinkList->GetHeadPosition();
-		while( Position != NULL )
-		{
-			CLink* pLink = pLinkList->GetNext( Position );
-			if( pLink != 0 && ( pLink->GetLayers() & StepLayers ) != 0 )
-				DrawLink( pRenderer, pPartsDoc->GetGearConnections(), pPartsDoc->GetViewLayers(), pLink, m_bShowLabels, false, false );
-		}
-
-		Position = pConnectors->GetHeadPosition();
-		while( Position != NULL )
-		{
-			CConnector* pConnector = pConnectors->GetNext( Position );
-			if( pConnector != 0 && ( pConnector->GetLayers() & StepLayers ) != 0 )
-				DrawConnector( pRenderer, pPartsDoc->GetViewLayers(), pConnector, m_bShowLabels );
-		}
-	}
-
-	Position = pPartsDoc->GetGearConnections()->GetHeadPosition();
 	while( Position != 0 )
 	{
-		CGearConnection *pGearConnection = pPartsDoc->GetGearConnections()->GetNext( Position );
-		if( pGearConnection == 0 )
-			continue;
-
-		if( pGearConnection->m_ConnectionType == pGearConnection->CHAIN )
-			DrawChain( pRenderer, pPartsDoc->GetViewLayers(), pGearConnection );
-	}
-
-	Position = pLinkList->GetHeadPosition();
-	while( Position != NULL )
-	{
 		CLink* pLink = pLinkList->GetNext( Position );
-		if( pLink != 0 )
+		if( pLink != 0  && ( pLink->GetLayers() & CLinkageDoc::MECHANISMLAYER ) != 0 )
 		{
-			CConnector *pConnector = pLink->GetStrokeConnector( 0 );
-			if( pConnector != 0 )
-				DrawConnector( pRenderer, pPartsDoc->GetViewLayers(), pConnector, m_bShowLabels, false, false, false, true );
-		}
-	}
+			ConnectorList* pConnectors = pLink->GetConnectorList();
 
-	DrawStackedConnectors( pRenderer, pPartsDoc->GetViewLayers() );
-
-	Position = pLinkList->GetHeadPosition();
-	while( Position != NULL )
-	{
-		CLink* pLink = pLinkList->GetNext( Position );
-		if( pLink != 0 && !pLink->IsMeasurementElement() )
+			DrawLink( pRenderer, pPartsDoc->GetGearConnections(), pPartsDoc->GetViewLayers(), pLink, false, false, true );
+			DrawLink( pRenderer, pPartsDoc->GetGearConnections(), pPartsDoc->GetViewLayers(), pLink, m_bShowLabels, true, false );
+			//POSITION Position2 = pConnectors->GetHeadPosition();
+			//while( Position2 != NULL )
+			//{
+			//	CConnector* pConnector = pConnectors->GetNext( Position2 );
+			//	if( pConnector != 0 )
+			//		DrawSliderTrack( pRenderer, pPartsDoc->GetViewLayers(), pConnector );
+			//}
+			DrawLink( pRenderer, pPartsDoc->GetGearConnections(), pPartsDoc->GetViewLayers(), pLink, m_bShowLabels, false, false );
+			POSITION Position2 = pConnectors->GetHeadPosition();
+			while( Position2 != NULL )
+			{
+				CConnector* pConnector = pConnectors->GetNext( Position2 );
+				if( pConnector != 0 )
+				{
+					DrawConnector( pRenderer, pPartsDoc->GetViewLayers(), pConnector, m_bShowLabels );
+					// DrawConnector( pRenderer, pPartsDoc->GetViewLayers(), pConnector, m_bShowLabels, false, false, false, true );
+				}
+			}
 			DrawDimensions( pRenderer, pPartsDoc->GetGearConnections(), pPartsDoc->GetViewLayers(), pLink, true, true );
-	}
-
-	Position = pConnectors->GetHeadPosition();
-	while( Position != NULL )
-	{
-		CConnector* pConnector = pConnectors->GetNext( Position );
-		if( pConnector != 0 )
-			DrawDimensions( pRenderer, pPartsDoc->GetViewLayers(), pConnector, true, true );
-	}
-
-	DrawGroundDimensions( pRenderer, pPartsDoc->GetViewLayers(), true, true );
-
-	if( m_bSnapOn || m_bGridSnap )
-		DrawSnapLines( pRenderer );
-
-	if( m_bShowAngles )
-		DrawAlignmentLines( pRenderer );
-
-	if( m_bShowDebug )
-	{
-		CPen Pen( PS_SOLID, 1, RGB( 255, 0, 0 ) );
-		CPen *pOldPen = pRenderer->SelectObject( &Pen );
-
-		while( true )
-		{
-			CDebugItem *pDebugItem = DebugItemList.Pop();
-			if( pDebugItem == 0 )
-				break;
-			if( pDebugItem->m_Type == pDebugItem->DEBUG_OBJECT_POINT )
+			Position2 = pConnectors->GetHeadPosition();
+			while( Position2 != NULL )
 			{
-				CFPoint Point = pDebugItem->m_Point;
-				Point = Scale( Point );
-				pRenderer->Arc( Point.x - m_ConnectorRadius, Point.y - m_ConnectorRadius, Point.x + m_ConnectorRadius, Point.y + m_ConnectorRadius,
-				              Point.x, Point.y - m_ConnectorRadius, Point.x, Point.y - m_ConnectorRadius );
+				CConnector* pConnector = pConnectors->GetNext( Position2 );
+				if( pConnector != 0 )
+				DrawDimensions( pRenderer, pPartsDoc->GetViewLayers(), pConnector, true, true );
 			}
-			else if( pDebugItem->m_Type == pDebugItem->DEBUG_OBJECT_LINE )
-			{
-				CFLine Line = pDebugItem->m_Line;
-				pRenderer->DrawLine( Scale( Line ) );
-				//pRenderer->MoveTo( Scale( Line.GetStart() ) );
-				//pRenderer->LineTo( Scale( Line.GetEnd() ) );
-			}
-			else if( pDebugItem->m_Type == pDebugItem->DEBUG_OBJECT_CIRCLE )
-			{
-				CFCircle Circle = pDebugItem->m_Circle;
-				Circle = Scale( Circle );
-				CBrush *pSaveBrush = (CBrush*)pRenderer->SelectStockObject( NULL_BRUSH );
-				pRenderer->Circle( Circle );
-				pRenderer->SelectObject( pSaveBrush );
-			}
-			else if( pDebugItem->m_Type == pDebugItem->DEBUG_OBJECT_ARC )
-			{
-				CFArc Arc = pDebugItem->m_Arc;
-				Arc = Scale( Arc );
-				CBrush *pSaveBrush = (CBrush*)pRenderer->SelectStockObject( NULL_BRUSH );
-				pRenderer->Arc( Arc );
-				pRenderer->SelectObject( pSaveBrush );
-			}
-			delete pDebugItem;
-			pDebugItem = 0;
 		}
-
-
-		pRenderer->SelectObject( pOldPen );
-	}
-	else
-	{
-		while( true )
-		{
-			CDebugItem *pDebugItem = DebugItemList.Pop();
-			if( pDebugItem == 0 )
-				break;
-		}
+		PartPoint = ComputeNextPartLocation( pLink, PartPoint );
+		PartPoint.y -= 200;
+		m_ScrollPosition.y -= 200;
 	}
 
-	if( m_bShowSelection && pPartsDoc->IsSelectionAdjustable() )
-		DrawAdjustmentControls( pRenderer );
-
-	if( m_bShowData && m_bShowSelection )
-		DrawData( pRenderer );
-	
-	if( m_bShowSelection && m_MouseAction == ACTION_SELECT )
-	{
-		CPen Pen( PS_SOLID, 1, RGB( 128, 128, 255 ) );
-		CPen *pOldPen = pRenderer->SelectObject( &Pen );
-		pRenderer->DrawRect( m_SelectRect );
-		pRenderer->SelectObject( pOldPen );
-	}
+	m_ScrollPosition = SaveScrollPosition;
 }
 
 void CLinkageView::DrawMotionPath( CRenderer *pRenderer, CConnector *pConnector )
@@ -5381,13 +5227,10 @@ void CLinkageView::DrawStackedConnectors( CRenderer* pRenderer, unsigned int OnL
 	pRenderer->SelectObject( pOldPen );
 }
 
-CFArea CLinkageView::DrawGroundDimensions( CRenderer* pRenderer, unsigned int OnLayers, bool bDrawLines, bool bDrawText)
+CFArea CLinkageView::DrawGroundDimensions( CRenderer* pRenderer, CLinkageDoc *pDoc, unsigned int OnLayers, bool bDrawLines, bool bDrawText)
 {
 	if( !m_bShowDimensions )
 		return CFArea();
-
-	CLinkageDoc* pDoc = GetDocument();
-	ASSERT_VALID(pDoc);
 
 	if( ( OnLayers & CLinkageDoc::MECHANISMLAYERS ) == 0 )
 		return CFArea();

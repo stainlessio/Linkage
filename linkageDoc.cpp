@@ -4839,6 +4839,7 @@ void CLinkageDoc::MovePartsLinkToOrigin( CFPoint Origin, CLink *pPartsLink )
 	CFLine OrientationLine( pPoints[BestStartPoint], pPoints[BestEndPoint] );
 	double Angle = GetAngle( pPoints[BestStartPoint], pPoints[BestEndPoint] );
 
+	CFPoint AdditionalOffset;
 	Position = pPartsLink->GetConnectorList()->GetHeadPosition();
 	while( Position != 0 )
 	{
@@ -4849,16 +4850,39 @@ void CLinkageDoc::MovePartsLinkToOrigin( CFPoint Origin, CLink *pPartsLink )
 		CFPoint Point = pConnector->GetPoint();
 		Point.RotateAround( pPoints[BestStartPoint], -Angle );
 		pConnector->SetPoint( Point );
+		if( Point.x - pPoints[BestStartPoint].x < AdditionalOffset.x )
+			AdditionalOffset.x = Point.x - pPoints[BestStartPoint].x;
+		if( Point.y - pPoints[BestStartPoint].y > AdditionalOffset.y )
+			AdditionalOffset.y = Point.y - pPoints[BestStartPoint].y;
 	}
+
+	Position = pPartsLink->GetConnectorList()->GetHeadPosition();
+	while( Position != 0 )
+	{
+		CConnector *pConnector = pPartsLink->GetConnectorList()->GetNext( Position );
+		if( pConnector == 0 || pConnector == pStartConnector )
+			continue;
+
+		CFPoint Point = pConnector->GetPoint();
+		Point -= pPoints[BestStartPoint];
+		Point += Origin;
+		Point -= AdditionalOffset;
+		pConnector->SetPoint( Point );
+	}
+	Origin -= AdditionalOffset;
+	pStartConnector->SetPoint( Origin );
 }
 
 void CLinkageDoc::CreatePartsFromDocument( CLinkageDoc *pOriginalDoc )
 {
+	CFRect Area;
+	pOriginalDoc->GetDocumentArea( Area );
+
 	POSITION Position = pOriginalDoc->m_Links.GetHeadPosition();
 	while( Position != 0 )
 	{
 		CLink *pLink = pOriginalDoc->m_Links.GetNext( Position );
-		if( pLink == 0 )
+		if( pLink == 0 || ( pLink->GetLayers() & DRAWINGLAYER ) != 0 )
 			continue;
 
 		if( pLink->GetConnectorCount() <= 1 && !pLink->IsGear() )
@@ -4884,7 +4908,7 @@ void CLinkageDoc::CreatePartsFromDocument( CLinkageDoc *pOriginalDoc )
 			m_Connectors.AddTail( pPartsConnector );
 		}
 
-		MovePartsLinkToOrigin( pPartsLink );
+		MovePartsLinkToOrigin( Area.TopLeft(), pPartsLink );
 		m_Links.AddTail( pPartsLink );
 	}
 
@@ -4910,7 +4934,7 @@ void CLinkageDoc::CreatePartsFromDocument( CLinkageDoc *pOriginalDoc )
 		pGroundLink->AddConnector( pPartsConnector );
 		m_Connectors.AddTail( pPartsConnector );
 	}
-	MovePartsLinkToOrigin( pGroundLink );
+	MovePartsLinkToOrigin( Area.TopLeft(), pGroundLink );
 	m_Links.AddTail( pGroundLink );
 }
 
