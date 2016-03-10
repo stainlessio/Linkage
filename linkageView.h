@@ -322,10 +322,6 @@ private:
 
 	void UpdateForDocumentChange( void );
 
-	CLinkageDoc *m_pPartsDocument;
-
-	void CreatePartsDocument( void );
-
 // Generated message map functions
 protected:
 	//{{AFX_MSG(CLinkageView)

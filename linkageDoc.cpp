@@ -87,6 +87,7 @@ void CLinkageDoc::SetLinkConnector( CLink* pLink, CConnector* pConnector )
 
 CLinkageDoc::CLinkageDoc()
 {
+	m_pPartsDoc = 0;
 	m_pCapturedConnector = 0;
 	m_pCapturedController = 0;
 	m_pUndoList = 0;
@@ -119,6 +120,10 @@ CLinkageDoc::CLinkageDoc()
 
 CLinkageDoc::~CLinkageDoc()
 {
+	if( m_pPartsDoc != 0 )
+		delete m_pPartsDoc;
+	m_pPartsDoc = 0;
+
 	DeleteContents();
 }
 
@@ -4753,7 +4758,7 @@ void CLinkageDoc::FastenThese( CLink *pFastenThis, CConnector *pFastenToThis )
 	pFastenToThis->AddFastenLink( pFastenThis );
 }
 
-CLinkageDoc *CLinkageDoc::CreatePartsDocument( void )
+CLinkageDoc *CLinkageDoc::GetPartsDocument( bool bRecompute )
 {
 	/* 
 	 * The parts document is a copy of the document but with some HUGE changes.
@@ -4766,9 +4771,15 @@ CLinkageDoc *CLinkageDoc::CreatePartsDocument( void )
 	 * HOW DO I HANDLE GEAR SIZES?!?!
 	 */
 
-	CLinkageDoc *pNewDocument = new CLinkageDoc;
-	pNewDocument->CreatePartsFromDocument( this );
-	return pNewDocument;
+	if( !bRecompute && m_pPartsDoc != 0 )
+		return m_pPartsDoc;
+
+	if( m_pPartsDoc != 0 )
+		delete m_pPartsDoc;
+
+	m_pPartsDoc = new CLinkageDoc;
+	m_pPartsDoc->CreatePartsFromDocument( this );
+	return m_pPartsDoc;
 }
 
 void CLinkageDoc::MovePartsLinkToOrigin( CLink *pPartsLink )

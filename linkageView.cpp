@@ -373,8 +373,6 @@ CLinkageView::CLinkageView()
 	m_bRecordingVideo = false;
 	m_RecordQuality = 0;
 
-	m_pPartsDocument = 0;
-
 	m_pPopupGallery = new CPopupGallery( ID_POPUP_GALLERY, IDB_INSERT_POPUP_GALLERY, 48 );
 	if( m_pPopupGallery != 0 )
 	{
@@ -457,10 +455,6 @@ CLinkageView::~CLinkageView()
 	if( m_pPopupGallery != 0 )
 		delete m_pPopupGallery;
 	m_pPopupGallery = 0;
-
-	if( m_pPartsDocument != 0 )
-		delete m_pPartsDocument;
-	m_pPartsDocument = 0;
 
 	CWinApp *pApp = AfxGetApp();
 	if( pApp != 0 )
@@ -1630,10 +1624,13 @@ void CLinkageView::DrawMechanism( CRenderer* pRenderer )
 
 void CLinkageView::DrawPartsList( CRenderer* pRenderer )
 {
-	if( m_pPartsDocument == 0 )
-		CreatePartsDocument();
-	ASSERT( m_pPartsDocument != 0 );
-	if( m_pPartsDocument == 0 )
+	CLinkageDoc* pDoc = GetDocument();
+	ASSERT_VALID(pDoc);
+	CLinkageDoc *pPartsDoc = pDoc->GetPartsDocument( false );
+	pDoc = 0; // Don't use this elsewhere in this function!
+
+	ASSERT( pPartsDoc != 0 );
+	if( pPartsDoc == 0 )
 		return;
 
 	if( m_bShowGrid )
@@ -1644,7 +1641,7 @@ void CLinkageView::DrawPartsList( CRenderer* pRenderer )
 	
 	POSITION Position = 0;
 
-	LinkList* pLinkList = m_pPartsDocument->GetLinkList();
+	LinkList* pLinkList = pPartsDoc->GetLinkList();
 	Position = pLinkList->GetHeadPosition();
 	while( Position != NULL )
 	{
@@ -1653,14 +1650,14 @@ void CLinkageView::DrawPartsList( CRenderer* pRenderer )
 			pLink->ComputeHull();
 	}
 
-	ConnectorList* pConnectors = m_pPartsDocument->GetConnectorList();
+	ConnectorList* pConnectors = pPartsDoc->GetConnectorList();
 	Position = pConnectors->GetHeadPosition();
 	while( Position != NULL )
 	{
 		CConnector* pConnector = pConnectors->GetNext( Position );
 		if( pConnector == 0 )
 			continue;
-		DebugDrawConnector( pRenderer, m_pPartsDocument->GetViewLayers(), pConnector, m_bShowLabels );
+		DebugDrawConnector( pRenderer, pPartsDoc->GetViewLayers(), pConnector, m_bShowLabels );
 	}
 
 	static const int Steps = 2;
@@ -1674,7 +1671,7 @@ void CLinkageView::DrawPartsList( CRenderer* pRenderer )
 		{
 			CLink* pLink = pLinkList->GetNext( Position );
 			if( pLink != 0  && ( pLink->GetLayers() & StepLayers ) != 0 )
-				DrawLink( pRenderer, m_pPartsDocument->GetGearConnections(), m_pPartsDocument->GetViewLayers(), pLink, false, false, true );
+				DrawLink( pRenderer, pPartsDoc->GetGearConnections(), pPartsDoc->GetViewLayers(), pLink, false, false, true );
 		}
 	}
 
@@ -1683,7 +1680,7 @@ void CLinkageView::DrawPartsList( CRenderer* pRenderer )
 	{
 		CLink* pLink = pLinkList->GetNext( Position );
 		if( pLink != 0  )
-			DebugDrawLink( pRenderer, m_pPartsDocument->GetViewLayers(), pLink, false, true, true );
+			DebugDrawLink( pRenderer, pPartsDoc->GetViewLayers(), pLink, false, true, true );
 	}
 
 	for( int Step = 0; Step < 2; ++Step )
@@ -1695,7 +1692,7 @@ void CLinkageView::DrawPartsList( CRenderer* pRenderer )
 		{
 			CLink* pLink = pLinkList->GetNext( Position );
 			if( pLink != 0 && ( pLink->GetLayers() & StepLayers ) != 0 )
-				DrawLink( pRenderer, m_pPartsDocument->GetGearConnections(), m_pPartsDocument->GetViewLayers(), pLink, m_bShowLabels, true, false );
+				DrawLink( pRenderer, pPartsDoc->GetGearConnections(), pPartsDoc->GetViewLayers(), pLink, m_bShowLabels, true, false );
 		}
 
 		if( m_MouseAction == ACTION_STRETCH && Step == 1 )
@@ -1734,7 +1731,7 @@ void CLinkageView::DrawPartsList( CRenderer* pRenderer )
 		{
 			CConnector* pConnector = pConnectors->GetNext( Position );
 			if( pConnector != 0 && ( pConnector->GetLayers() & StepLayers ) != 0 )
-				DrawSliderTrack( pRenderer, m_pPartsDocument->GetViewLayers(), pConnector );
+				DrawSliderTrack( pRenderer, pPartsDoc->GetViewLayers(), pConnector );
 		}
 
 		Position = pLinkList->GetHeadPosition();
@@ -1742,7 +1739,7 @@ void CLinkageView::DrawPartsList( CRenderer* pRenderer )
 		{
 			CLink* pLink = pLinkList->GetNext( Position );
 			if( pLink != 0 && ( pLink->GetLayers() & StepLayers ) != 0 )
-				DrawLink( pRenderer, m_pPartsDocument->GetGearConnections(), m_pPartsDocument->GetViewLayers(), pLink, m_bShowLabels, false, false );
+				DrawLink( pRenderer, pPartsDoc->GetGearConnections(), pPartsDoc->GetViewLayers(), pLink, m_bShowLabels, false, false );
 		}
 
 		Position = pConnectors->GetHeadPosition();
@@ -1750,19 +1747,19 @@ void CLinkageView::DrawPartsList( CRenderer* pRenderer )
 		{
 			CConnector* pConnector = pConnectors->GetNext( Position );
 			if( pConnector != 0 && ( pConnector->GetLayers() & StepLayers ) != 0 )
-				DrawConnector( pRenderer, m_pPartsDocument->GetViewLayers(), pConnector, m_bShowLabels );
+				DrawConnector( pRenderer, pPartsDoc->GetViewLayers(), pConnector, m_bShowLabels );
 		}
 	}
 
-	Position = m_pPartsDocument->GetGearConnections()->GetHeadPosition();
+	Position = pPartsDoc->GetGearConnections()->GetHeadPosition();
 	while( Position != 0 )
 	{
-		CGearConnection *pGearConnection = m_pPartsDocument->GetGearConnections()->GetNext( Position );
+		CGearConnection *pGearConnection = pPartsDoc->GetGearConnections()->GetNext( Position );
 		if( pGearConnection == 0 )
 			continue;
 
 		if( pGearConnection->m_ConnectionType == pGearConnection->CHAIN )
-			DrawChain( pRenderer, m_pPartsDocument->GetViewLayers(), pGearConnection );
+			DrawChain( pRenderer, pPartsDoc->GetViewLayers(), pGearConnection );
 	}
 
 	Position = pLinkList->GetHeadPosition();
@@ -1773,18 +1770,18 @@ void CLinkageView::DrawPartsList( CRenderer* pRenderer )
 		{
 			CConnector *pConnector = pLink->GetStrokeConnector( 0 );
 			if( pConnector != 0 )
-				DrawConnector( pRenderer, m_pPartsDocument->GetViewLayers(), pConnector, m_bShowLabels, false, false, false, true );
+				DrawConnector( pRenderer, pPartsDoc->GetViewLayers(), pConnector, m_bShowLabels, false, false, false, true );
 		}
 	}
 
-	DrawStackedConnectors( pRenderer, m_pPartsDocument->GetViewLayers() );
+	DrawStackedConnectors( pRenderer, pPartsDoc->GetViewLayers() );
 
 	Position = pLinkList->GetHeadPosition();
 	while( Position != NULL )
 	{
 		CLink* pLink = pLinkList->GetNext( Position );
 		if( pLink != 0 && !pLink->IsMeasurementElement() )
-			DrawDimensions( pRenderer, m_pPartsDocument->GetGearConnections(), m_pPartsDocument->GetViewLayers(), pLink, true, true );
+			DrawDimensions( pRenderer, pPartsDoc->GetGearConnections(), pPartsDoc->GetViewLayers(), pLink, true, true );
 	}
 
 	Position = pConnectors->GetHeadPosition();
@@ -1792,10 +1789,10 @@ void CLinkageView::DrawPartsList( CRenderer* pRenderer )
 	{
 		CConnector* pConnector = pConnectors->GetNext( Position );
 		if( pConnector != 0 )
-			DrawDimensions( pRenderer, m_pPartsDocument->GetViewLayers(), pConnector, true, true );
+			DrawDimensions( pRenderer, pPartsDoc->GetViewLayers(), pConnector, true, true );
 	}
 
-	DrawGroundDimensions( pRenderer, m_pPartsDocument->GetViewLayers(), true, true );
+	DrawGroundDimensions( pRenderer, pPartsDoc->GetViewLayers(), true, true );
 
 	if( m_bSnapOn || m_bGridSnap )
 		DrawSnapLines( pRenderer );
@@ -1860,7 +1857,7 @@ void CLinkageView::DrawPartsList( CRenderer* pRenderer )
 		}
 	}
 
-	if( m_bShowSelection && m_pPartsDocument->IsSelectionAdjustable() )
+	if( m_bShowSelection && pPartsDoc->IsSelectionAdjustable() )
 		DrawAdjustmentControls( pRenderer );
 
 	if( m_bShowData && m_bShowSelection )
@@ -4385,7 +4382,11 @@ void CLinkageView::OnViewParts()
 	m_bShowParts = !m_bShowParts;
 	m_bAllowEdit = !m_bShowParts;
 	if( m_bShowParts )
-		CreatePartsDocument();
+	{
+		CLinkageDoc* pDoc = GetDocument();
+		ASSERT_VALID(pDoc);
+		pDoc->GetPartsDocument( true );
+	}
 	InvalidateRect( 0 );
 }
 
@@ -8028,15 +8029,3 @@ void CLinkageView::UpdateForDocumentChange( void )
 	ShowSelectedElementCoordinates();
 	InvalidateRect( 0 );
 }
-
-void CLinkageView::CreatePartsDocument( void )
-{
-	if( m_pPartsDocument != 0 )
-		delete m_pPartsDocument;
-		
-	CLinkageDoc* pDoc = GetDocument();
-	ASSERT_VALID(pDoc);
-
-	m_pPartsDocument = pDoc->CreatePartsDocument();
-}
-

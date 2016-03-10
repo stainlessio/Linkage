@@ -229,6 +229,8 @@ private:
 	ConnectorList m_SelectedConnectors;
 	LinkList m_SelectedLinks;
 	GearConnectionList m_GearConnectionList;
+
+	CLinkageDoc *m_pPartsDoc;
 	
 	int m_AlignConnectorCount;
 
