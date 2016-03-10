@@ -264,7 +264,7 @@ private:
 	void PopUndo( void );
 	void PopUndoDelete( void );
 
-	void MovePartsLinkToOrigin( CLink *pPartsLink );
+	void MovePartsLinkToOrigin( CFPoint Origin, CLink *pPartsLink );
  	
 	void DeleteContents( bool bDeleteUndoInfo );
 

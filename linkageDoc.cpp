@@ -4782,7 +4782,7 @@ CLinkageDoc *CLinkageDoc::GetPartsDocument( bool bRecompute )
 	return m_pPartsDoc;
 }
 
-void CLinkageDoc::MovePartsLinkToOrigin( CLink *pPartsLink )
+void CLinkageDoc::MovePartsLinkToOrigin( CFPoint Origin, CLink *pPartsLink )
 {
 	int HullCount = 0;
 	CFPoint *pPoints = pPartsLink->GetHull( HullCount );
