@@ -1,0 +1,1189 @@
+// Microsoft Visual C++ generated resource script.
+//
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#define SPECSTRING_SUPP_H
+#define SAL_SUPP_H
+#include "afxres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// English (United States) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#pragma code_page(1252)
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+2 TEXTINCLUDE 
+BEGIN
+    "#define SPECSTRING_SUPP_H\r\n"
+    "#define SAL_SUPP_H\r\n"
+    "#include ""afxres.h""\r\0"
+END
+
+1 TEXTINCLUDE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE 
+BEGIN
+    "#ifndef APSTUDIO_INVOKED\r\n"
+    "#include ""targetver.h""\r\n"
+    "#endif\r\n"
+    "#include ""afxres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE 
+BEGIN
+    "#define _AFX_NO_OLE_RESOURCES\r\n"
+    "#define _AFX_NO_TRACKER_RESOURCES\r\n"
+    "#define _AFX_NO_PROPERTY_RESOURCES\r\n"
+    "\r\n"
+    "#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)\r\n"
+    "LANGUAGE 9, 1\r\n"
+    "#pragma code_page(1252)\r\n"
+    "#include ""res\\Linkage.rc2""  // non-Microsoft Visual C++ edited resources\r\n"
+    "#include ""afxres.rc""         // Standard components\r\n"
+    "#include ""afxprint.rc""       // printing/print preview resources\r\n"
+    "#if !defined(_AFXDLL)\r\n"
+    "#include ""afxribbon.rc""              // MFC ribbon and control bar resources\r\n"
+    "#endif\r\n"
+    "#endif\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDR_MAINFRAME           ICON                    "C:\\development\\Linkage\\res\\testx.ico"
+IDR_LINKAGTYPE          ICON                    "res\\LinkageDoc.ico"
+IDI_ICON1               ICON                    "res\\icon1.ico"
+IDI_ICON2               ICON                    "res\\icon2.ico"
+IDI_ICON3               ICON                    "res\\icon3.ico"
+IDI_ICON4               ICON                    "res\\icon4.ico"
+IDI_ICON5               ICON                    "res\\icon5.ico"
+IDI_ICON7               ICON                    "res\\icon7.ico"
+IDI_ICON9               ICON                    "res\\icon9.ico"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Bitmap
+//
+
+IDB_FILELARGE           BITMAP                  "res\\filelarge.bmp"
+IDB_FILESMALL           BITMAP                  "res\\filesmall.bmp"
+IDB_SAMPLE_GALLERY      BITMAP                  "res\\sample_gallery.bmp"
+IDB_MAIN                BITMAP                  "res\\main.bmp"
+IDB_BUTTONS             BITMAP                  "res\\buttons.bmp"
+IDB_INSERT_POPUP_GALLERY BITMAP                  "res\\popup_gallery.bmp"
+IDB_INSERT_POPUP_GALLERY2 BITMAP                  "res\\popup_gallery_2.bmp"
+IDB_PLAY                BITMAP                  "res\\play.bmp"
+IDB_BITMAP3             BITMAP                  "res\\bitmap3.bmp"
+IDB_CONNECTOR           BITMAP                  "res\\bitmap7.bmp"
+IDB_ANCHOR              BITMAP                  "res\\bitmap9.bmp"
+IDB_INPUT               BITMAP                  "res\\bitmap11.bmp"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Toolbar
+//
+
+IDR_MAINFRAME TOOLBAR 20, 20
+BEGIN
+    BUTTON      ID_FILE_NEW
+    BUTTON      ID_FILE_OPEN
+    BUTTON      ID_FILE_SAVE
+    SEPARATOR
+    BUTTON      ID_FILE_PRINT
+    SEPARATOR
+    BUTTON      ID_EDIT_CUT
+    BUTTON      ID_EDIT_COPY
+    BUTTON      ID_EDIT_PASTE
+    BUTTON      ID_EDIT_DELETESELECTED
+    SEPARATOR
+    BUTTON      ID_EDIT_UNDO
+    SEPARATOR
+    BUTTON      ID_VIEW_LABELS
+    BUTTON      ID_VIEW_DATA
+    BUTTON      ID_VIEW_ZOOMIN
+    BUTTON      ID_VIEW_ZOOMOUT
+    SEPARATOR
+    BUTTON      ID_SIMULATION_RUN
+    BUTTON      ID_SIMULATION_STOP
+    BUTTON      ID_SIMULATION_SIMULATE
+    SEPARATOR
+    BUTTON      ID_EDIT_CONNECT
+    BUTTON      ID_EDIT_JOIN
+    BUTTON      ID_EDIT_SPLIT
+    BUTTON      ID_EDIT_COMBINE
+    BUTTON      ID_EDIT_SLIDE
+    SEPARATOR
+    BUTTON      ID_INSERT_CONNECTOR
+    BUTTON      ID_INSERT_SLIDER
+    BUTTON      ID_INSERT_DOUBLE
+    BUTTON      ID_INSERT_TRIPLE
+    BUTTON      ID_INSERT_ANCHOR
+    BUTTON      ID_INSERT_ROTATINGANCHOR
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Menu
+//
+
+IDR_MAINFRAME MENU
+BEGIN
+    POPUP "&File"
+    BEGIN
+        MENUITEM "&New\tCtrl+N",                ID_FILE_NEW
+        MENUITEM "&Open...\tCtrl+O",            ID_FILE_OPEN
+        MENUITEM "&Save\tCtrl+S",               ID_FILE_SAVE
+        MENUITEM "Save &As...",                 ID_FILE_SAVE_AS
+        MENUITEM SEPARATOR
+        POPUP "Samples"
+        BEGIN
+            MENUITEM "Examples",                    ID_HELP_LOADEXAMPLE1
+        END
+        MENUITEM SEPARATOR
+        MENUITEM "&Print...\tCtrl+P",           ID_FILE_PRINT
+        MENUITEM "Print Pre&view",              ID_FILE_PRINT_PREVIEW
+        MENUITEM "P&rint Setup...",             ID_FILE_PRINT_SETUP
+        MENUITEM SEPARATOR
+        MENUITEM "Recent File",                 ID_FILE_MRU_FILE1
+        MENUITEM SEPARATOR
+        MENUITEM "E&xit",                       ID_APP_EXIT
+    END
+    POPUP "&Edit"
+    BEGIN
+        MENUITEM "&Undo\tCtrl+Z",               ID_EDIT_UNDO
+        MENUITEM SEPARATOR
+        MENUITEM "Cu&t\tCtrl+X",                ID_EDIT_CUT
+        MENUITEM "&Copy\tCtrl+C",               ID_EDIT_COPY
+        MENUITEM "&Paste\tCtrl+V",              ID_EDIT_PASTE
+        MENUITEM "&Delete\tDel",                ID_EDIT_DELETESELECTED
+        MENUITEM SEPARATOR
+        MENUITEM "Select &All\tCtrl-A",         ID_EDIT_SELECT_ALL
+        MENUITEM SEPARATOR
+        MENUITEM "Connect",                     ID_EDIT_CONNECT
+        MENUITEM "Join",                        ID_EDIT_JOIN
+        MENUITEM "Combine",                     ID_EDIT_COMBINE
+        MENUITEM "Slide",                       ID_EDIT_SLIDE
+        MENUITEM "Split",                       ID_EDIT_SPLIT
+        MENUITEM SEPARATOR
+        POPUP "&Insert Link"
+        BEGIN
+            MENUITEM "&Single",                     ID_INSERT_CONNECTOR
+            MENUITEM "&Double",                     ID_INSERT_DOUBLE
+            MENUITEM "&Triple",                     ID_INSERT_TRIPLE
+            MENUITEM "&Anchor",                     ID_INSERT_ANCHOR
+            MENUITEM "&Rotator",                    ID_INSERT_ROTATINGANCHOR
+            MENUITEM "Slider",                      ID_INSERT_SLIDER
+            MENUITEM "Actuator",                    ID_INSERT_ACTUATOR
+        END
+        MENUITEM SEPARATOR
+        MENUITEM "Properties...",               ID_EDIT_PROPERTIES
+    END
+    POPUP "&View"
+    BEGIN
+        MENUITEM "Zoom &In\t+",                 ID_VIEW_ZOOMIN
+        MENUITEM "Zoom &Out\t-",                ID_VIEW_ZOOMOUT
+        MENUITEM "Zoom 100%",                   ID_VIEW_ZOOMFIT
+        MENUITEM SEPARATOR
+        MENUITEM "&Labels",                     ID_VIEW_LABELS
+        MENUITEM "&Data",                       ID_VIEW_DATA
+        MENUITEM "&Debugging Stuff",            ID_VIEW_DEBUG
+        MENUITEM SEPARATOR
+        MENUITEM "&Toolbar",                    ID_VIEW_TOOLBAR
+        MENUITEM "&Status Bar",                 ID_VIEW_STATUS_BAR
+    END
+    POPUP "Mechanism"
+    BEGIN
+        MENUITEM "&Animate",                    ID_SIMULATION_RUN
+        MENUITEM "&Simulate",                   ID_SIMULATION_SIMULATE
+        MENUITEM "Simulate Interactive",        ID_SIMULATE_INTERACTIVE
+    END
+    POPUP "&Help"
+    BEGIN
+        MENUITEM "User's Guide",                ID_HELP_USERGUIDE
+        MENUITEM SEPARATOR
+        MENUITEM "&About linkage...",           ID_APP_ABOUT
+    END
+END
+
+IDR_POPUP_EDIT MENU
+BEGIN
+    POPUP "Edit"
+    BEGIN
+        MENUITEM "Cu&t\tCtrl+X",                ID_EDIT_CUT
+        MENUITEM "&Copy\tCtrl+C",               ID_EDIT_COPY
+        MENUITEM "&Paste\tCtrl+V",              ID_EDIT_PASTE
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Accelerator
+//
+
+IDR_MAINFRAME ACCELERATORS
+BEGIN
+    VK_RETURN,      ID_ACCELERATOR39004,    VIRTKEY, NOINVERT
+    "A",            ID_EDIT_ADDCONNECTOR,   VIRTKEY, NOINVERT
+    "B",            ID_EDIT_COMBINE,        VIRTKEY, NOINVERT
+    "C",            ID_EDIT_CONNECT,        VIRTKEY, NOINVERT
+    "C",            ID_EDIT_COPY,           VIRTKEY, CONTROL, NOINVERT
+    VK_INSERT,      ID_EDIT_COPY,           VIRTKEY, CONTROL, NOINVERT
+    VK_DELETE,      ID_EDIT_CUT,            VIRTKEY, SHIFT, NOINVERT
+    "X",            ID_EDIT_CUT,            VIRTKEY, CONTROL, NOINVERT
+    VK_DELETE,      ID_EDIT_DELETESELECTED, VIRTKEY, NOINVERT
+    "F",            ID_EDIT_FASTEN,         VIRTKEY, NOINVERT
+    "U",            ID_EDIT_UNFASTEN,       VIRTKEY, NOINVERT
+    "J",            ID_EDIT_JOIN,           VIRTKEY, NOINVERT
+    "V",            ID_EDIT_PASTE,          VIRTKEY, CONTROL, NOINVERT
+    VK_INSERT,      ID_EDIT_PASTE,          VIRTKEY, SHIFT, NOINVERT
+    "A",            ID_EDIT_SELECT_ALL,     VIRTKEY, CONTROL, NOINVERT
+    "L",            ID_EDIT_SLIDE,          VIRTKEY, NOINVERT
+    VK_BACK,        ID_EDIT_UNDO,           VIRTKEY, ALT, NOINVERT
+    "Z",            ID_EDIT_UNDO,           VIRTKEY, CONTROL, NOINVERT
+    "N",            ID_FILE_NEW,            VIRTKEY, CONTROL, NOINVERT
+    "O",            ID_FILE_OPEN,           VIRTKEY, CONTROL, NOINVERT
+    "P",            ID_FILE_PRINT,          VIRTKEY, CONTROL, NOINVERT
+    "S",            ID_FILE_SAVE,           VIRTKEY, CONTROL, NOINVERT
+    "P",            ID_PROPERTIES_PROPERTIES, VIRTKEY, NOINVERT
+    VK_TAB,         ID_SELECT_NEXT,         VIRTKEY, NOINVERT
+    "<",            ID_SIMULATE_BACKWARD,   ASCII,  NOINVERT
+    "[",            ID_SIMULATE_BACKWARD,   ASCII,  NOINVERT
+    //VK_LEFT,        ID_SIMULATE_BACKWARD,   VIRTKEY, NOINVERT
+    //VK_LEFT,        ID_SIMULATE_BACKWARD_BIG, VIRTKEY, SHIFT, NOINVERT
+    ">",            ID_SIMULATE_FORWARD,    ASCII,  NOINVERT
+    "]",            ID_SIMULATE_FORWARD,    ASCII,  NOINVERT
+    //VK_RIGHT,       ID_SIMULATE_FORWARD,    VIRTKEY, NOINVERT
+    //VK_RIGHT,       ID_SIMULATE_FORWARD_BIG, VIRTKEY, SHIFT, NOINVERT
+    "R",            ID_SIMULATION_RUN,      VIRTKEY, NOINVERT
+    "S",            ID_SIMULATION_STOP,     VIRTKEY, NOINVERT
+    VK_ESCAPE,      ID_SIMULATION_STOP,     VIRTKEY, NOINVERT
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_CONNECTOR_PROPERTIES DIALOGEX 0, 0, 245, 247
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Connector Properties"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    LTEXT           "Name:",IDC_NAMEPROMPT,51,18,22,8
+    EDITTEXT        IDC_EDIT3,76,16,117,12,ES_AUTOHSCROLL
+    CONTROL         "Connector",IDC_RADIO1,"Button",BS_AUTORADIOBUTTON | WS_GROUP | WS_TABSTOP,51,38,49,10
+    CONTROL         "Anchor",IDC_RADIO3,"Button",BS_AUTORADIOBUTTON,51,72,39,10
+    CONTROL         "Rotating Anchor of RPM:",IDC_RADIO5,"Button",BS_AUTORADIOBUTTON,51,93,95,10
+    EDITTEXT        IDC_EDIT1,151,92,42,12,ES_AUTOHSCROLL
+    CONTROL         "Always Manual Operation",IDC_CHECK2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,67,106,97,10
+    CONTROL         "Draw Motion Path",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,67,51,73,10
+    LTEXT           "Coordinates:",IDC_STATIC,51,179,42,8
+    EDITTEXT        IDC_EDIT2,96,177,43,12,ES_AUTOHSCROLL
+    LTEXT           ",",IDC_STATIC,142,179,8,8
+    EDITTEXT        IDC_EDIT4,150,177,43,12,ES_AUTOHSCROLL
+    DEFPUSHBUTTON   "OK",IDOK,48,227,66,14
+    PUSHBUTTON      "Cancel",IDCANCEL,130,227,66,14
+    EDITTEXT        IDC_EDIT7,151,126,42,12,ES_AUTOHSCROLL
+    CONTROL         "Slide Path Radius:",IDC_CHECK4,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,51,128,73,10
+    LTEXT           "Slide Path Minimum Radius:",IDC_SLIDERADIUSMINPROMPT,51,140,91,8
+    LTEXT           "Static",IDC_SLIDRADIUSMINVALUE,155,141,33,8
+    LTEXT           "Fastened to Link",IDC_FASTENEDTO,51,200,139,8
+    LTEXT           "Color:",IDC_STATIC,51,159,20,8
+    CONTROL         "",IDC_COLOR,"Static",SS_GRAYRECT | SS_NOTIFY,139,156,53,13
+END
+
+IDD_SELECT_IMAGE_OPTION DIALOGEX 0, 0, 249, 75
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Dialog"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    PUSHBUTTON      "Cancel",IDCANCEL,192,54,50,14
+END
+
+IDD_LINK_PROPERTIES DIALOGEX 0, 0, 245, 217
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Link Properties"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    LTEXT           "Name:",IDC_NAMEPROMPT,51,18,22,8
+    EDITTEXT        IDC_EDIT3,76,16,117,12,ES_AUTOHSCROLL
+    CONTROL         "Actuator of CPM:",IDC_CHECK2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,51,38,67,10
+    EDITTEXT        IDC_EDIT2,140,37,53,12,ES_AUTOHSCROLL
+    LTEXT           "Throw Distance:",IDC_THROWDISTANCEPROMPT,51,51,53,8
+    EDITTEXT        IDC_EDIT5,140,50,53,12,ES_AUTOHSCROLL
+    CONTROL         "Always Manual Operation",IDC_CHECK3,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,51,64,97,10
+    LTEXT           "Line Size:",IDC_RPMPROMPT,51,85,31,8
+    EDITTEXT        IDC_EDIT1,140,83,53,12,ES_AUTOHSCROLL
+    CONTROL         "",IDC_SPIN1,"msctls_updown32",UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS,197,83,11,14
+    CONTROL         "Solid",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,51,98,32,10
+    DEFPUSHBUTTON   "OK",IDOK,49,198,66,14
+    PUSHBUTTON      "Cancel",IDCANCEL,128,198,66,14
+    CONTROL         "Gear",IDC_CHECK5,"Button",BS_AUTOCHECKBOX | WS_DISABLED | WS_TABSTOP,51,147,31,10
+    LTEXT           "Fastened to Link",IDC_FASTENEDTO,51,171,139,8
+    LTEXT           "Color:",IDC_COLORPROMPT,52,112,20,8
+    CONTROL         "",IDC_COLOR,"Static",SS_GRAYRECT | SS_NOTIFY,139,109,53,13
+    CONTROL         "Locked",IDC_LOCKED,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,51,131,38,10
+END
+
+IDD_ABOUT DIALOGEX 0, 0, 274, 113
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "About Linkage"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,104,94,66,14
+    CONTROL         IDB_BITMAP3,IDC_STATIC,"Static",SS_BITMAP,25,20,32,30
+    LTEXT           "Linkage Mechanism Designer and Simulator",IDC_TITLE,80,18,172,12
+    LTEXT           "Static",IDC_VERSION,80,30,164,8
+    LTEXT           "Copyright © 2000 - 2016, David M. Rector\nrectorsquid@gmail.com\nwww.linkagesimulator.com",IDC_COPYRIGHT,80,41,164,27
+END
+
+IDD_START_RECORD DIALOGEX 0, 0, 243, 248
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Record Video"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    LTEXT           "Press the Record button to begin the simulation and start recording the video. Press the Stop button in the Ribbon Bar to stop recording.",IDC_STATIC,42,11,168,31
+    LTEXT           "Select a Video Encoder:",IDC_STATIC,27,158,76,8
+    COMBOBOX        IDC_COMBO1,26,169,188,161,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    DEFPUSHBUTTON   "Record",IDOK,61,228,52,14
+    PUSHBUTTON      "Cancel",IDCANCEL,127,228,52,14
+    CONTROL         IDB_BITMAP5,IDC_STATIC,"Static",SS_BITMAP,17,13,21,20
+    COMBOBOX        IDC_COMBO2,26,138,188,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    LTEXT           "Quality:",IDC_STATIC,27,125,26,8
+    CONTROL         "Start Pause Time:",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,27,56,73,10
+    EDITTEXT        IDC_EDIT1,110,55,104,13,ES_AUTOHSCROLL
+    CONTROL         "Record Time:",IDC_CHECK2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,27,79,58,10
+    EDITTEXT        IDC_EDIT2,110,77,104,13,ES_AUTOHSCROLL
+    CONTROL         "End Pause Time:",IDC_CHECK3,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,27,101,69,10
+    EDITTEXT        IDC_EDIT3,110,99,104,13,ES_AUTOHSCROLL
+    PUSHBUTTON      "Configure Video Encoder",IDC_BUTTON1,70,191,101,14
+END
+
+IDD_ANGLE DIALOGEX 0, 0, 157, 75
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Set Angle"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    LTEXT           "Angle:",IDC_STATIC,44,24,22,8
+    EDITTEXT        IDC_EDIT1,66,22,46,12,ES_AUTOHSCROLL
+    DEFPUSHBUTTON   "OK",IDOK,27,55,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,81,55,50,14
+END
+
+IDD_POINT_PROPERTIES DIALOGEX 0, 0, 245, 135
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Point Properties"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    LTEXT           "Name:",IDC_NAMEPROMPT,51,18,22,8
+    EDITTEXT        IDC_EDIT3,76,16,117,12,ES_AUTOHSCROLL
+    LTEXT           "Coordinates:",IDC_STATIC,51,56,42,8
+    EDITTEXT        IDC_EDIT2,96,54,43,12,ES_AUTOHSCROLL
+    LTEXT           ",",IDC_STATIC,142,56,8,8
+    EDITTEXT        IDC_EDIT4,150,54,43,12,ES_AUTOHSCROLL
+    DEFPUSHBUTTON   "OK",IDOK,49,115,66,14
+    PUSHBUTTON      "Cancel",IDCANCEL,128,115,66,14
+    CONTROL         "Draw Circle",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,51,36,52,10
+    LTEXT           "Radius:",IDC_RADIUSPROMPT,121,37,25,8
+    EDITTEXT        IDC_EDIT6,150,35,43,12,ES_AUTOHSCROLL
+    LTEXT           "Fastened to Link",IDC_FASTENEDTO,51,92,139,8
+    LTEXT           "Color:",IDC_STATIC,51,76,20,8
+    CONTROL         "",IDC_COLOR,"Static",SS_GRAYRECT | SS_NOTIFY,140,73,53,13
+END
+
+IDD_DRAWINGLINK_PROPERTIES DIALOGEX 0, 0, 245, 145
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Line Properties"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    LTEXT           "Name:",IDC_NAMEPROMPT,51,18,22,8
+    EDITTEXT        IDC_EDIT3,76,16,117,12,ES_AUTOHSCROLL
+    LTEXT           "Line Size:",IDC_RPMPROMPT,51,57,31,8
+    EDITTEXT        IDC_EDIT1,140,55,53,12,ES_AUTOHSCROLL
+    CONTROL         "",IDC_SPIN1,"msctls_updown32",UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS,198,54,18,14
+    CONTROL         "Measurement Line",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,51,38,74,10
+    DEFPUSHBUTTON   "OK",IDOK,49,126,66,14
+    PUSHBUTTON      "Cancel",IDCANCEL,128,126,66,14
+    LTEXT           "Color:",IDC_STATIC,51,76,20,8
+    LTEXT           "Fastened to Link",IDC_FASTENEDTO,51,98,139,8
+    CONTROL         "",IDC_COLOR,"Static",SS_GRAYRECT | SS_NOTIFY,140,73,53,13
+END
+
+IDD_GEAR_RATIO_DIALOG DIALOGEX 0, 0, 239, 160
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Gear Size Ratio"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    RTEXT           "First Selected Gear",IDC_STATIC,32,58,79,8
+    LTEXT           "Second Selected Gear",IDC_STATIC,127,58,71,8
+    RTEXT           "Link Name",IDC_NAME1,32,69,79,8
+    LTEXT           "Link Name",IDC_NAME2,127,69,33,8
+    EDITTEXT        IDC_EDIT1,71,83,40,13,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT7,127,83,40,13,ES_AUTOHSCROLL
+    CONTROL         "Gears",IDC_RADIO1,"Button",BS_AUTORADIOBUTTON | WS_GROUP | WS_TABSTOP,93,29,35,10
+    CONTROL         "Chain / Belt",IDC_RADIO2,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,93,40,53,10
+    DEFPUSHBUTTON   "OK",IDOK,51,141,60,14
+    PUSHBUTTON      "Cancel",IDCANCEL,127,141,60,14
+    LTEXT           ":",IDC_STATIC,118,85,8,8
+    CTEXT           "Set the size ratio of the gears.",IDC_STATIC,67,14,104,11
+    CONTROL         "Use Values as Radii",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,81,106,85,10
+END
+
+IDD_EXPORTIMAGE DIALOGEX 0, 0, 727, 438
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Export Image Settings"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    CONTROL         "",IDC_PREVIEW,"Static",SS_BLACKRECT,7,7,713,401
+    LTEXT           "Resolution:",IDC_STATIC,26,420,37,8
+    CONTROL         "1920x1200",IDC_RADIO1,"Button",BS_AUTORADIOBUTTON | WS_GROUP | WS_TABSTOP,70,418,49,13
+    CONTROL         "960x600",IDC_RADIO3,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,125,418,42,13
+    CONTROL         "640x400",IDC_RADIO2,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,173,418,44,13
+    CONTROL         "100x100",IDC_RADIO7,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,222,418,44,13
+    LTEXT           "Scale Factor:",IDC_STATIC,295,420,43,8
+    EDITTEXT        IDC_EDIT1,345,418,49,13,ES_AUTOHSCROLL
+    CONTROL         "",IDC_SPIN1,"msctls_updown32",UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS,384,417,11,14
+    LTEXT           "Margin:",IDC_STATIC,418,420,25,8
+    EDITTEXT        IDC_EDIT7,449,418,49,13,ES_AUTOHSCROLL
+    CONTROL         "",IDC_SPIN2,"msctls_updown32",UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS,494,417,11,14
+    DEFPUSHBUTTON   "Save",IDOK,584,417,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,639,417,50,14
+    PUSHBUTTON      "Copy",IDC_BUTTON1,528,417,50,14
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION 3,1,4,0
+ PRODUCTVERSION 3,1,4,0
+ FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+ FILEFLAGS 0x1L
+#else
+ FILEFLAGS 0x0L
+#endif
+ FILEOS 0x4L
+ FILETYPE 0x1L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "080004e4"
+        BEGIN
+            VALUE "FileDescription", "linkage Application"
+            VALUE "FileVersion", "3.1.4.0"
+            VALUE "InternalName", "Linkage"
+            VALUE "LegalCopyright", "Copyright © 2002 - 2016 David Rector"
+            VALUE "OriginalFilename", "Linkage.exe"
+            VALUE "ProductName", "linkage Application"
+            VALUE "ProductVersion", "3.1.4.0"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x800, 1252
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO
+BEGIN
+    IDD_CONNECTOR_PROPERTIES, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 236
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 231
+    END
+
+    IDD_SELECT_IMAGE_OPTION, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 242
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 68
+    END
+
+    IDD_LINK_PROPERTIES, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 234
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 210
+    END
+
+    IDD_ABOUT, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 267
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 106
+    END
+
+    IDD_START_RECORD, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 232
+        VERTGUIDE, 120
+        TOPMARGIN, 7
+    END
+
+    IDD_ANGLE, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 150
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 68
+    END
+
+    IDD_POINT_PROPERTIES, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 236
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 128
+    END
+
+    IDD_DRAWINGLINK_PROPERTIES, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 234
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 138
+    END
+
+    IDD_GEAR_RATIO_DIALOG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 232
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 144
+    END
+
+    IDD_EXPORTIMAGE, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 720
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 431
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// AFX_DIALOG_LAYOUT
+//
+
+IDD_LINK_PROPERTIES AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE
+BEGIN
+    ID_INSERT_CONNECTOR     "Add a single lone connector.\nInsert Connector"
+    ID_INSERT_ANCHOR        "Add a single lone anchor.\nInsert Anchor"
+    ID_EDIT_PROPERTIES      "Modifies the properties of the selected connector.\nProperties"
+    ID_EDIT_JOIN            "Convert the selected connectors into a single connector.\nJoin Connectors"
+    ID_EDIT_GRIDSNAP        "Snap to align with an invisible grid.\nGrid Snap"
+    ID_VIEW_DIMENSIONS      "View dimensions.\nView Dimensions"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_SAMPLE_LINK3        "Complex drawing mechanism using sliding connectors.\nSmile 2"
+    IDS_SAMPLE_LINK4        "Sliding link drawing mechanism with solid links.\nSliding Link 3"
+    IDS_RIBBON_DIMENSIONS   "Auto Dimensions"
+    ID_EDIT_LOCK            "Lock the size and shape of a link.\nLock"
+    IDS_RIBBON_LOCK         "Lock"
+END
+
+STRINGTABLE
+BEGIN
+    ID_INSERT_MEASUREMENT   "Add a measurement line to the drawing layer.\nInsert Measurement"
+    IDS_RIBBON_INSERTMEASUREMENT "Measurement"
+    IDS_SAMPLE_THROW        "Linear actuator throw distance test.\nThrow Distance Test"
+    IDS_SAMPLE_PISTON       "Piston and crank mechanism.\nPiston and Crank Mechanism"
+    IDS_RIBBON_FASTEN       "Fasten\nf"
+    ID_EDIT_FASTEN          "Fasten the selected drawing elements or gears to the selected link.\nFasten"
+    ID_INSERT_ANCHORLINK    "Add a link with an anchor and a connector.\nInsert Anchor Link"
+    IDS_SAMPLE_LIFTER       "Two-stage ball lifting mechanism.\nBall Lifter"
+END
+
+STRINGTABLE
+BEGIN
+    ID_INSERT_GEAR          "Add a gear to the mechanism.\nInsert Gear"
+    IDS_RIBBON_INSERTGEAR   "Gear"
+    IDS_RIBBON_UNFASTEN     "Unfasten\nf"
+    ID_EDIT_UNFASTEN        "Unfasten the selected drawing elements or gears.\nUnfasten"
+    IDS_SAMPLE_FOURGEARS    "Four gear reduction mechanism.\nFour Gears"
+    IDS_SAMPLE_ORBITGEARS   "Sun-planet-moon orbit gear and chain mechanism.\nOrbit Machine"
+    IDS_SAMPLE_OSCILLATORGEARS 
+                            "Applified rocking motion mechanism.\nAmplified Rocking"
+	IDS_SAMPLE_STEPHENSON	"Stephenson valve gear.\nStephenson Valve Gear"
+	IDS_SAMPLE_PEAUCELLIER	"Peaucellier straight link mechanism.\Peaucellier Mechanism"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_RIBBON_PAUSE        "Pause"
+    ID_SIMULATION_PAUSE     "Pause the simulation or start it in a paused state.\nPause Simulation"
+    IDS_RIBBON_FORWARD      "Forward"
+    ID_SIMULATE_FORWARD     "Step the simulation forward 0.033 (1/30) seconds.\nStep Forward"
+    IDS_RIBBON_BACKWARD     "Backward"
+    ID_SIMULATE_BACKWARD    "Step the simulation backwards 0.033 (1/30) seconds.\nStep Backward"
+    ID_EDIT_SET_RATIO       "Set the gear or chain/pulley ratio.\nSet Ratio"
+    IDS_RIBBON_SET_RATIO    "Set Ratio"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_RIBBON_SOLIDLINKS   "New Links Solid"
+    ID_VIEW_SOLIDLINKS      "Show any new links as solid.\nNew Links Solid"
+    IDS_SAMPLE_CURVEDSLIDER "Curved path sliding connector.\nCurved Slide Path 1."
+    IDS_SAMPLE_CURVEDSLIDER2 
+                            "Curved path sliding connector with moving path.\nCurved Slide Path 2."
+    IDS_SAMPLE_CHEBYSHEV    "Chebyshev straight link mechanism.\nChebyshev Mechanism."
+END
+
+STRINGTABLE
+BEGIN
+    IDS_RIBBON_VIEWDRAWING  "Drawing"
+    ID_VIEW_MECHANISM       "View the mechanism layer.\nView Mechanism"
+    IDS_RIBBON_VIEWMECHANISM "Mechanism"
+    ID_INSERT_POINT         "Add a point to the drawing layer.\nInsert Point"
+    ID_INSERT_LINE          "Add a line to the drawing layer.\nInsert Line"
+    IDS_RIBBON_INSERT_POINT "Dot"
+    IDS_RIBBON_INSERT_LINE  "Line"
+    ID_EDIT_DRAWING         "Edit the drawing layer.\nEdit Drawing"
+    IDS_RIBBON_EDITDRAWING  "Drawing"
+    ID_EDIT_MECHANISM       "Edit the mechanism layer.\nEdit Mechanism"
+    IDS_RIBBON_EDITMECHANISM "Mechanism"
+    ID_ALIGN_SNAPBUTTON     "Enable grid snap, element snap, and auto join options.\nSnap"
+    IDS_RIBBON_UNDO         "Undo"
+    ID_ALIGN_DETAILSBUTTON  "Show and hide machanism details like labels, dimensions, angle hints, etc.\nDetails"
+    ID_EDIT_ADDCONNECTOR    "Add a connector the the selected link.\nAdd Connector"
+    IDS_RIBBON_ADDCONNECTOR "Add"
+END
+
+STRINGTABLE
+BEGIN
+    ID_EDIT_AUTOJOIN        "Automatically join connectors when one is dragged to the same location as another and dropped.\nAuto Join"
+    IDS_RIBBON_AUTOJOIN     "Auto Join"
+    IDS_RIBBON_EVENSPACE    "Even Space"
+    ID_ALIGN_EVENSPACE      "Align the selected connectors in a line and space them evenly. Connectors are lined up between the first and last selected.\nEven Space"
+    IDS_MENU_SAMPLE_GALLERY "Samples"
+    ID_FILE_SAVEIMAGE       "Export an image of the mechanism.\nCExport Image"
+    IDS_RIBBON_SAVEIMAGE    "Export Image..."
+    IDS_RIBBON_SETANGLE     "Set Angle"
+    ID_ALIGN_SETANGLE       "Align the selected connectors to form the specified angle.\nSet Angle"
+    ID_VIEW_DRAWING         "View the drawing layer.\nView Drawing"
+END
+
+STRINGTABLE
+BEGIN
+    ID_EDIT_CLEAR           "Erase the selection.\nErase"
+    ID_EDIT_CLEAR_ALL       "Erase everything.\nErase All"
+    ID_EDIT_COPY            "Copy the selection and put it on the Clipboard.\nCopy"
+    ID_EDIT_CUT             "Cut the selection and put it on the Clipboard.\nCut"
+    ID_EDIT_FIND            "Find the specified text.\nFind"
+    ID_EDIT_PASTE           "Insert the Clipboard contents into the mechanism.\nPaste"
+    ID_EDIT_REPEAT          "Repeat the last action.\nRepeat"
+    ID_EDIT_REPLACE         "Replace specific text with different text.\nReplace"
+    ID_EDIT_SELECT_ALL      "Select all links and connectors.\nSelect All"
+    ID_EDIT_UNDO            "Undo the last action.\nUndo"
+    ID_EDIT_REDO            "Redo the previously undone action.\nRedo"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_RIBBON_ZOOM         "Zoom"
+    IDS_RIBBON_ZOOMFIT      "Fit"
+    IDS_RIBBON_SNAP         "Object"
+    ID_INSERT_SLIDER        "Add a single lone sliding connector.\nInsert Sliding Connector"
+    ID_INSERT_LINK2         "Add a link with two connectors.\nInsert Link"
+    ID_INSERT_LINK3         "Add a link with three connectors.\nInsert 3-Connector Link"
+    ID_INSERT_LINK4         "Add a link with four connectors.\nInsert 4-Connector Link"
+    ID_INSERT_INPUT         "Add a link with a rotating input anchor and a connector.\nInsert Input Link"
+    IDS_RIBBON_INSERT_CONNECTOR "Connector"
+    IDS_RIBBON_INSERT_SLIDER "Slider"
+    IDS_RIBBON_INSERT_LINK2 "Link"
+    IDS_RIBBON_INSERT_LINK3 "Triangle"
+    IDS_RIBBON_INSERT_ANCHOR "Anchor"
+    IDS_RIBBON_INSERT_INPUT "Input"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_RIBBON_INSERT_ANCHORLINK "Anchor Link"
+    IDS_SAMPLE_DOUBLECURVESLIDE 
+                            "Link on curved path pushed into position by a curved path sliding connector.\nCurved Link Path."
+    IDS_RIBBON_EXPORT       "Export"
+    IDS_RIBBON_EXPORT_LABEL "Export the Mechanism"
+    ID_FILE_SAVEDXF         "Export the mechanism in DXF format.\nExport DXF"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_RIBBON_INSERTBUTTON "Elements"
+    ID_EDIT_INSERTBUTTON    "Insert one of a variety of elements into the mechanism.\nInsert"
+    IDS_RIBBON_SAMPLE_GALLERY "Gallery"
+    IDS_RIBBON_INSERT_LINK4 "Quad\n"
+    IDS_RIBBON_PRINTING     "&Printing"
+    IDS_RIBBON_PRINTOPTIONS "Options"
+    IDS_RIBBON_PRINTFULL    "Actual Size"
+END
+
+STRINGTABLE
+BEGIN
+    ID_FILE_PRINTFULL       "Print multiple sheets with the mechanism printed actual size.\nActual Size"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_RIBBON_SETTINGS     "Settings"
+    IDS_RIBBON_SETTINGSOPTIONS "Options"
+    IDS_RIBBON_VIEW_LARGEFONT "Large Text"
+	IDS_RIBBON_VIEW_GRID		"Show Grid"
+	IDS_RIBBON_VIEW_PARTS		"Parts List"
+END
+
+STRINGTABLE
+BEGIN
+    ID_HELP_USERGUIDE_TIP   "Help"
+    ID_HELP_USERGUIDE_DESCRIPTION "Open the User Guide document."
+    IDS_RIBBON_PROPERTIES_PROPERTIES "Properties\np"
+    ID_PROPERTIES_PROPERTIES 
+                            "Edit the properties of the selected element.\nEdit Properties"
+    IDS_RIBBON_SIMULATEMANUAL "Manual"
+    ID_SIMULATE_MANUAL      "Run the simulation with interactive movement of the entire mechanism and no automatic movement.\nSimulate Manual"
+    IDS_RIBBON_GRIDSNAP     "Grid"
+    ID_HELP_ABOUT_TIP       "About"
+    ID_HELP_ABOUT_DESCRIPTION "Show version information about this program."
+    IDS_RIBBON_ANGLES       "Angles"
+END
+
+STRINGTABLE
+BEGIN
+    AFX_IDS_APP_TITLE       "Linkage"
+    AFX_IDS_IDLEMESSAGE     "Ready"
+END
+
+STRINGTABLE
+BEGIN
+    ID_INDICATOR_EXT        "EXT"
+    ID_INDICATOR_CAPS       "CAP"
+    ID_INDICATOR_NUM        "NUM"
+    ID_INDICATOR_SCRL       "SCRL"
+    ID_INDICATOR_OVR        "OVR"
+    ID_INDICATOR_REC        "REC"
+END
+
+STRINGTABLE
+BEGIN
+    ID_FILE_NEW             "Create a new document.\nNew"
+    ID_FILE_OPEN            "Open an existing document.\nOpen"
+    ID_FILE_CLOSE           "Close the active document.\nClose"
+    ID_FILE_SAVE            "Save the active document.\nSave"
+    ID_FILE_SAVE_AS         "Save the active document with a new name.\nSave As"
+    ID_FILE_PAGE_SETUP      "Change the printing options.\nPage Setup"
+    ID_FILE_PRINT_SETUP     "Change the printer and printing options.\nPrint Setup"
+    ID_FILE_PRINT           "Print the active document.\nPrint"
+    ID_FILE_PRINT_DIRECT    "Print the active document using current options.\nQuick Print"
+    ID_FILE_PRINT_PREVIEW   "Display full pages.\nPrint Preview"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_RIBBON_RIGHTANGLE   "Right Angle"
+    IDS_RIBBON_RECTANGLE    "Rectangle"
+    IDS_RIBBON_PARALLELOGRAM "Parallelogram"
+    IDS_RIBBON_HORIZONTAL   "Horizontal"
+    IDS_RIBBON_VERTICAL     "Vertical"
+    IDS_RIBBON_LINEUP       "Line Up"
+    ID_FILE_SAVEVIDEO       "Export a video of the mechanism movement.\nCExport Video"
+    IDS_RIBBON_SAVEVIDEO    "Export Video..."
+END
+
+STRINGTABLE
+BEGIN
+    IDS_RIBBON_SAVEDXF      "Export to DXF..."
+    ID_FILE_SAVEMOTION      "Export the motion paths from the simulation.\nCExport Motion paths"
+    IDS_RIBBON_SAVEMOTION   "Export Motion Paths..."
+END
+
+STRINGTABLE
+BEGIN
+    IDS_RIBBON_VIEW_ANICROP "Video Area"
+    IDS_RIBBON_VIEW_UNITS   "Units"
+    IDS_RIBBON_VIEW_BOLD    "Bold"
+    ID_VIEW_BOLD            "Show the mechanism twice size including line thickness, font sizes, etc.\nBold"
+    IDS_RIBBON_DIM          "Dimension"
+    IDS_RIBBON_FLIPH        "Flip Horizontal"
+    IDS_RIBBON_FLIPV        "Flip Vertical"
+    ID_ALIGN_FLIPV          "Flip the selected elements vertically.\nFlip Vertical"
+    ID_ALIGN_FLIPH          "Flip the selected elements horizontally.\nFlip Horizontal"
+    IDS_RIBBON_PIN          "Pin"
+    ID_SIMULATION_PIN       "Stop the mechanism and save the current positions of the links as the starting positions.\nPin"
+    IDS_RIBBON_CONFIG       "&Configuration"
+    IDS_RIBBON_ALIGNBUTTON  "Align"
+    ID_ALIGN_ALIGNBUTTON    "Select from a variety of alignment actions to perform on the selected elements.\nAlign"
+END
+
+STRINGTABLE
+BEGIN
+    ID_APP_ABOUT            "Display program information, version number and copyright.\nAbout"
+    ID_APP_EXIT             "Quit the application; prompts to save documents.\nExit"
+END
+
+STRINGTABLE
+BEGIN
+    ID_FILE_MRU_FILE1       "Open this document."
+    ID_FILE_MRU_FILE2       "Open this document."
+    ID_FILE_MRU_FILE3       "Open this document."
+    ID_FILE_MRU_FILE4       "Open this document."
+    ID_FILE_MRU_FILE5       "Open this document."
+    ID_FILE_MRU_FILE6       "Open this document."
+    ID_FILE_MRU_FILE7       "Open this document."
+    ID_FILE_MRU_FILE8       "Open this document."
+    ID_FILE_MRU_FILE9       "Open this document."
+    ID_FILE_MRU_FILE10      "Open this document."
+    ID_FILE_MRU_FILE11      "Open this document."
+    ID_FILE_MRU_FILE12      "Open this document."
+    ID_FILE_MRU_FILE13      "Open this document."
+    ID_FILE_MRU_FILE14      "Open this document."
+    ID_FILE_MRU_FILE15      "Open this document."
+    ID_FILE_MRU_FILE16      "Open this document."
+END
+
+STRINGTABLE
+BEGIN
+    ID_NEXT_PANE            "Switch to the next window pane.\nNext Pane"
+    ID_PREV_PANE            "Switch back to the previous window pane.\nPrevious Pane"
+END
+
+STRINGTABLE
+BEGIN
+    ID_WINDOW_SPLIT         "Split the active window into panes.\nSplit"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_RIBBON_ACTION       "Modify"
+    IDS_RIBBON_CONNECT      "Connect\nc"
+    IDS_RIBBON_JOIN         "Join\nj"
+    IDS_RIBBON_COMBINE      "Combine\nb"
+    IDS_RIBBON_SLIDE        "Slide\nl"
+    IDS_RIBBON_SPLIT        "Split"
+    ID_RIBBON_SAMPLE_GALLERY "Open one of the sample mechanisms.\nOpen Sample"
+    ID_VIEW_ZOOMFIT         "Zoom to 100% and move the content to be centered in the window.\nUnscale 100%"
+    IDS_RIBBON_ALIGN        "Edit"
+END
+
+STRINGTABLE
+BEGIN
+    ID_VIEW_ZOOMIN          "Show a closer and more detailed view of the mechanism.\nUnscale In"
+    ID_VIEW_ZOOMOUT         "Show the mechanism from farther away, making it smaller.\nUnscale Out"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_STATUS_PANE1        "Pane 1"
+    IDS_STATUS_PANE2        "Pane 2"
+    IDS_RIBBON_LABELS       "Labels"
+END
+
+STRINGTABLE
+BEGIN
+    ID_EDIT_SPLIT           "Disconnect all of the links that share the selected connector.\nSplit"
+    ID_ALIGN_RIGHTANGLE     "Align the selected connectors to form a right triangle.\nRight Angle"
+    ID_ALIGN_RECTANGLE      "Align the selected connectors to form a rectangle.\nRectangle"
+    ID_ALIGN_PARALLELOGRAM  "Align the selected connectors to form a parallelogram.\nParallelogram"
+    ID_ALIGN_HORIZONTAL     "Align the selected connectors along the same horizontal line.\nHorizontal"
+    ID_ALIGN_VERTICAL       "Align the selected connectors along the same vertical line.\nVertical"
+    ID_ALIGN_LINEUP         "Align the selected connectors in a line. Connectors are lined up between the first and last selected.\nLine Up"
+    ID_INSERT_TRIPLE        "Insert a link with three connectors\nInsert Triple"
+    ID_INSERT_DOUBLE        "Insert a link with two connectors\nInsert Double"
+    ID_VIEW_LABELS          "Show labels that identify links, connectors, PRM, and other information.\nLabels"
+END
+
+STRINGTABLE
+BEGIN
+    ID_VIEW_ANGLES          "Show right angle, rectangle, and parallelogram hint lines during selection.\nAngles"
+    ID_EDIT_SLIDE           "Attach the selected slider to the selected connectors to slide between them.\nSlide"
+END
+
+STRINGTABLE
+BEGIN
+    ID_VIEW_DATA            "Show position and length information for the links and connectors.\nShow Data"
+    ID_VIEW_DEBUG           "Show debugging information such as possible rotations of various links and connectors.\nDebug"
+    ID_EDIT_SNAP            "Snap to align with connectors.\nObject Snap"
+END
+
+STRINGTABLE
+BEGIN
+    IDR_MAINFRAME           "Linkage\n\nlinkag\nLinkage2 Files (*.linkage2)\n.linkage2\nLinkage2.Document\nLinkag Document\nLINK\nlink Files"
+    IDS_EDIT_MENU           "Edit"
+    IDS_RIBBON_OPENSAMPLE   "Samples"
+    IDS_STRING131           "IDS_RIBBON_"
+    IDS_RIBBON_INTERACTIVE  "Interactive"
+    ID_SIMULATE_INTERACTIVE "Run a simulation with interactive movement of individual inputs and no automatic movement.\nSimulate Interactive"
+    ID_INSERT_ACTUATOR      "Add a linear actuator link.\nInsert Linear Actuator"
+    IDS_RIBBON_INSERT_ACTUATOR "Actuator"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_RIBBON_VIEW_DATA    "Show Data"
+    IDS_RIBBON_VIEW_DEBUG   "Debug"
+    IDS_RIBBON_VIEW_ZOOMIN  "In"
+    IDS_RIBBON_VIEW_ZOOMOUT "Out"
+    IDS_RIBBON_SIMULATION   "Simulate"
+    IDS_RIBBON_RUN          "Run\nr"
+    IDS_RIBBON_SIMULATE     "Simulate"
+    IDS_RIBBON_STOP         "Stop\ns"
+    ID_SIMULATION_RUN       "Run the mechanism in real time, showing the animation in the window.\nRun"
+    ID_SIMULATION_STOP      "Stop the mechanism animation and reset it to its original condition.\nStop"
+    ID_SIMULATION_SIMULATE  "Simulate the mechanism movement and show the results of any drawing connectors in the window.\nSimulate"
+    IDS_RIBBON_LINKPROPERTIES "Link"
+    IDS_RIBBON_SAMPLES      "Open Sample Mechanism"
+    IDS_RIBBON_INSERT       "Insert"
+END
+
+STRINGTABLE
+BEGIN
+    ID_EDIT_COMBINE         "Change all of the selected connectors and links to be a single link.\nCombine"
+    ID_EDIT_CONNECT         "Create a link between all selected connectors.\nConnect"
+    ID_EDIT_DELETESELECTED  "Delete the selection\tDelete"
+END
+
+STRINGTABLE
+BEGIN
+    ID_VIEW_TOOLBAR         "Show the toolbar.\nToggle ToolBar"
+    ID_VIEW_STATUS_BAR      "Show the status bar.\nToggle Status Bar"
+END
+
+STRINGTABLE
+BEGIN
+    ID_VIEW_CAPTION_BAR     "Show or hide the caption bar.\nToggle Caption Bar"
+    IDS_CAPTION_BUTTON      "Options..."
+    IDS_CAPTION_BUTTON_TIP  "Click here to see more options"
+    IDS_CAPTION_TEXT        "This is a caption bar where a message can be presented to the user."
+    IDS_CAPTION_IMAGE_TIP   "Important"
+    IDS_CAPTION_IMAGE_TEXT  "Here is an informational message for the user."
+    IDS_MYCALENDARS         "My Calendars"
+    IDS_CALENDAR            "Calendar"
+    IDS_SHORTCUTS           "Shortcuts"
+    IDS_FOLDERS             "Folders"
+END
+
+STRINGTABLE
+BEGIN
+    AFX_IDS_SCSIZE          "Change the window size"
+    AFX_IDS_SCMOVE          "Change the window position"
+    AFX_IDS_SCMINIMIZE      "Reduce the window to an icon"
+    AFX_IDS_SCMAXIMIZE      "Enlarge the window to full size"
+    AFX_IDS_SCNEXTWINDOW    "Switch to the next document window"
+    AFX_IDS_SCPREVWINDOW    "Switch to the previous document window"
+    AFX_IDS_SCCLOSE         "Close the active window and prompts to save the documents"
+END
+
+STRINGTABLE
+BEGIN
+    AFX_IDS_SCRESTORE       "Restore the window to normal size"
+    AFX_IDS_SCTASKLIST      "Activate Task List"
+END
+
+STRINGTABLE
+BEGIN
+    AFX_IDS_PREVIEW_CLOSE   "Close print preview mode.\nCancel Preview"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_OUTLOOKBAR          "Outlook Bar"
+    IDS_RIBBON_FILE         "File"
+    IDS_RIBBON_NEW          "&New"
+    IDS_RIBBON_OPEN         "&Open..."
+    IDS_RIBBON_SAVE         "&Save"
+    IDS_RIBBON_SAVEAS       "Save &As..."
+    IDS_RIBBON_PRINT        "Print"
+    IDS_RIBBON_PRINT_LABEL  "Preview and Print the Mechanism"
+    IDS_RIBBON_PRINT_QUICK  "&Quick Print"
+    IDS_RIBBON_PRINT_PREVIEW "Print Pre&view"
+    IDS_RIBBON_PRINT_SETUP  "Print Set&up"
+    IDS_RIBBON_CLOSE        "&Close"
+    IDS_RIBBON_RECENT_DOCS  "Recent Documents"
+    IDS_RIBBON_EXIT         "E&xit"
+    IDS_RIBBON_HOME         "&Home"
+    IDS_RIBBON_CLIPBOARD    "Selection\nd"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_RIBBON_PASTE        "Paste"
+    IDS_RIBBON_CUT          "Cut"
+    IDS_RIBBON_COPY         "Copy"
+    IDS_RIBBON_SELECTALL    "Select All"
+    IDS_RIBBON_WINDOW       "Window\nw"
+    IDS_RIBBON_WINDOWS      "Windows\ni"
+    IDS_RIBBON_STYLE        "Style"
+    IDS_RIBBON_STYLE_TIP    "Modify Visual Style"
+    IDS_RIBBON_STYLE_DESC   "Choose one of the Office 2007 themes"
+    IDS_RIBBON_STATUSBAR    "Status Bar"
+    IDS_RIBBON_VIEW         "View"
+    IDS_RIBBON_PROPERTIES   "Element"
+    IDS_RIBBON_CONNECTPROPERTIES "Connector"
+    IDS_RIBBON_CAPTIONBAR   "Caption Bar"
+END
+
+STRINGTABLE
+BEGIN
+    ID_SAMPLE_SIMPLE        "Simple mechanism with one rotating input."
+    ID_SAMPLE_ACTUATOR      "Linear actuators moving multiple links."
+    ID_SAMPLE_ACTUATOR2     "Linear actuator moving a sliding connector."
+END
+
+STRINGTABLE
+BEGIN
+    ID_SAMPLE_COMPLICATED   "Multiple sliders, rotating inputs, and linear inputs."
+    ID_SAMPLE_JANSEN        "The Theo Jansen leg mechanism."
+    ID_SAMPLE_KLANN         "The Joe Klann leg mechanism."
+    ID_SAMPLE_JOULES        "Bicycle pedalling example."
+    ID_SAMPLE_HOEKEN        "Rotating to linear motion converter."
+    ID_SAMPLE_PARALLEL      "Factor part moving mechanism."
+    ID_SAMPLE_FOLDINGTOP    "Convertible car top example."
+    ID_SAMPLE_SLIDING1      "A single sliding connector rotating around an anchor."
+    ID_SAMPLE_SLIDING2      "An example of a sliding connector moving to match another link."
+    ID_SAMPLE_LINK1         "Sliding link example."
+    ID_SAMPLE_LINK2         "An example of an elliptical exercise machine."
+    ID_SAMPLE_SMILE         "A set of links and connectors that will bring a smile."
+    ID_SAMPLE_LINK3         "Smile 2"
+    ID_SAMPLE_LINK4         "Sliding Link 3"
+    ID_SAMPLE_SCISSORS      "Scissor lift mechanism."
+END
+
+STRINGTABLE
+BEGIN
+    ID_SAMPLE_VARYSPEED     "Varying speed mechanism."
+    ID_SAMPLE_FINGERBOX     "Button pushing machine."
+    ID_SAMPLE_WATT          "Watt Parallel Mechanism."
+    ID_SAMPLE_THROW         "Throw Distance Test Mechanism."
+    ID_SAMPLE_PISTON        "Piston and Crank Mechanism."
+    ID_SAMPLE_LIFTER        "Two-Stage Ball Lifting Mechanism."
+    ID_SAMPLE_FOURGEARS     "Four Gear Reduction Mechanism."
+    ID_SAMPLE_ORBITGEARS    "Planet and Moon Orbit Meachanism."
+    ID_SAMPLE_OSCILLATORGEARS "Applified Rocking Motion Mechanism."
+	ID_SAMPLE_STEPHENSON	"Stephenson Valve Gear Mechanism."
+	ID_SAMPLE_PEAUCELLIER	"Peaucellier Straight Line Mechanism."
+END
+
+STRINGTABLE
+BEGIN
+    IDS_SAMPLE_SIMPLE       "Simple four bar linkage.\nSimple"
+    IDS_SAMPLE_JANSEN       "The Theo Jansen leg mechanism.\nJansen"
+    IDS_SAMPLE_KLANN        "The Joe Klann leg mechanism.\nKlann"
+    IDS_SAMPLE_JOULES       "Joules pedalling mechanism.\nJoules"
+    IDS_SAMPLE_HOEKEN       "Rotating to linear motion converter.\nHoeken"
+    IDS_SAMPLE_PARALLEL     "Parallel lifing and moving mechanism.\nParallel"
+    IDS_SAMPLE_FOLDINGTOP   "Convertible car top mechanism.\nFolding Top"
+    IDS_SAMPLE_SLIDING1     "Sliding connector mechanism.\nSimple Slider 1"
+    IDS_SAMPLE_SLIDING2     "Sliding connector mechanism.\nSimple Slider 2"
+    IDS_SAMPLE_LINK1        "Sliding link mechanism.\nSliding Link 1"
+    IDS_SAMPLE_LINK2        "Elliptical exercise machine.\nElliptical Machine"
+    IDS_SAMPLE_SMILE        "Complex drawing mechanism.\nSmile"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_SAMPLE_ACTUATOR     "Linear actuator mechanism with a sliding link.\nActuator 1"
+    IDS_SAMPLE_ACTUATOR2    "Simple linear actuator mechanism.\n Actuator 2"
+    IDS_SAMPLE_ACTUATOR3    "Backhoe digging mechanism.\nActuator Slider"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_SAMPLE_COMPLICATED  "Linear actuator, rotating input, and various types of sliding connector configurations.\nComplicated Mechanism"
+    IDS_SAMPLE_REVERSER     "Reversing mechanism using a manual actuator during normal simulation.\nReversing Mechanism"
+    IDS_SAMPLE_SCISSORS     "Scissor lift mechanism.\nScissor Lift Mechanism"
+    IDS_SAMPLE_VARYSPEED    "Varying rotational speed mechanism.\nVarying Speed Mechanism"
+    IDS_SAMPLE_FINGERBOX    "Finger pushing button machine.\nButton Pushing Machine"
+    IDS_SAMPLE_WATT         "Watt parallel mechanism for stem engines.\nWatt Parallel Mechanism"
+END
+
+#endif    // English (United States) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+#define _AFX_NO_OLE_RESOURCES
+#define _AFX_NO_TRACKER_RESOURCES
+#define _AFX_NO_PROPERTY_RESOURCES
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+LANGUAGE 9, 1
+#pragma code_page(1252)
+#include "res\Linkage.rc2"  // non-Microsoft Visual C++ edited resources
+#include "afxres.rc"         // Standard components
+#include "afxprint.rc"       // printing/print preview resources
+#if !defined(_AFXDLL)
+#include "afxribbon.rc"              // MFC ribbon and control bar resources
+#endif
+#endif
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+

@@ -1,0 +1,305 @@
+6/19/2012 Changed selection order to check for actuator control knob selection before link and connector selection.
+
+6/21/2012 Added avi output support in the code but not in the interface last night. Interface changes to come.
+
+6/26/2012 Added about box.
+
+8/23/2012 Added dimensions/measurements feature.
+
+8/23/2012 Fixed bug where pasting would also change Scale and offset.
+
+8/23/2012 Fixed Unscale 100% bugs.
+
+8/24/2012 
+Add code work around to CPen and CPreparePrepareRenderer bug that screws up some lines while printing.
+The Scaling built into CPreparePrepareRenderer would create a new pen for every pen selected and the 
+new pen would be scaled in size appropriately. When this code ran and and old pen was
+selected back into the device context, the logpen data could not be obtained and the
+pen was not selected. This resulted in some sort of default pen with default line size 
+and color to be used. The fake arrowhead code seems to have made this happen but
+probably only because it selected pens too often. The work around is to set the scale
+factor to 1 in CPreparePrepareRenderer and then rely on SetWindowExt() and SetViewportExt() to
+let the GDI code do the scaling itself.
+
+8/25/2012
+Add measurement units.
+Add Unit selection in the ribbon.
+Add a ruler when dimensions are enabled and the document is empty.
+Add automatic landscape/portrait selection when printing based on the size of the mechanism.
+
+9/2/2012
+Fix Unscale to fit.
+Change Unscale to change by 1.3x per Unscale level.
+
+9/12/2012
+* Changed app icons.
+* Made the alignment tools (align horz, align vert, right angle, rectangle, etc.) part of a drop down menu in the ribbon.
+* Made the insert tools part of a drop down menmu in the ribbon.
+
+9/14/2012
+* Implemented flip vertical and flip horizontal functions.
+* Fixed bug where pasted items look selected but are not always acounted as selected.
+* Added Watt parallel motion mechanism sample.
+* Changed flip feature to allow flipping of selected links without the connectors needing selection.
+* Fixed a bug where dragging connectors and links used the wrong offset from the mouse pointer location to the selected item(s).
+* Added code to disable some menu/ribbon items when the mechanism is empty (no connectors or links,e tc.).
+* Fix crash bug when placing quad link from ribbon bar insert menu.
+* Changed link selection code to detect a select operation anywhere inside of a link and not just along the edge.
+* Multi-threaded the video file frame creation code to overlap a little with the screen image generation.
+
+11/26/2012
+* Fix problem where pan and Unscale information was not getting set in the view when a document was opened by specifying it on the command line.
+
+11/28/2012
+* Change to move slider to intersection point after a link is rotated based on 
+  that intersection point. This improves the display quality that is otherwise
+  sometimes screwed up due to imprecision of the rotation (for some unknown 
+  reason).
+
+11/30/2012
+* Added CoInitialize() to the video compression thread so that AVIOpenFile() works on all systems.
+
+12/7/2012
+
+* Changed almost all screen pixel stuff to use floating point to make scaling look better when generating a video of the mechanism simulation.
+* Added pause, and step forwards/backward simulation controls.
+* Added some more keyboard shortcuts using single key presses for things like Connect, comBine, etc.
+1/9/2013
+
+* Change the look of the Simulation panel in the ribbon bar.
+* Changed more code to use the simulation mode enum values instead of boolean variables.
+1/10/2012
+
+* Fixed keyboard shortcuts to not use . and , as shortcuts so that they can be entered into the coordinate box.
+* Fix coordinate box code so that the coordinates are cleared once set.
+1/22/2013
+
+* Fixed bug where document unit scale factor was not set when reading in a file.
+* Added auto join feature.
+* Added line-up-and-space-evenly feature.
+* Changed alignment along line to use first and last selected connectors as basis for alignment, not first and second connectors.
+* Changed documentation to include new features.
+* Moved sample gallery to the file menu.
+* Fixed bug in recently added auto join feature.
+* Changed snap feature so that object snap overrides a grid snap if both can be done.
+1/23/2013
+
+* Changed to use proper cartesian coordinate system with +y being up, not down. +y being down is for screen coordinates internally.
+* Changed 0,0 to be the middle of the window at all times.
+* Fix bug where '-' accelerator key keeps the coordinates edit box in the ribbon from getting '-' minus signs.
+* Added a small kludge to handle circle line intersection problems when lines are exactly horizontal or vertical. The segment check incorrectly detected a point beyond the segment because of rounding errors or some such numerical thing.
+* Added another small kludge to the circle line intersection to catch intersections that are 0.00001 past the end of a line. This can be a rounding error so being that much past the end if treated as a valid intersection point. The point is not changed.
+* Added Save As Image feature with an arbitrary 1200x1200 image size for now. JPEG and PNG are supported.
+* Fixed some more problems caused by change to y coordinate direction. Inserting elements and scaling/stretching selections had problems.
+1/25/2013
+
+* Fixed Unscale to fit bug caused by recent Y coordinate change.
+* Fixed old bug in scroll bar code that caused a failure when the Y coordinate changed.
+* Update scroll extents using scroll and Unscale information from document before the first draw operation.
+1/28/2013
+
+* Fixed old scroll bar problem of moving by a "page" at a time.
+1/29/2013
+
+* Fixed bug in link properties handling where selecting a single actuator would then not let the CPM be set.
+1/29/2013
+
+* Picked a more accurate number for converting radians to degrees. Never trust the internet!
+* Show location, distance, or angle in the ribbon bar coordinates box when selecting connectors.
+* Allow the angle to be set in the ribbon bar coordinates box when three connectors are selected.
+* Change angle entry dialog box to show the current angle and to round to 4 decimal places.
+* Apply grid and object snap after snapping sliders to their slide path.
+* Added link name support in files and on screen but there is no way for a user to set it yet.
+* Fix image save, printing, and video save, all because of the recent Y coordinate change.
+* Added ability to set the link name in the link properties dialog box.
+
+1/30/2013
+
+Received some feature requests recently. These are some NOT YET ADDED:
+- Reference points and lines drawn separately from the mechanism. Draw nodes with the look of a plus sign if alone and as a black dot if connected. nodes would be just line anchors and lines would be drawn between nodes like links. There should be properties like line width, color, and node naming.
+- Rotate connector when right-angle or angle are used on sliding connector. (fixed bug to keep slider from moving at all du9irng these operations. Select the connectors in the proper order to get the right angle/angle adjustment to happens as desired).
+- Curved slider paths!
+- Distance and/or location locking. Maybe link locking. I'm not sure how this would work when mnoving, rotating, sclaing links.
+- Save a motion path as a drawing object so it "sticks" in the mechanism window and can be moved, etc.
+- DXF export.
+- Grid spacing control.
+
+* Add names to connectors.
+* Refactor the code to use a base class for all mechanism elements and move common code to that class.
+* Fix problem saving names in the output file.
+* Update documentation for recent changes.
+2/1/2013
+
+* Added lines and points. The code treats links and connectors on the drawing layer as lines and points.
+* Show coordinates when dimensions are shown for points.
+* All multiple link or line property changes.
+* Changed ribbon bar to move less used options into sub-menus.
+* Added drawing and mechanism layer concept (and layers are in the code as bit flagged parameters for all elements).
+* Created common base element class to simplify connector and link code.
+* Moved SetSelectedElementCoordinates() to the document class.
+* Improved dimension arrow heads for high-res output such as hi-def video, jpeg/png, and printer output.
+* Changed connector and link name display to only show the name and not the identifier if a name has been assigned.
+* Disabled the CPM input box if a link is not set to be an actuator.
+2/7/2013
+
+* Fixed bug when adding points and line using the Elements menu in the ribbon bar.
+* Fixed about box text wrap problem.
+* Increased the momentum effect on connectors to make sure that multiple connected cranks work properly.
+* Fixed recently introduced bug with being unable read back data written top file or undo buffer.
+* Changed the order of drawing elements to get some of the following features:
+  + fill for polygons (not links) drawn below everything else.
+  + Fill for links drawn next.
+  + Lines and lines of polygons drawn above that.
+  + links and connectors drawn above that.
+  + Dimensions above most everything.
+  + Adjustment knobs, selection indicators drawn on top.
+
+* Fixed small drawing glitch in solid links that caused a line to have a visible one pixel step in it at certain times when it should not.
+* Change to always edit and view alllayers when loading a new mechanism or starting a new one.
+* Fix to not draw dotted area rect when stretching a zero height (or width) selection (such as a horizontal line).
+* Add measurement line option for lines.
+* Added "add connector" feature.
+* Added measurement line to element popup gallery and element insert menu.
+* Added throw distance setting inthe link properties dialog box.
+* Fix to show coordinates of the selected elements when a drag/rotate/stretch operation is done.
+2/12/2013
+
+* Fixed bug that kept links from being filled unless they were marked as solid.
+2/13/2013
+
+* Fix tooltip problem for popup gallery line and measurement line.
+* Make the popup element gallery two rows.
+* Added code to allow for text in the popup gallery if shown in a single column. This is unused so far.
+2/14/2013
+
+* Fixed crash bug in cut/delete code where selected connectos and links being deleted at the same time could cause a crash.
+* Fixed slightly misplaced connector in Hoeken Linkage example.
+* Remove option to create sliding connector and sliding anchors without setting slide limits.
+* Make the split operation change a slider into a non-slider but not split it.
+* Added feature for drawing circles around drawing layer connectors.
+* Fixed odd bug that caused left over internal data during delete of a single lone connector.
+* Added Fastening feature for fastening drawing elements to link in the mechanism.
+* added 0.00005 fudge factor to circle-circle intersection code to make up for rounding ussues during point rotations.
+* Fixed bug in circle intersection code where stopping the rejection of an intersection on one coordinate due to the addition of the fudge factor caused the other coordinate test to be skipped. In other words, an intersection point was not rejected if the fudge factor had an effect in some situation.
+2/19/2013
+
+* Change code to scale circles around points when the scaling is diagonal. Horizontal-only or vertical-only scaling does not change the circle size.
+* Added slider path radius value to connectors and add the properties dialog box slide path radius setting.
+* Draw dotted slide path when the link is solid, as before, and when the slide path radius is non-zero.
+* Added various code to handle curved slider paths. Sliding connectors and the paths can now be moved around and the slider is snapped onto the curved path.
+* Implemented curved slide path handling to one of the many sliding connector special case functions.
+* Fixed bug with simulation getting stuck when the mechanism gets to an invalid position.
+* Fixed recent bug related to Y coordinate change and manually rotating inputs during simulation.
+* Got dotted lines working correctly for a width > 1. Now the printig, image export, and video cexport, all look correct.
+* Changed the slide path to be the color of the link that holds it, not a generic grey.
+2/28/2013
+
+* Reverse rotation direction of inputs when flipping.
+* Changed motion path color.
+* Added ribbon bar option to create new links as solid.
+* Added new curved slider path examples and removed some other less useful samples.
+* No longer showing generic ID values on drawing layer, only user-specified element names.
+* Change to line up the sliding connector with the arc when the path is curved instead of keeping it aligned with what would have been the straight path.
+3/1/2013
+
+* Changed order of elements in the popup element gallery and in the element insert menu.
+* Added simgle anchor to the elements menu and popup gallery.
+* Added support for sliding a link on two sliding connectors.
+* Added new example of a sliding link moved by another sliding link with a slider connection between the two.
+3/5/2013
+
+* Added DXF drawing functions to the code and now write an experimental DXF file.
+* Changed the main menu to have a single Export item with a sub menu for picking image, video, or DXF export.
+* Moved all drawing code into a renderer class to facilitate rendering to DXF files and other places that are not Windows GDI-based rendering targets.
+* Almost usable DXF output being written.
+* Fixed bug where circle-to-1line intersection code could get rounding error that is within the expected fudge factor distance but the intersection gets rejected because values are not identical. There is no known reason for this problem and it just showed up. It might be cause by fudge factors in other code that deals with some other rounding and IEEE number issues.
+4/12/2013
+
+* Fixed memory leak in new rendering code. m_pDC was not freed and the implementation class also didn't have a needed virtual destructor.
+4/24/2013
+
+* Fixed earlier code changes that screwed up the move count duing simulation.
+* Added error checking to detect when either of the two links in a link-to-link move situation connect to something that is fixed. Previoous code just checked one of them because of a bad assumption on my part.
+* Changed one of the curved sliding path samples to be a Chebyshev straight line mechanism.
+* Set to version 2.9.9
+5/8/2013
+
+* Change to allow auto-join to lone connectors. Without this, links could not be connected to lone anchors.
+5/9/2013
+
+* Deleted the old setup project and created a Wix project. Too much went on with creating the initial Wix implementation to describe here. Let's just say that it was tricky.
+* Finished new setup project.
+5/10/2013
+
+* Save and restore selected connectors, in order, when using the Undo feature.
+* Wow, it's been a year since I documented a change!
+5/21/2014
+
+* Fixed solid connector drawing in DXF output files.
+7/9/2014
+
+* The arrow keys will now step the simulation forwards and backwards. The old [ and ] keys still work.
+* Holding the shift key while pressing a left or right arrow will step the simulation 10 steps instead of 1 step. There are 30 simulation steps per second, so the simulation runs for 1/3 of a second using the shift-arrow keys.
+* When a link is selected and it has two connectors, the position/length/angle text box in the toolbar will show the length of the link. The text box cannot be used to edit this length because that only works when connectors are selected.
+* A Large Font option is now available in the View/Details menu in the toolbar. The larger font is about 45% larger than the font standard font.
+* Fixed a design issue that would keep you from opening a file that is already open. Now, when the file is selected in the file dialog box, or in the recent file list, you will be asked to save your current changes, and then the file will be opened. This is an easy way to abandon all changes since the file was opened before.
+* Improved the simulation code to do multiple iterations in the document object so that the view object doesn't need to keep track of the simulation step.
+* Added code to do more internal iterations, such as when using shift-arrow to make large jumps.
+* Fixed the manual simulation to internally iteration to the correct location in the simulation, without displaying intermediate steps - unless the destination position takes too long to calculate.
+* Fixed interactive simulation to make smaller steps of input elements, but to do more internal iterations.
+2.12.0.0 8/4/2014 8:15 PM
+
+* Fixed a bug that caused the mechanism to be incorrectly scaled when creating a video file.
+* Improved feel of the manual and interactive simulation controls.
+* Changed the simulation code to do proper partial simulation steps wihout skipping a whole step to start with.
+2.12.1.0 8/5/2014
+
+* Changed the piston sample to use drawing elements to draw a piston and crank around the links and connectors.
+2.12.2.0 8/8/2014 12:06 PM
+
+* Added a 180 degree arc to the bottom left of connectors that are at the exact same screen location. This helps differentiate them from being a single connector that connects two or more links.
+* Fixed video codec selection bug that caused the default codec to always get used.
+* Added a button to configure the selected codec before proceeding to export as a video file.
+?
+
+* Added gears and chains.
+* Changed internal represenation of fastened links and connectors.
+* Added color selection for links, lines, connectors, and points.
+* Changed output file format to exclude XML attributes whose value is the default value.
+* Changed the image export size to improve the look of small mechanisms.
+3.0.2 1/6/2015 10:23 AM
+
+* Added image export size and detail settings dialog before selecting a file for image export.
+* Fixed some bugs in gear simulation code.
+3.0.5 1/20/2015 4:29 PM
+
+* Changed video export to allow fractional seconds.
+3.0.6 1/22/2015 12:58 PM
+
+* New sample.
+* Change to how radius dimensions are drawn.
+3.0.7 1/29/2015 5:28 PM
+
+* Fixed bug in text output after a font change causing the text to be in the wrong location.
+3.0.8 1/29/2015 6:09 PM
+
+* Fixed bug that kept sliders from being "split" from their slide path (made to not be sliders).
+3.0.9 3/25/2015 5:05 PM
+
+2/11/2016 2:23 PM: Fixed bug in hull computations where coincident points were getting flagged incorrectly and one of them was not deleted from the hull point list.
+2/11/2016 2:23 PM: Fixed bug in connector join code where slider limits were not properly fixed when a limit connector was deleted.
+2/11/2016 3:54 PM: Added motion path export feature.
+2/12/2016 3:49 PM: Fixed mistake where the sliding path dotted line was not drawn when it was between connectors that were not on the hull of a link. 
+2/14/2016 1:55 PM: Fixed bug where links that shared two conectors would try to move to connect to each other before their position was determined by some other connection.
+2/16/2016 3:02 PM: Changed to not support high DPI displays using a project option in the manifest tool settings.
+2/22/2016 12:59 PM: Fixed bug in manual simulations mode that kept the simulation from jumping immediately to the desired simulation step. Instead, the simulation would run at normal speed until the desired simulation step was reached.
+2/22/2016 1:00 PM: Changed the way document area is computed to incude some dimension lines in the area.
+2/22/2016 1:00 PM: Use the new document area to find the more optimal size for image export and printing.
+2/22/2016 9:31 PM: Changed dimension line algorithm to pick a better stat point. If the bottom line of a multi-connector link is the longest then the start point will be at the bottom left of the mechanism.
+2/22/2016 10:36 PM: Changed manual simulation mode to step each actuator only the amount it could step during a single normal simulation step. This keeps the mechanism from getting screwed up.
+2/25/2016 3:51 PM: Fixed bug in arrow key handling - using accelerators kept the ribbbon edit control from getting arrow key presses.
+2/25/2016 3:51 PM: Fixed bug in bit array code where the proper bits were not cleared when changing to certain lengths.
+2/27/2016 11:31 PM: Fixed bug in "always manual" simulation so that the simulation doesn't take multiple steps to get to a new position for the manual control while also trying to just run the rest of the simulation at normal speed.
+
+
+

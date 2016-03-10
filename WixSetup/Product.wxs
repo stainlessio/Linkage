@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+
+	<?define PRODUCTVERSION="3.1.4"?>
+	<?define UPGRADECODE="363E6270-4C3C-4022-80C5-32499430E4BE"?>
+
+	<Product Id="*" Name="Linkage" Language="1033" Codepage="1252" Version="$(var.PRODUCTVERSION)" 
+	         Manufacturer="David Rector" UpgradeCode="$(var.UPGRADECODE)">
+
+		<Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine" Id="*" SummaryCodepage="1252"/>
+
+		<Property Id="WIXUI_INSTALLDIR" Value="INSTALLFOLDER" />
+
+		<UI Id="MyUserInterface">
+			<TextStyle Id="WixUI_Font_Normal" FaceName="Tahoma" Size="8" />
+			<TextStyle Id="WixUI_Font_Bigger" FaceName="Tahoma" Size="12" />
+			<TextStyle Id="WixUI_Font_Title" FaceName="Tahoma" Size="9" Bold="yes" />
+
+			<Property Id="DefaultUIFont" Value="WixUI_Font_Normal" />
+			<Property Id="WixUI_Mode" Value="Minimal" />
+
+			<DialogRef Id="ErrorDlg" />
+			<DialogRef Id="FatalError" />
+			<DialogRef Id="FilesInUse" />
+			<DialogRef Id="MsiRMFilesInUse" />
+			<DialogRef Id="PrepareDlg" />
+			<DialogRef Id="ProgressDlg" />
+			<DialogRef Id="ResumeDlg" />
+			<DialogRef Id="UserExit" />
+
+			<DialogRef Id="WelcomeDlg" />
+			
+			<!-- Hook the new welcome dialog to the next one in the stack-->
+			<Publish Dialog="WelcomeDlg" Control="Next" Event="NewDialog" Value="PrepareDlg">1</Publish>
+
+			<Publish Dialog="ExitDialog" Control="Finish" Event="EndDialog" Value="Return" Order="999">1</Publish>
+
+			<Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="MaintenanceTypeDlg">1</Publish>
+
+			<Publish Dialog="MaintenanceWelcomeDlg" Control="Next" Event="NewDialog" Value="MaintenanceTypeDlg">1</Publish>
+
+			<Publish Dialog="MaintenanceTypeDlg" Control="RepairButton" Event="NewDialog" Value="VerifyReadyDlg">1</Publish>
+			<Publish Dialog="MaintenanceTypeDlg" Control="RemoveButton" Event="NewDialog" Value="VerifyReadyDlg">1</Publish>
+			<Publish Dialog="MaintenanceTypeDlg" Control="Back" Event="NewDialog" Value="MaintenanceWelcomeDlg">1</Publish>
+
+			<Property Id="ARPNOMODIFY" Value="1" />
+		</UI>
+
+		<UIRef Id="WixUI_Common" />
+
+		<WixVariable Id="WixUIBannerBmp" Value="..\res\banner.bmp" />
+		<WixVariable Id="WixUIDialogBmp" Value="..\res\installsplash.bmp" />
+
+
+
+
+		<Upgrade Id="$(var.UPGRADECODE)">
+			<UpgradeVersion OnlyDetect="yes"
+							Minimum="$(var.PRODUCTVERSION)"
+							Property="NEWERVERSIONDETECTED"
+							IncludeMinimum="no" />
+
+			<!-- 
+				The IncludeMaximum="yes" attribute will cause an ICE61 warning normally.
+			    My project supresses that warning. The end result is that my failure to
+				increase the version number of this install doesn't stop the installer from
+				removing the old version and installing this new one. Change the attribute
+				to "no" and the user will see an error during install that the same version
+				is already installed but is from a different build. That's a strange error
+				for a user to see so I just let the install happen.
+
+				A symptom of not detecting the alternate build with the same version is
+				having multiple entries in the "Programs and Features" list in the Control
+				Panel. If you see that then you have multiple different builds with the same
+				version number!		 
+			-->
+
+			<UpgradeVersion OnlyDetect="no"
+							Maximum="$(var.PRODUCTVERSION)"
+							Property="OLDERVERSIONBEINGUPGRADED"
+							IncludeMaximum="yes" />
+
+		</Upgrade>
+
+		<CustomAction Id="CA_BlockOlderVersionInstall" Error="A newer version of Linkage is already installed. You will need to remove it first if you want to install this older version." />
+		<CustomAction Id="CA_BlockAnotherBuildInstall" Error="Another version of Linkage is already installed but it has the same version number as this version. Uninstall the other version or contact customer support to help resove this issue." />
+
+		<InstallExecuteSequence>
+
+			<Custom Action="CA_BlockOlderVersionInstall" After="FindRelatedProducts">
+				<![CDATA[NEWERVERSIONDETECTED]]>
+			</Custom>
+
+			<Custom Action="CA_BlockAnotherBuildInstall" After="FindRelatedProducts">
+				<![CDATA[ANOTHERBUILDINSTALLED]]>
+			</Custom>
+			
+			<LaunchConditions After="AppSearch" />
+
+			<RemoveExistingProducts After="InstallInitialize" />
+		</InstallExecuteSequence>
+
+
+		<InstallUISequence>
+			<Custom Action="CA_BlockOlderVersionInstall" After="FindRelatedProducts">
+				<![CDATA[NEWERVERSIONDETECTED]]>
+			</Custom>
+
+			<Custom Action="CA_BlockAnotherBuildInstall" After="FindRelatedProducts">
+				<![CDATA[ANOTHERBUILDINSTALLED]]>
+			</Custom>
+
+			<LaunchConditions After="AppSearch" />
+		</InstallUISequence>
+
+
+		<Media Id="1" Cabinet="Cab1.cab" EmbedCab="yes"/>
+
+		<Feature Id="ProductFeature" Title="Linkage" Level="1">
+			<ComponentRef Id="LinkageExecutable"/>
+			<ComponentRef Id="LinkageDocumentation"/>
+			<ComponentRef Id="LinkageMisc"/>
+		</Feature>
+
+		<Icon Id="icon.exe" SourceFile="..\res\icon.exe" />
+		<Icon Id="icon.ico" SourceFile="..\res\testx.ico"/>
+		<Property Id="ARPPRODUCTICON" Value="icon.ico" />
+
+	</Product>
+
+	<Fragment>
+		<Directory Id="TARGETDIR" Name="SourceDir">
+			<Directory Id="DesktopFolder" Name="Desktop"/>
+			<Directory Id="ProgramMenuFolder">
+				<Directory Id="ApplicationProgramsFolder" Name="Linkage"/>
+			</Directory>
+			<Directory Id="ProgramFilesFolder">
+				<Directory Id="INSTALLFOLDER" Name="Linkage"/>
+			</Directory>
+		</Directory>
+	</Fragment>
+
+	<Fragment>
+		<Component Id="LinkageExecutable" Directory="INSTALLFOLDER" Guid="7AF9110C-E88C-4BBE-A510-1933A0798D8A">
+			<File Id="linkage.exe" Name="linkage.exe" DiskId="1" Vital="yes" Source="..\Release\linkage.exe" KeyPath="yes">
+				<Shortcut Id="ApplicationStartMenuShortcut"
+						  Advertise="yes"
+						  Directory="ApplicationProgramsFolder"
+						  Name="Linkage"
+						  Icon="icon.exe"
+						  Description="Linkage Mechanism Designer and Simulator"
+						  WorkingDirectory="INSTALLFOLDER"/>
+				<Shortcut Id="DesktopMenuShortcut"
+						  Advertise="yes"
+						  Directory="DesktopFolder"
+						  Name="Linkage"
+						  Icon="icon.exe"
+						  Description="Linkage Mechanism Designer and Simulator"
+						  WorkingDirectory="INSTALLFOLDER"/>
+			</File>
+			<RemoveFolder Id="ApplicationProgramsFolder" Directory="ApplicationProgramsFolder" On="uninstall" />
+		</Component>
+
+		<Component Id="LinkageDocumentation" Directory="INSTALLFOLDER" Guid="27D1D154-2197-4B00-9B1D-D97C57D2E96D">
+			<File Id="linkage.pdf" Name="linkage.pdf" DiskId="1" Vital="yes" Source="..\linkage.pdf" />
+		</Component>
+
+		<Component Id="LinkageMisc" Directory="INSTALLFOLDER" Guid="ACE32A96-1D38-453D-9E22-671366577E46">
+			<File Id="history.txt" Name="history.txt" DiskId="1" Vital="yes" Source="..\history.txt" />
+		</Component>
+
+	</Fragment>
+
+</Wix>
