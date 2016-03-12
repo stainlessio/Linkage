@@ -1212,41 +1212,58 @@ CFRect CLinkageView::GetDocumentArea( bool bWithDimensions, bool bSelectedOnly )
 
 	if( !bSelectedOnly )
 	{
-		double SolidLinkCornerRadius = Unscale( CONNECTORRADIUS + 3 ); 
-		DocumentArea.InflateRect( SolidLinkCornerRadius, SolidLinkCornerRadius );
-
 		CRenderer NullRenderer( CRenderer::NULL_RENDERER );
 
-		LinkList* pLinkList = pDoc->GetLinkList();
-		POSITION Position = pLinkList->GetHeadPosition();
-		while( Position != NULL )
+		if( m_bShowParts )
 		{
-			CLink* pLink = pLinkList->GetNext( Position );
-			if( pLink != 0 && !pLink->IsMeasurementElement() )
+			bool bTemp = m_bShowDimensions;
+			m_bShowDimensions = bWithDimensions;
+			DocumentArea = DrawPartsList( &NullRenderer );
+			m_bShowDimensions = bTemp;
+		}
+		else
+		{
+			double SolidLinkCornerRadius = Unscale( CONNECTORRADIUS + 3 ); 
+			DocumentArea.InflateRect( SolidLinkCornerRadius, SolidLinkCornerRadius );
+
+			LinkList* pLinkList = pDoc->GetLinkList();
+			POSITION Position = pLinkList->GetHeadPosition();
+			while( Position != NULL )
 			{
-				pLink->ComputeHull();
-				DocumentArea += DrawDimensions( &NullRenderer, pDoc->GetGearConnections(), pDoc->GetViewLayers(), pLink, true, true );
+				CLink* pLink = pLinkList->GetNext( Position );
+				if( pLink != 0 && !pLink->IsMeasurementElement() )
+				{
+					pLink->ComputeHull();
+					DocumentArea += DrawDimensions( &NullRenderer, pDoc->GetGearConnections(), pDoc->GetViewLayers(), pLink, true, true );
+				}
 			}
-		}
 
-		ConnectorList* pConnectors = pDoc->GetConnectorList();
-		Position = pConnectors->GetHeadPosition();
-		while( Position != NULL )
-		{
-			CConnector* pConnector = pConnectors->GetNext( Position );
-			if( pConnector != 0 )
-				DocumentArea += DrawDimensions( &NullRenderer, pDoc->GetViewLayers(), pConnector, true, true );
-		}
+			ConnectorList* pConnectors = pDoc->GetConnectorList();
+			Position = pConnectors->GetHeadPosition();
+			while( Position != NULL )
+			{
+				CConnector* pConnector = pConnectors->GetNext( Position );
+				if( pConnector != 0 )
+					DocumentArea += DrawDimensions( &NullRenderer, pDoc->GetViewLayers(), pConnector, true, true );
+			}
 
-		DocumentArea += DrawGroundDimensions( &NullRenderer, pDoc, pDoc->GetViewLayers(), true, true );
+			DocumentArea += DrawGroundDimensions( &NullRenderer, pDoc, pDoc->GetViewLayers(), true, true );
+		}
 	}
 	return DocumentArea.GetRect();
 }
 
-void CLinkageView::DoDraw( CRenderer* pRenderer )
+CFArea CLinkageView::DoDraw( CRenderer* pRenderer )
 {
 	CLinkageDoc* pDoc = GetDocument();
 	ASSERT_VALID(pDoc);
+
+	CFArea Area;
+
+	if( m_bShowParts )
+		Area = DrawPartsList( pRenderer );
+	else
+		Area = DrawMechanism( pRenderer );
 
 	if( m_bShowDebug )
 	{
@@ -1264,10 +1281,7 @@ void CLinkageView::DoDraw( CRenderer* pRenderer )
 		pRenderer->SelectObject( pOldPen );
 	}
 
-	if( m_bShowParts )
-		DrawPartsList( pRenderer );
-	else
-		DrawMechanism( pRenderer );
+	return Area;
 }
 
 double roundUp( double number, double fixedBase ) 
@@ -1362,7 +1376,7 @@ void CLinkageView::DrawGrid( CRenderer* pRenderer )
 	pRenderer->SelectObject( pOldPen );
 }
 
-void CLinkageView::DrawMechanism( CRenderer* pRenderer )
+CFArea CLinkageView::DrawMechanism( CRenderer* pRenderer )
 {
 	CLinkageDoc* pDoc = GetDocument();
 	ASSERT_VALID(pDoc);
@@ -1620,6 +1634,8 @@ void CLinkageView::DrawMechanism( CRenderer* pRenderer )
 		pRenderer->DrawRect( m_SelectRect );
 		pRenderer->SelectObject( pOldPen );
 	}
+
+	return CFArea();
 }
 
 CFPoint CLinkageView::ComputeNextPartLocation( CLink *pPartsLink, CFPoint ThisPartsPoint )
@@ -1627,21 +1643,21 @@ CFPoint CLinkageView::ComputeNextPartLocation( CLink *pPartsLink, CFPoint ThisPa
 	return CFPoint();
 }
 
-void CLinkageView::DrawPartsList( CRenderer* pRenderer )
+CFArea CLinkageView::DrawPartsList( CRenderer* pRenderer )
 {
 	CLinkageDoc* pDoc = GetDocument();
 	ASSERT_VALID(pDoc);
 
+	CLinkageDoc *pPartsDoc = pDoc->GetPartsDocument( false );
+
 	CFRect Area;
 	pDoc->GetDocumentArea( Area );
-	//pRenderer->DrawRect( Scale( Area ) );
 
-	CLinkageDoc *pPartsDoc = pDoc->GetPartsDocument( false );
 	pDoc = 0; // Don't use this elsewhere in this function!
 
 	ASSERT( pPartsDoc != 0 );
 	if( pPartsDoc == 0 )
-		return;
+		return CFArea();
 
 	if( m_bShowGrid )
 		DrawGrid( pRenderer );
@@ -1660,18 +1676,20 @@ void CLinkageView::DrawPartsList( CRenderer* pRenderer )
 			pLink->ComputeHull();
 	}
 
-//	ConnectorList* pConnectors = pPartsDoc->GetConnectorList();
-
-//	static const int Steps = 2;
-//	static const int LayersOnStep[Steps] = { CLinkageDoc::DRAWINGLAYER, CLinkageDoc::MECHANISMLAYER };
-
 	/*
 	 * The parts list has no overlapping parts. The order of the drawing is simplied
-	 * as compared to the normal editor drawing order.
+	 * as compared to the normal editor drawing order. The code does a kludge and uses
+	 * the scroll position to draw the parts in unique places on the screen and elsewhere.
+	 * of course, there should be a change to the code to be able to pass an offset to the
+	 * drawing functions.
 	 */
 
 	CFPoint PartPoint = Area.TopLeft();
 	CFPoint SaveScrollPosition = m_ScrollPosition;
+	CFArea DocumentArea;
+
+	double LastPartHeight = 0;
+	double yOffset = 0.0;
 
 	Position = pLinkList->GetHeadPosition();
 	while( Position != 0 )
@@ -1679,6 +1697,14 @@ void CLinkageView::DrawPartsList( CRenderer* pRenderer )
 		CLink* pLink = pLinkList->GetNext( Position );
 		if( pLink != 0  && ( pLink->GetLayers() & CLinkageDoc::MECHANISMLAYER ) != 0 )
 		{
+			m_ScrollPosition.y -= Scale( LastPartHeight );
+			yOffset -= LastPartHeight;
+
+			GearConnectionList *pGearConections = pPartsDoc->GetGearConnections();
+
+			CFArea PartArea;
+			pLink->GetArea( *pGearConections, PartArea );
+			
 			ConnectorList* pConnectors = pLink->GetConnectorList();
 
 			DrawLink( pRenderer, pPartsDoc->GetGearConnections(), pPartsDoc->GetViewLayers(), pLink, false, false, true );
@@ -1701,21 +1727,29 @@ void CLinkageView::DrawPartsList( CRenderer* pRenderer )
 					// DrawConnector( pRenderer, pPartsDoc->GetViewLayers(), pConnector, m_bShowLabels, false, false, false, true );
 				}
 			}
-			DrawDimensions( pRenderer, pPartsDoc->GetGearConnections(), pPartsDoc->GetViewLayers(), pLink, true, true );
+			PartArea += DrawDimensions( pRenderer, pPartsDoc->GetGearConnections(), pPartsDoc->GetViewLayers(), pLink, true, true );
 			Position2 = pConnectors->GetHeadPosition();
 			while( Position2 != NULL )
 			{
 				CConnector* pConnector = pConnectors->GetNext( Position2 );
 				if( pConnector != 0 )
-				DrawDimensions( pRenderer, pPartsDoc->GetViewLayers(), pConnector, true, true );
+				PartArea += DrawDimensions( pRenderer, pPartsDoc->GetViewLayers(), pConnector, true, true );
 			}
+
+			CFArea Temp( PartArea );
+			Temp.top += UnscaledUnits( yOffset );
+			Temp.bottom += UnscaledUnits( yOffset );
+			DocumentArea += Temp; // Will only get width properly. Height is affected by the scrol positions.
+
+			LastPartHeight = PartArea.Height() + Unscale( OFFSET_INCREMENT );
 		}
-		PartPoint = ComputeNextPartLocation( pLink, PartPoint );
-		PartPoint.y -= 200;
-		m_ScrollPosition.y -= 200;
 	}
 
 	m_ScrollPosition = SaveScrollPosition;
+
+	pRenderer->DrawRect( Scale( DocumentArea ) );
+
+	return DocumentArea;
 }
 
 void CLinkageView::DrawMotionPath( CRenderer *pRenderer, CConnector *pConnector )

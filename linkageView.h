@@ -79,10 +79,10 @@ public:
 	virtual BOOL PreCreateWindow(CREATESTRUCT& cs);
 	//}}AFX_VIRTUAL
 
-	void DoDraw( CRenderer* pRenderer );
+	CFArea DoDraw( CRenderer* pRenderer );
 	void DrawGrid( CRenderer* pRenderer );
-	void DrawMechanism( CRenderer* pRenderer );
-	void DrawPartsList( CRenderer* pRenderer );
+	CFArea DrawMechanism( CRenderer* pRenderer );
+	CFArea DrawPartsList( CRenderer* pRenderer );
 	CFRect CLinkageView::GetDocumentArea( bool bWithDimensions = false, bool bSelectedOnly = false );
 	CFRect CLinkageView::GetDocumentAdjustArea( bool bSelectedOnly = false );
 
@@ -245,7 +245,7 @@ private:
 	CFArea DrawDimensions( CRenderer* pRenderer, const GearConnectionList *pGearConnections, unsigned int OnLayers, CLink *pLink, bool bDrawLines, bool bDrawText );
 	CFArea DrawDimensions( CRenderer* pRenderer, unsigned int OnLayers, CConnector *pConnector, bool bDrawLines, bool bDrawText );
 	CFArea DrawConnectorLinkDimensions( CRenderer* pRenderer, const GearConnectionList *pGearConnections, unsigned int OnLayers, CLink *pLink, bool bDrawLines, bool bDrawText );
-	CFArea DrawGroundDimensions( CRenderer* pRenderer,  CLinkageDoc *pDoc, unsigned int OnLayers, bool bDrawLines, bool bDrawText );
+	CFArea DrawGroundDimensions( CRenderer* pRenderer, CLinkageDoc *pDoc, unsigned int OnLayers, bool bDrawLines, bool bDrawText );
 	CFArea DrawCirclesRadius( CRenderer *pRenderer, CFPoint Center, std::list<double> &RadiusList, bool bDrawLines, bool bDrawText );
 	void DrawStackedConnectors( CRenderer* pRenderer, unsigned int OnLayers );
 	void DrawActuator( CRenderer* pRenderer, unsigned int OnLayers, CLink *pLink, bool bDrawFill = false );

@@ -132,6 +132,10 @@ BOOL CLinkageDoc::OnNewDocument()
 	if (!CDocument::OnNewDocument())
 		return FALSE;
 
+	if( m_pPartsDoc != 0 )
+		delete m_pPartsDoc;
+	m_pPartsDoc = 0;
+
 	m_pCapturedConnector = 0;
 	m_SelectedConnectors.RemoveAll();
 	m_SelectedLinks.RemoveAll();
