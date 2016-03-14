@@ -218,7 +218,7 @@ private:
 
 	void ShowSelectedElementCoordinates( void );
 
-	CRect PreparePrepareRenderer( CRenderer &Renderer, CRect *pDrawRect, CBitmap *pBitmap, CDC *pDC, double ForceScaling, bool bScaleToFit, double MarginScale, double UnscaledUnitSize, bool bForScreen, bool bAntiAlias, bool bActualSize, int PageNumber );
+	CRect PrepareRenderer( CRenderer &Renderer, CRect *pDrawRect, CBitmap *pBitmap, CDC *pDC, double ForceScaling, bool bScaleToFit, double MarginScale, double UnscaledUnitSize, bool bForScreen, bool bAntiAlias, bool bActualSize, int PageNumber );
 	int GetPrintPageCount( CDC *pDC, CPrintInfo *pPrintInfo, bool bPrintActualSize );
 	void DrawAdjustmentControls( CRenderer *pRenderer );
 	void GetAdjustmentControlRect( AdjustmentControl Control, CFRect &Rect );

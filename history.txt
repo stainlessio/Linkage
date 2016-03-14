@@ -11,14 +11,14 @@
 8/23/2012 Fixed Unscale 100% bugs.
 
 8/24/2012 
-Add code work around to CPen and CPreparePrepareRenderer bug that screws up some lines while printing.
-The Scaling built into CPreparePrepareRenderer would create a new pen for every pen selected and the 
+Add code work around to CPen and CPrepareRenderer bug that screws up some lines while printing.
+The Scaling built into CPrepareRenderer would create a new pen for every pen selected and the 
 new pen would be scaled in size appropriately. When this code ran and and old pen was
 selected back into the device context, the logpen data could not be obtained and the
 pen was not selected. This resulted in some sort of default pen with default line size 
 and color to be used. The fake arrowhead code seems to have made this happen but
 probably only because it selected pens too often. The work around is to set the scale
-factor to 1 in CPreparePrepareRenderer and then rely on SetWindowExt() and SetViewportExt() to
+factor to 1 in CPrepareRenderer and then rely on SetWindowExt() and SetViewportExt() to
 let the GDI code do the scaling itself.
 
 8/25/2012

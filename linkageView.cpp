@@ -714,8 +714,13 @@ int CLinkageView::GetPrintPageCount( CDC *pDC, CPrintInfo *pPrintInfo, bool bPri
 
 }
 		
-CRect CLinkageView::PreparePrepareRenderer( CRenderer &Renderer, CRect *pDrawRect, CBitmap *pBitmap, CDC *pDC, double ScalingValue, bool bScaleToFit, double MarginScale, double UnscaledUnitSize, bool bForScreen, bool bAntiAlias, bool bActualSize, int PageNumber )
+CRect CLinkageView::PrepareRenderer( CRenderer &Renderer, CRect *pDrawRect, CBitmap *pBitmap, CDC *pDC, double ScalingValue, bool bScaleToFit, double MarginScale, double UnscaledUnitSize, bool bForScreen, bool bAntiAlias, bool bActualSize, int PageNumber )
 {
+	CLinkageDoc* pDoc = GetDocument();
+	ASSERT_VALID(pDoc);
+	bool bEmpty = pDoc->IsEmpty();
+	pDoc = 0; // Don't use this anymore after this.
+
 	m_YUpDirection = ( Renderer.GetYOrientation() < 0 ) ? -1 : 1;
 	m_BaseUnscaledUnit = UnscaledUnitSize;
 	m_ConnectorRadius = CONNECTORRADIUS * UnscaledUnitSize;
@@ -754,9 +759,6 @@ CRect CLinkageView::PreparePrepareRenderer( CRenderer &Renderer, CRect *pDrawRec
 		 * feature of CRenderer.
 		 */
 
-		CLinkageDoc* pDoc = GetDocument();
-		ASSERT_VALID(pDoc);
-
 		static const double MyLogicalPixels = CLinkageDoc::GetBaseUnitsPerInch();
 
 		int PixelsPerInch = pDC->GetDeviceCaps( LOGPIXELSX );
@@ -764,7 +766,7 @@ CRect CLinkageView::PreparePrepareRenderer( CRenderer &Renderer, CRect *pDrawRec
 
 		/*
 		 * The detail scale allows the drawing functions to draw to a much larger area and the window/viewport
-		 * scaling combined wih the device context scaling makes it the correct size for the page. This has
+		 * scaling combined with the device context scaling makes it the correct size for the page. This has
 		 * the advantage of allowing a higher resolution to be drawn to than the document 96 DPI while still
 		 * making fonts, lines, arrowheads, all look correct on the page.
 		 */
@@ -784,7 +786,7 @@ CRect CLinkageView::PreparePrepareRenderer( CRenderer &Renderer, CRect *pDrawRec
 		pDC->SetViewportExt( cx, cy );
 
 		/*
-		 * Mechanisms are draw actual size. The view zoom lets the user do this but printing
+		 * Mechanisms are drawn actual size. The view zoom lets the user do this but printing
 		 * does not use the screen Unscale. Shrink the drawing to fit on the page if it is too big.
 		 */
 		double ExtraScaling = 1.0;
@@ -833,10 +835,7 @@ CRect CLinkageView::PreparePrepareRenderer( CRenderer &Renderer, CRect *pDrawRec
 
 		if( bScaleToFit )
 		{
-			CLinkageDoc* pDoc = GetDocument();
-			ASSERT_VALID(pDoc);
-
-			if( pDoc->IsEmpty() )
+			if( bEmpty )
 			{
 				m_Zoom = 1;
 				m_ScrollPosition.x = 0;
@@ -874,7 +873,7 @@ CRect CLinkageView::PreparePrepareRenderer( CRenderer &Renderer, CRect *pDrawRec
 			NewArea.Normalize();
 
 			// 4 times is enought to get the chage ratio up to .99995 during testing.
-			for( int Test = 0; Test < 4; ++Test )
+			for( int Test = 0; Test < 34; ++Test )
 			{
 				// Zoom out to make room for dimensions. This is not exact because the zoom affects the dimension line sizes and positions.
 				CFRect BigArea = GetDocumentArea( true );
@@ -1850,7 +1849,7 @@ void CLinkageView::OnDraw( CDC* pDC, CPrintInfo *pPrintInfo )
 	 * when saving a video animation of the mechanism.
 	 */
 
-    PreparePrepareRenderer( Renderer, 0, &Bitmap, pDC, 1.0, false, 0.0, 1.0, !pDC->IsPrinting(), false, m_bPrintFullSize, pPrintInfo == 0 ? 0 : pPrintInfo->m_nCurPage - 1 );
+    PrepareRenderer( Renderer, 0, &Bitmap, pDC, 1.0, false, 0.0, 1.0, !pDC->IsPrinting(), false, m_bPrintFullSize, pPrintInfo == 0 ? 0 : pPrintInfo->m_nCurPage - 1 );
 
 	DoDraw( &Renderer );
 
@@ -1910,7 +1909,7 @@ void CLinkageView::OnDraw( CDC* pDC, CPrintInfo *pPrintInfo )
 
 		CRect VideoRect( 0, 0, ANIMATIONWIDTH, ANIMATIONHEIGHT );
 
-		PreparePrepareRenderer( VideoRenderer, &VideoRect, &VideoBitmap, pDC, 4.0, false, 0.0, 1.0, true, true, false, 0 );
+		PrepareRenderer( VideoRenderer, &VideoRect, &VideoBitmap, pDC, 4.0, false, 0.0, 1.0, true, true, false, 0 );
 
 		// Adjust the offset to get the image properly positioned within the video area
 		// since drawing is done of the video area only.
@@ -4465,9 +4464,9 @@ void CLinkageView::OnMenuUnscalefit()
 	cx -= 140;
 	cy -= 140;
 
-	CFRect Area = GetDocumentArea();
+	CFRect Area = GetDocumentArea( m_bShowDimensions );
 
-	// Figure out the Unscaleing needed once we are at a zoom level of 1.
+	// Figure out the Unscaling needed once we are at a zoom level of 1.
 	double xScaleChange = cx / fabs( Area.Width() );
 	double yScaleChange = cy / fabs( Area.Height() );
 
@@ -7721,7 +7720,7 @@ bool CLinkageView::DisplayAsImage( CDC *pOutputDC, int xOut, int yOut, int OutWi
 
 	double ScaleFactor = 4.0;
 
-	PreparePrepareRenderer( Renderer, &ImageRect, &MemoryBitmap, pDC, ScaleFactor, true, MarginScale, 1.0, false, true, false, 0 );
+	PrepareRenderer( Renderer, &ImageRect, &MemoryBitmap, pDC, ScaleFactor, true, MarginScale, 1.0, false, true, false, 0 );
 
 	DoDraw( &Renderer );
 
@@ -7797,7 +7796,7 @@ bool CLinkageView::SaveAsImage( const char *pFileName, int RenderWidth, int Rend
 
 	double ScaleFactor = 4.0;
 
-	PreparePrepareRenderer( Renderer, &ImageRect, &MemoryBitmap, pDC, ScaleFactor, true, MarginScale, 1.0, false, true, false, 0 );
+	PrepareRenderer( Renderer, &ImageRect, &MemoryBitmap, pDC, ScaleFactor, true, MarginScale, 1.0, false, true, false, 0 );
 
 	DoDraw( &Renderer );
 
@@ -7866,7 +7865,7 @@ bool CLinkageView::SaveAsDXF( const char *pFileName )
 
 	CRect ImageRect( 0, 0, Width, Height );
 
-	PreparePrepareRenderer( Renderer, &ImageRect, 0, 0, 1.0, false, 0.0, ConnectorSize, false, false, false, 0 );
+	PrepareRenderer( Renderer, &ImageRect, 0, 0, 1.0, false, 0.0, ConnectorSize, false, false, false, 0 );
 
 	m_Zoom = pDoc->GetUnitScale();
 	DoDraw( &Renderer );
