@@ -623,6 +623,14 @@ bool CLinkageDoc::ReadIn( CArchive& ar, bool bSelectAll, bool bObeyUnscaleOffset
 					}
 				}
 
+				if( bSizeAsSize )
+				{
+					// This cancels out unit scaling done inside of the SetGearRatio function so that
+					// the value set is the document gear size, not the gear size for display.
+					Size1 *= m_UnitScaling;
+					Size2 *= m_UnitScaling;
+				}
+
 				if( pLink1 != 0 && pLink2 != 0 && Size1 > 0.0 && Size2 > 0.0 )
 					SetGearRatio( pLink1, pLink2, Size1, Size2, bSizeAsSize, Type, false );
 			}
@@ -4650,22 +4658,25 @@ CGearConnection * CLinkageDoc::GetGearRatio( CLink *pGear1, CLink *pGear2, doubl
 		if( pGearConnection == 0 || pGearConnection->m_pGear1 == 0 || pGearConnection->m_pGear2 == 0 )
 			continue;
 
+		// Scale the size values if using a chain and gears whose size is set.
+		double UseDocumentScale = pGearConnection->m_bUseSizeAsRadius ? GetUnitScale() : 1;
+
 		if( ( pGearConnection->m_pGear1 == pGear1 && pGearConnection->m_pGear2 == pGear2 )
 		    || ( pGearConnection->m_pGear1 == pGear2 && pGearConnection->m_pGear2 == pGear1 ) )
 		{
 			if( pGearConnection->m_pGear1 == pGear1 )
 			{
 				if( pSize1 != 0 )
-					*pSize1 = pGearConnection->m_Gear1Size;
+					*pSize1 = pGearConnection->m_Gear1Size * UseDocumentScale;
 				if( pSize2 != 0 )
-					*pSize2 = pGearConnection->m_Gear2Size;
+					*pSize2 = pGearConnection->m_Gear2Size * UseDocumentScale;
 			}
 			else
 			{
 				if( pSize1 != 0 )
-					*pSize1 = pGearConnection->m_Gear2Size;
+					*pSize1 = pGearConnection->m_Gear2Size * UseDocumentScale;
 				if( pSize2 != 0 )
-					*pSize2 = pGearConnection->m_Gear1Size;
+					*pSize2 = pGearConnection->m_Gear1Size * UseDocumentScale;
 			}
 			return pGearConnection;
 		}
@@ -4698,6 +4709,13 @@ bool CLinkageDoc::SetGearRatio( CLink *pGear1, CLink *pGear2, double Size1, doub
 
 	if( bFromUI )
 		PushUndo();
+
+	if( bUseSizeAsSize )
+	{
+		double DocumentScale = GetUnitScale();
+		Size1 /= DocumentScale;
+		Size2 /= DocumentScale;
+	}
 
 	if( bNew || pGearConnection->m_pGear1 == pGear1 )
 	{
