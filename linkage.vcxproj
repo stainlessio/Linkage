@@ -180,7 +180,7 @@
       <AdditionalManifestFiles>res\linkage.xml;%(AdditionalManifestFiles)</AdditionalManifestFiles>
       <OutputManifestFile>
       </OutputManifestFile>
-      <EnableDpiAwareness>none</EnableDpiAwareness>
+      <EnableDpiAwareness>false</EnableDpiAwareness>
     </Manifest>
     <Bscmake>
       <SuppressStartupBanner>true</SuppressStartupBanner>
