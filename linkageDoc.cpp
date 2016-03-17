@@ -94,6 +94,7 @@ CLinkageDoc::CLinkageDoc()
 	m_pUndoListEnd = 0;
 	m_UndoCount = 0;
 
+	m_bSelectionMakeAnchor = false;
 	m_bSelectionConnectable = false;
 	m_bSelectionCombinable = false;
 	m_bSelectionJoinable = false;
@@ -145,7 +146,8 @@ BOOL CLinkageDoc::OnNewDocument()
 	m_pUndoList = 0;
 	m_pUndoListEnd = 0;
 	m_UndoCount = 0;
-	
+
+	m_bSelectionMakeAnchor= false;
 	m_bSelectionConnectable = false;
 	m_bSelectionCombinable = false;
 	m_bSelectionJoinable = false;
@@ -2637,6 +2639,26 @@ void CLinkageDoc::MakeParallelogramSelected( bool bMakeRectangle )
 	SetSelectedModifiableCondition();
 }
 
+void CLinkageDoc::MakeAnchorSelected( void )
+{
+	PushUndo();
+
+	POSITION Position = m_Connectors.GetHeadPosition();
+	while( Position != NULL )
+	{
+		POSITION DeletePosition = Position;
+		CConnector* pConnector = m_Connectors.GetNext( Position );
+		if( pConnector == 0 || !pConnector->IsSelected() )
+			continue;
+
+		pConnector->SetAsAnchor( true );
+	}
+
+	FinishChangeSelected();
+	
+	SetSelectedModifiableCondition();
+}
+
 void CLinkageDoc::CombineSelected( void )
 {
 	PushUndo();
@@ -3875,6 +3897,7 @@ void CLinkageDoc::SetSelectedModifiableCondition( void )
 		m_bSelectionJoinable = false;
 		m_bSelectionSlideable = false;
 		m_bSelectionLockable = false;
+		m_bSelectionMakeAnchor = false;
 	}
 	else
 	{
@@ -3884,6 +3907,7 @@ void CLinkageDoc::SetSelectedModifiableCondition( void )
 		m_bSelectionJoinable = SelectedConnectors > 1 && Sliders <= 1;
 		m_bSelectionSlideable = ConnectSliderLimits( true );
 		m_bSelectionLockable = SelectedConnectors == 0 && SelectedRealLinks > 0;
+		m_bSelectionMakeAnchor = SelectedConnectors > 0 && SelectedRealLinks == 0;
 	}
 
 	m_bSelectionSplittable = SelectedRealLinks == 0 && SelectedConnectors == 1;

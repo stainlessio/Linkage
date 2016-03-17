@@ -1147,17 +1147,17 @@
 		<slidelimit id=\"6\"/>\
 		<slidelimit id=\"11\"/>\
 	</connector>\
-	<connector id=\"17\" selected=\"true\" layer=\"16\" x=\"650.096751\" y=\"-185.718339\" anchor=\"true\" slider=\"true\" color=\"2121760\">\
+	<connector id=\"17\" selected=\"true\" layer=\"16\" x=\"651.150901\" y=\"-203.173032\" anchor=\"true\" slider=\"true\" slideradius=\"156.734694\" color=\"2121760\">\
 		<slidelimit id=\"21\"/>\
 		<slidelimit id=\"23\"/>\
 	</connector>\
-	<connector id=\"19\" selected=\"true\" layer=\"16\" x=\"705.853436\" y=\"-184.962976\" anchor=\"true\" slider=\"true\" color=\"8421440\">\
+	<connector id=\"19\" selected=\"true\" layer=\"16\" x=\"709.276271\" y=\"-207.342172\" anchor=\"true\" slider=\"true\" slideradius=\"156.734694\" color=\"8421440\">\
 		<slidelimit id=\"21\"/>\
 		<slidelimit id=\"23\"/>\
 	</connector>\
-	<connector id=\"21\" selected=\"true\" layer=\"16\" x=\"629.306122\" y=\"-186.000000\" color=\"8405120\"/>\
+	<connector id=\"21\" selected=\"true\" layer=\"16\" x=\"626.938776\" y=\"-194.591039\" color=\"8405120\"/>\
 	<connector id=\"22\" selected=\"true\" layer=\"16\" x=\"705.306122\" y=\"-132.000000\" color=\"6324288\"/>\
-	<connector id=\"23\" selected=\"true\" layer=\"16\" x=\"780.090048\" y=\"-183.957256\" slider=\"true\" color=\"16711680\">\
+	<connector id=\"23\" selected=\"true\" layer=\"16\" x=\"784.667425\" y=\"-177.488756\" slider=\"true\" color=\"16711680\">\
 		<slidelimit id=\"5\"/>\
 		<slidelimit id=\"16\"/>\
 	</connector>\
@@ -1232,6 +1232,46 @@
 		<connector id=\"20\"/>\
 		<connector id=\"16\"/>\
 	</Link>\
+	<selected>\
+		<connector id=\"20\"/>\
+		<connector id=\"16\"/>\
+		<connector id=\"5\"/>\
+		<connector id=\"23\"/>\
+		<connector id=\"22\"/>\
+		<connector id=\"21\"/>\
+		<connector id=\"19\"/>\
+		<connector id=\"17\"/>\
+		<connector id=\"18\"/>\
+		<connector id=\"15\"/>\
+		<connector id=\"13\"/>\
+		<connector id=\"11\"/>\
+		<connector id=\"6\"/>\
+		<connector id=\"10\"/>\
+		<connector id=\"9\"/>\
+		<connector id=\"8\"/>\
+		<connector id=\"7\"/>\
+		<connector id=\"14\"/>\
+		<connector id=\"12\"/>\
+		<connector id=\"4\"/>\
+		<connector id=\"3\"/>\
+		<connector id=\"2\"/>\
+		<connector id=\"1\"/>\
+		<connector id=\"0\"/>\
+		<link id=\"15\"/>\
+		<link id=\"14\"/>\
+		<link id=\"12\"/>\
+		<link id=\"13\"/>\
+		<link id=\"11\"/>\
+		<link id=\"10\"/>\
+		<link id=\"8\"/>\
+		<link id=\"4\"/>\
+		<link id=\"7\"/>\
+		<link id=\"1\"/>\
+		<link id=\"6\"/>\
+		<link id=\"5\"/>\
+		<link id=\"2\"/>\
+		<link id=\"0\"/>\
+	</selected>\
 </linkage2>\
 "
 

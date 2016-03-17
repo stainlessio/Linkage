@@ -143,6 +143,8 @@ BEGIN_MESSAGE_MAP(CLinkageView, CView)
 
 	ON_COMMAND(ID_EDIT_SET_RATIO, &CLinkageView::OnEditSetRatio)
 	ON_UPDATE_COMMAND_UI(ID_EDIT_SET_RATIO, &CLinkageView::OnUpdateEditSetRatio)
+	ON_COMMAND(ID_EDIT_MAKEANCHOR, &CLinkageView::OnEditmakeAnchor)
+	ON_UPDATE_COMMAND_UI(ID_EDIT_MAKEANCHOR, &CLinkageView::OnUpdateEditmakeAnchor)
 
 	ON_UPDATE_COMMAND_UI(ID_EDIT_DELETESELECTED, &CLinkageView::OnUpdateEditSelected)
 	ON_COMMAND(ID_EDIT_DELETESELECTED, &CLinkageView::OnEditDeleteselected)
@@ -3343,6 +3345,21 @@ void CLinkageView::OnEditCombine()
 	ASSERT_VALID(pDoc);
 	pDoc->CombineSelected();
 	InvalidateRect( 0 );
+}
+
+afx_msg void CLinkageView::OnEditmakeAnchor()
+{
+	CLinkageDoc* pDoc = GetDocument();
+	ASSERT_VALID(pDoc);
+	pDoc->MakeAnchorSelected();
+	InvalidateRect( 0 );
+}
+
+afx_msg void CLinkageView::OnUpdateEditmakeAnchor(CCmdUI *pCmdUI)
+{
+	CLinkageDoc* pDoc = GetDocument();
+	ASSERT_VALID(pDoc);
+	pCmdUI->Enable( !m_bSimulating && pDoc->IsSelectionMakeAnchor() && m_bAllowEdit );
 }
 
 void CLinkageView::OnEditConnect()
