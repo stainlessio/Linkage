@@ -44,6 +44,7 @@
 #define IDC_BUTTON3                     1020
 #define IDC_BUTTON4                     1021
 #define ID_CONTROL_WINDOW               1022
+#define ID_EDIT_MAKEANCHOR              1023
 #define IDC_COMMAND1                    2000
 #define IDC_CHECK2                      2001
 #define IDB_BITMAP4                     2002
@@ -347,7 +348,7 @@
 #define ID_SAMPLE_ORBITGEARS            5131
 #define ID_SAMPLE_OSCILLATORGEARS       5132
 #define ID_SAMPLE_STEPHENSON            5133
-#define ID_SAMPLE_UNUSED17		        5134
+#define ID_SAMPLE_UNUSED17              5134
 #define ID_SAMPLE_UNUSED18              5135
 #define ID_SAMPLE_UNUSED19              5136
 #define ID_SAMPLE_UNUSED20              5137
@@ -454,12 +455,12 @@
 #define IDS_SAMPLE_FOURGEARS            5419
 #define IDS_SAMPLE_ORBITGEARS           5420
 #define IDS_SAMPLE_OSCILLATORGEARS      5421
-#define IDS_SAMPLE_STEPHENSON			5422
-#define IDS_SAMPLE_PEAUCELLIER			5423
-#define IDS_RIBBON_VIEW_GRID			5424
-#define ID_VIEW_GRID					5425
-#define IDS_RIBBON_VIEW_PARTS			5426
-#define ID_VIEW_PARTS					5427
+#define IDS_SAMPLE_STEPHENSON           5422
+#define IDS_SAMPLE_PEAUCELLIER          5423
+#define IDS_RIBBON_VIEW_GRID            5424
+#define ID_VIEW_GRID                    5425
+#define IDS_RIBBON_VIEW_PARTS           5426
+#define ID_VIEW_PARTS                   5427
 #define ID_FILE_PRINTFULL               5935
 #define IDD_EXPORTIMAGE                 6000
 #define IDC_PREVIEW                     8000
@@ -469,7 +470,7 @@
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        6002
-#define _APS_NEXT_COMMAND_VALUE         7000
+#define _APS_NEXT_COMMAND_VALUE         7002
 #define _APS_NEXT_CONTROL_VALUE         8001
 #define _APS_NEXT_SYMED_VALUE           9000
 #endif

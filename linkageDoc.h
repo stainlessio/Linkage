@@ -153,6 +153,7 @@ public:
 	void MakeSelectedAtAngle( double Angle );
 	void MakeParallelogramSelected( bool bMakeRectangle );
 	void CombineSelected( void );
+	void MakeAnchorSelected( void );
 	bool AddConnectorToSelected( double Offset );
 
 	void AlignSelected( _Direction Direction );
@@ -210,6 +211,7 @@ public:
 	bool IsSelectionUnfastenable( void ) { return m_bSelectionUnfastenable; }
 	bool IsSelectionMeshableGears( void ) { return m_bSelectionMeshable; }
 	bool IsSelectionLockable( void ) { return m_bSelectionLockable; }
+	bool IsSelectionMakeAnchor( void ) { return m_bSelectionMakeAnchor; }
 
 	void GetSnapLines( CFLine &Line1, CFLine &Line2 ) { Line1 = m_SnapLine[0]; Line2 = m_SnapLine[1]; }
 	
@@ -280,6 +282,7 @@ private:
 	bool m_bSelectionUnfastenable;
 	bool m_bSelectionMeshable;
 	bool m_bSelectionLockable;
+	bool m_bSelectionMakeAnchor;
 
 	bool CheckMeshableGears( void );
 	bool CheckMeshableGears( CLink *pGear1, CLink *pGear2 );

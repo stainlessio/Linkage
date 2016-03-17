@@ -78,14 +78,23 @@ END
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
 IDR_MAINFRAME           ICON                    "C:\\development\\Linkage\\res\\testx.ico"
+
 IDR_LINKAGTYPE          ICON                    "res\\LinkageDoc.ico"
+
 IDI_ICON1               ICON                    "res\\icon1.ico"
+
 IDI_ICON2               ICON                    "res\\icon2.ico"
+
 IDI_ICON3               ICON                    "res\\icon3.ico"
+
 IDI_ICON4               ICON                    "res\\icon4.ico"
+
 IDI_ICON5               ICON                    "res\\icon5.ico"
+
 IDI_ICON7               ICON                    "res\\icon7.ico"
+
 IDI_ICON9               ICON                    "res\\icon9.ico"
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -93,17 +102,29 @@ IDI_ICON9               ICON                    "res\\icon9.ico"
 //
 
 IDB_FILELARGE           BITMAP                  "res\\filelarge.bmp"
+
 IDB_FILESMALL           BITMAP                  "res\\filesmall.bmp"
+
 IDB_SAMPLE_GALLERY      BITMAP                  "res\\sample_gallery.bmp"
+
 IDB_MAIN                BITMAP                  "res\\main.bmp"
+
 IDB_BUTTONS             BITMAP                  "res\\buttons.bmp"
+
 IDB_INSERT_POPUP_GALLERY BITMAP                  "res\\popup_gallery.bmp"
+
 IDB_INSERT_POPUP_GALLERY2 BITMAP                  "res\\popup_gallery_2.bmp"
+
 IDB_PLAY                BITMAP                  "res\\play.bmp"
+
 IDB_BITMAP3             BITMAP                  "res\\bitmap3.bmp"
+
 IDB_CONNECTOR           BITMAP                  "res\\bitmap7.bmp"
+
 IDB_ANCHOR              BITMAP                  "res\\bitmap9.bmp"
+
 IDB_INPUT               BITMAP                  "res\\bitmap11.bmp"
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -261,7 +282,6 @@ BEGIN
     "X",            ID_EDIT_CUT,            VIRTKEY, CONTROL, NOINVERT
     VK_DELETE,      ID_EDIT_DELETESELECTED, VIRTKEY, NOINVERT
     "F",            ID_EDIT_FASTEN,         VIRTKEY, NOINVERT
-    "U",            ID_EDIT_UNFASTEN,       VIRTKEY, NOINVERT
     "J",            ID_EDIT_JOIN,           VIRTKEY, NOINVERT
     "V",            ID_EDIT_PASTE,          VIRTKEY, CONTROL, NOINVERT
     VK_INSERT,      ID_EDIT_PASTE,          VIRTKEY, SHIFT, NOINVERT
@@ -269,6 +289,7 @@ BEGIN
     "L",            ID_EDIT_SLIDE,          VIRTKEY, NOINVERT
     VK_BACK,        ID_EDIT_UNDO,           VIRTKEY, ALT, NOINVERT
     "Z",            ID_EDIT_UNDO,           VIRTKEY, CONTROL, NOINVERT
+    "U",            ID_EDIT_UNFASTEN,       VIRTKEY, NOINVERT
     "N",            ID_FILE_NEW,            VIRTKEY, CONTROL, NOINVERT
     "O",            ID_FILE_OPEN,           VIRTKEY, CONTROL, NOINVERT
     "P",            ID_FILE_PRINT,          VIRTKEY, CONTROL, NOINVERT
@@ -277,15 +298,12 @@ BEGIN
     VK_TAB,         ID_SELECT_NEXT,         VIRTKEY, NOINVERT
     "<",            ID_SIMULATE_BACKWARD,   ASCII,  NOINVERT
     "[",            ID_SIMULATE_BACKWARD,   ASCII,  NOINVERT
-    //VK_LEFT,        ID_SIMULATE_BACKWARD,   VIRTKEY, NOINVERT
-    //VK_LEFT,        ID_SIMULATE_BACKWARD_BIG, VIRTKEY, SHIFT, NOINVERT
     ">",            ID_SIMULATE_FORWARD,    ASCII,  NOINVERT
     "]",            ID_SIMULATE_FORWARD,    ASCII,  NOINVERT
-    //VK_RIGHT,       ID_SIMULATE_FORWARD,    VIRTKEY, NOINVERT
-    //VK_RIGHT,       ID_SIMULATE_FORWARD_BIG, VIRTKEY, SHIFT, NOINVERT
     "R",            ID_SIMULATION_RUN,      VIRTKEY, NOINVERT
     "S",            ID_SIMULATION_STOP,     VIRTKEY, NOINVERT
     VK_ESCAPE,      ID_SIMULATION_STOP,     VIRTKEY, NOINVERT
+    "G",            ID_EDIT_MAKEANCHOR,     VIRTKEY, NOINVERT
 END
 
 
@@ -488,8 +506,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 3,1,5,0
- PRODUCTVERSION 3,1,5,0
+ FILEVERSION 3,1,6,0
+ PRODUCTVERSION 3,1,6,0
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -505,12 +523,12 @@ BEGIN
         BLOCK "080004e4"
         BEGIN
             VALUE "FileDescription", "linkage Application"
-            VALUE "FileVersion", "3.1.5.0"
+            VALUE "FileVersion", "3.1.6.0"
             VALUE "InternalName", "Linkage"
             VALUE "LegalCopyright", "Copyright © 2002 - 2016 David Rector"
             VALUE "OriginalFilename", "Linkage.exe"
             VALUE "ProductName", "linkage Application"
-            VALUE "ProductVersion", "3.1.5.0"
+            VALUE "ProductVersion", "3.1.6.0"
         END
     END
     BLOCK "VarFileInfo"
@@ -668,8 +686,8 @@ BEGIN
     IDS_SAMPLE_ORBITGEARS   "Sun-planet-moon orbit gear and chain mechanism.\nOrbit Machine"
     IDS_SAMPLE_OSCILLATORGEARS 
                             "Applified rocking motion mechanism.\nAmplified Rocking"
-	IDS_SAMPLE_STEPHENSON	"Stephenson valve gear.\nStephenson Valve Gear"
-	IDS_SAMPLE_PEAUCELLIER	"Peaucellier straight link mechanism.\Peaucellier Mechanism"
+    IDS_SAMPLE_STEPHENSON   "Stephenson valve gear.\nStephenson Valve Gear"
+    IDS_SAMPLE_PEAUCELLIER  "Peaucellier straight link mechanism.\\Peaucellier Mechanism"
 END
 
 STRINGTABLE
@@ -792,8 +810,12 @@ BEGIN
     IDS_RIBBON_SETTINGS     "Settings"
     IDS_RIBBON_SETTINGSOPTIONS "Options"
     IDS_RIBBON_VIEW_LARGEFONT "Large Text"
-	IDS_RIBBON_VIEW_GRID		"Show Grid"
-	IDS_RIBBON_VIEW_PARTS		"Parts List"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_RIBBON_VIEW_GRID    "Show Grid"
+    IDS_RIBBON_VIEW_PARTS   "Parts List"
 END
 
 STRINGTABLE
@@ -1108,6 +1130,7 @@ BEGIN
     ID_SAMPLE_SMILE         "A set of links and connectors that will bring a smile."
     ID_SAMPLE_LINK3         "Smile 2"
     ID_SAMPLE_LINK4         "Sliding Link 3"
+    ID_SAMPLE_PEAUCELLIER   "Peaucellier Straight Line Mechanism."
     ID_SAMPLE_SCISSORS      "Scissor lift mechanism."
 END
 
@@ -1122,8 +1145,7 @@ BEGIN
     ID_SAMPLE_FOURGEARS     "Four Gear Reduction Mechanism."
     ID_SAMPLE_ORBITGEARS    "Planet and Moon Orbit Meachanism."
     ID_SAMPLE_OSCILLATORGEARS "Applified Rocking Motion Mechanism."
-	ID_SAMPLE_STEPHENSON	"Stephenson Valve Gear Mechanism."
-	ID_SAMPLE_PEAUCELLIER	"Peaucellier Straight Line Mechanism."
+    ID_SAMPLE_STEPHENSON    "Stephenson Valve Gear Mechanism."
 END
 
 STRINGTABLE

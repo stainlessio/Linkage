@@ -452,6 +452,8 @@ public:
 	afx_msg void OnUpdateViewDrawing(CCmdUI *pCmdUI);
 	afx_msg void OnViewMechanism();
 	afx_msg void OnUpdateViewMechanism(CCmdUI *pCmdUI);
+	afx_msg void OnEditmakeAnchor();
+	afx_msg void OnUpdateEditmakeAnchor(CCmdUI *pCmdUI);
 
 	afx_msg void OnEditDrawing();
 	afx_msg void OnUpdateEditDrawing(CCmdUI *pCmdUI);
