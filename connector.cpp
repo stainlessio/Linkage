@@ -18,7 +18,7 @@ static CString GetAlphaIdentifier( int ID )
 
 void CConnector::Reset( void )
 {
-	m_Point.x = 0; 
+	m_Point.x = 0;   
 	m_Point.y = 0;
 	m_OriginalPoint.x = 0;
 	m_OriginalPoint.y = 0;
