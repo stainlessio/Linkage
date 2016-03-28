@@ -18,7 +18,7 @@
 #include "linkpropertiesdialog.h"
 #include "testdialog.h"
 #include "DebugItem.h"
-#include "RecordDialog.h"get
+#include "RecordDialog.h"
 #include "AngleDialog.h"
 #include <stdio.h>
 #include <string.h>
@@ -334,6 +334,7 @@ CLinkageView::CLinkageView()
 {
 	m_MouseAction = ACTION_NONE;
 	m_bSimulating = false;
+	m_bAllowEdit = true;
 	m_SimulationControl = AUTO;
 	m_bShowLabels = true;
 	m_bShowAngles = true;
