@@ -90,7 +90,7 @@ class CLink : public CElement
 	void InitializeForMove( void );
 	void ResetMoveCount( void ) { m_MoveCount = 0; }
 	int GetMoveCount( void ) { return m_MoveCount; }
-	void IncrementMoveCount( int Increment = +1 ) { m_MoveCount + Increment; }
+	void IncrementMoveCount( int Increment = +1 ) { m_MoveCount += Increment; }
 	
 	int GetLineSize( void ) { return m_LineSize; }
 	void SetLineSize( int Size ) { m_LineSize = Size <= 0 ? 1 : Size; }
