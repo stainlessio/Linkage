@@ -87,7 +87,6 @@ void CLinkageDoc::SetLinkConnector( CLink* pLink, CConnector* pConnector )
 
 CLinkageDoc::CLinkageDoc()
 {
-	m_pPartsDoc = 0;
 	m_pCapturedConnector = 0;
 	m_pCapturedController = 0;
 	m_pUndoList = 0;
@@ -121,10 +120,6 @@ CLinkageDoc::CLinkageDoc()
 
 CLinkageDoc::~CLinkageDoc()
 {
-	if( m_pPartsDoc != 0 )
-		delete m_pPartsDoc;
-	m_pPartsDoc = 0;
-
 	DeleteContents();
 }
 
@@ -132,10 +127,6 @@ BOOL CLinkageDoc::OnNewDocument()
 {
 	if (!CDocument::OnNewDocument())
 		return FALSE;
-
-	if( m_pPartsDoc != 0 )
-		delete m_pPartsDoc;
-	m_pPartsDoc = 0;
 
 	m_pCapturedConnector = 0;
 	m_SelectedConnectors.RemoveAll();
@@ -4804,6 +4795,8 @@ void CLinkageDoc::FastenThese( CLink *pFastenThis, CConnector *pFastenToThis )
 	pFastenToThis->AddFastenLink( pFastenThis );
 }
 
+#if 0
+
 CLinkageDoc *CLinkageDoc::GetPartsDocument( bool bRecompute )
 {
 	/* 
@@ -4983,6 +4976,8 @@ void CLinkageDoc::CreatePartsFromDocument( CLinkageDoc *pOriginalDoc )
 	MovePartsLinkToOrigin( Area.TopLeft(), pGroundLink );
 	m_Links.AddTail( pGroundLink );
 }
+#endif
+
 
 
 

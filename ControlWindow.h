@@ -12,7 +12,7 @@ public:
 	virtual ~CControlWindow();
 
 	void Clear( void );
-	void AddControl( int ControlID, const char *pDescription, int CommandID, double InitialPosition = 0.0 );
+	void AddControl( int ControlID, const char *pDescription, int CommandID, bool bCentered = false, double InitialPosition = 0.0 );
 	void UpdateControl( int ControlID, double Position );
 
 	int GetDesiredHeight( void );

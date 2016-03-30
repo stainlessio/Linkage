@@ -246,7 +246,7 @@ void CMainFrame::CreateViewPanel( CMFCRibbonCategory* pCategory )
 	AppendMenuItem( pDetailsButton, IDS_RIBBON_VIEW_LARGEFONT, ID_VIEW_LARGEFONT, 78 );
 	AppendMenuItem( pDetailsButton, IDS_RIBBON_SOLIDLINKS, ID_VIEW_SOLIDLINKS, 75 );
 	AppendMenuItem( pDetailsButton, IDS_RIBBON_VIEW_GRID, ID_VIEW_GRID, 85 );
-	// AppendMenuItem( pDetailsButton, IDS_RIBBON_VIEW_PARTS, ID_VIEW_PARTS, 86 );
+	//AppendMenuItem( pDetailsButton, IDS_RIBBON_VIEW_PARTS, ID_VIEW_PARTS, 86 );
 	AppendMenuItem( pDetailsButton, IDS_RIBBON_VIEW_DEBUG, ID_VIEW_DEBUG, 81 );
 
 	// The menu is only needed in order to make the button work properly.
