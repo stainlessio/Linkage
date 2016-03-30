@@ -33,11 +33,6 @@
 #include <algorithm>
 #include <vector>
 
-//#include <gl/gl.h>
-//#include <gl/glu.h>
-
-#define TESTPARTS 0
-
 using namespace std;
 
 using namespace Gdiplus;
@@ -312,7 +307,7 @@ BEGIN_MESSAGE_MAP(CLinkageView, CView)
 	ON_UPDATE_COMMAND_UI(ID_EDIT_SLIDE, &CLinkageView::OnUpdateEditSlide)
 	ON_COMMAND(ID_INSERT_SLIDER, (AFX_PMSG)&CLinkageView::OnInsertlinkSlider)
 	ON_UPDATE_COMMAND_UI(ID_INSERT_SLIDER, &CLinkageView::OnUpdateEdit)
-	ON_UPDATE_COMMAND_UI( ID_RIBBON_SAMPLE_GALLERY, &CLinkageView::OnUpdateEdit)
+	//ON_UPDATE_COMMAND_UI( ID_RIBBON_SAMPLE_GALLERY, &CLinkageView::OnUpdateEdit)
 	ON_COMMAND(ID_INSERT_ACTUATOR, (AFX_PMSG)&CLinkageView::OnInsertActuator)
 	ON_WM_CREATE()
 	ON_WM_DESTROY()
@@ -422,6 +417,7 @@ CLinkageView::CLinkageView()
 		m_bPrintFullSize = pApp->GetProfileInt( "Settings", "PrintFullSize", 0 ) != 0;
 		m_bShowGrid = pApp->GetProfileInt( "Settings", "ShowGrid", 0 ) != 0;
 		m_bShowParts = pApp->GetProfileInt( "Settings", "ShowParts", 0 ) != 0;
+		m_bAllowEdit = !m_bShowParts;
 								
 		m_Rotate0 = pApp->LoadIcon( IDI_ICON5 );
 		m_Rotate1 = pApp->LoadIcon( IDI_ICON1 );
@@ -1212,18 +1208,17 @@ CFRect CLinkageView::GetDocumentArea( bool bWithDimensions, bool bSelectedOnly )
 
 	DocumentArea.Normalize();
 
-	if( !bSelectedOnly )
+	CRenderer NullRenderer( CRenderer::NULL_RENDERER );
+	if( m_bShowParts )
 	{
-		CRenderer NullRenderer( CRenderer::NULL_RENDERER );
-
-		if( m_bShowParts )
-		{
-			bool bTemp = m_bShowDimensions;
-			m_bShowDimensions = bWithDimensions;
-			DocumentArea = DrawPartsList( &NullRenderer );
-			m_bShowDimensions = bTemp;
-		}
-		else
+		bool bTemp = m_bShowDimensions;
+		m_bShowDimensions = bWithDimensions;
+		DocumentArea = DrawPartsList( &NullRenderer );
+		m_bShowDimensions = bTemp;
+	}
+	else
+	{
+		if( !bSelectedOnly )
 		{
 			double SolidLinkCornerRadius = Unscale( CONNECTORRADIUS + 3 ); 
 			DocumentArea.InflateRect( SolidLinkCornerRadius, SolidLinkCornerRadius );
@@ -1650,16 +1645,8 @@ CFArea CLinkageView::DrawPartsList( CRenderer* pRenderer )
 	CLinkageDoc* pDoc = GetDocument();
 	ASSERT_VALID(pDoc);
 
-	CLinkageDoc *pPartsDoc = pDoc->GetPartsDocument( false );
-
 	CFRect Area;
 	pDoc->GetDocumentArea( Area );
-
-	pDoc = 0; // Don't use this elsewhere in this function!
-
-	ASSERT( pPartsDoc != 0 );
-	if( pPartsDoc == 0 )
-		return CFArea();
 
 	if( m_bShowGrid )
 		DrawGrid( pRenderer );
@@ -1669,7 +1656,7 @@ CFArea CLinkageView::DrawPartsList( CRenderer* pRenderer )
 	
 	POSITION Position = 0;
 
-	LinkList* pLinkList = pPartsDoc->GetLinkList();
+	LinkList* pLinkList = pDoc->GetLinkList();
 	Position = pLinkList->GetHeadPosition();
 	while( Position != NULL )
 	{
@@ -1702,40 +1689,40 @@ CFArea CLinkageView::DrawPartsList( CRenderer* pRenderer )
 			m_ScrollPosition.y -= Scale( LastPartHeight );
 			yOffset -= LastPartHeight;
 
-			GearConnectionList *pGearConections = pPartsDoc->GetGearConnections();
+			GearConnectionList *pGearConections = pDoc->GetGearConnections();
 
 			CFArea PartArea;
 			pLink->GetArea( *pGearConections, PartArea );
 			
 			ConnectorList* pConnectors = pLink->GetConnectorList();
 
-			DrawLink( pRenderer, pPartsDoc->GetGearConnections(), pPartsDoc->GetViewLayers(), pLink, false, false, true );
-			DrawLink( pRenderer, pPartsDoc->GetGearConnections(), pPartsDoc->GetViewLayers(), pLink, m_bShowLabels, true, false );
+			DrawLink( pRenderer, pDoc->GetGearConnections(), pDoc->GetViewLayers(), pLink, false, false, true );
+			DrawLink( pRenderer, pDoc->GetGearConnections(), pDoc->GetViewLayers(), pLink, m_bShowLabels, true, false );
 			//POSITION Position2 = pConnectors->GetHeadPosition();
 			//while( Position2 != NULL )
 			//{
 			//	CConnector* pConnector = pConnectors->GetNext( Position2 );
 			//	if( pConnector != 0 )
-			//		DrawSliderTrack( pRenderer, pPartsDoc->GetViewLayers(), pConnector );
+			//		DrawSliderTrack( pRenderer, pDoc->GetViewLayers(), pConnector );
 			//}
-			DrawLink( pRenderer, pPartsDoc->GetGearConnections(), pPartsDoc->GetViewLayers(), pLink, m_bShowLabels, false, false );
+			DrawLink( pRenderer, pDoc->GetGearConnections(), pDoc->GetViewLayers(), pLink, m_bShowLabels, false, false );
 			POSITION Position2 = pConnectors->GetHeadPosition();
 			while( Position2 != NULL )
 			{
 				CConnector* pConnector = pConnectors->GetNext( Position2 );
 				if( pConnector != 0 )
 				{
-					DrawConnector( pRenderer, pPartsDoc->GetViewLayers(), pConnector, m_bShowLabels );
-					// DrawConnector( pRenderer, pPartsDoc->GetViewLayers(), pConnector, m_bShowLabels, false, false, false, true );
+					DrawConnector( pRenderer, pDoc->GetViewLayers(), pConnector, m_bShowLabels );
+					// DrawConnector( pRenderer, pDoc->GetViewLayers(), pConnector, m_bShowLabels, false, false, false, true );
 				}
 			}
-			PartArea += DrawDimensions( pRenderer, pPartsDoc->GetGearConnections(), pPartsDoc->GetViewLayers(), pLink, true, true );
+			PartArea += DrawDimensions( pRenderer, pDoc->GetGearConnections(), pDoc->GetViewLayers(), pLink, true, true );
 			Position2 = pConnectors->GetHeadPosition();
 			while( Position2 != NULL )
 			{
 				CConnector* pConnector = pConnectors->GetNext( Position2 );
 				if( pConnector != 0 )
-				PartArea += DrawDimensions( pRenderer, pPartsDoc->GetViewLayers(), pConnector, true, true );
+				PartArea += DrawDimensions( pRenderer, pDoc->GetViewLayers(), pConnector, true, true );
 			}
 
 			CFArea Temp( PartArea );
@@ -1748,8 +1735,6 @@ CFArea CLinkageView::DrawPartsList( CRenderer* pRenderer )
 	}
 
 	m_ScrollPosition = SaveScrollPosition;
-
-	pRenderer->DrawRect( Scale( DocumentArea ) );
 
 	return DocumentArea;
 }
@@ -2335,7 +2320,7 @@ void CLinkageView::OnLButtonDown(UINT nFlags, CPoint point)
 {
 	SetCapture();
 	
-	if( m_bSimulating )
+	if( m_bSimulating || !m_bAllowEdit )
 		return;
 		
 	m_PreviousDragPoint = point;
@@ -3080,7 +3065,7 @@ void CLinkageView::ConfigureControlWindow( enum _SimulationControl SimulationCon
 		{
 			CString String;
 			String.Format( "Connector %s", (const char*)pConnector->GetIdentifierString( m_bShowDebug ) );
-			m_ControlWindow.AddControl( 10000 + pConnector->GetIdentifier(), String, 10000 + pConnector->GetIdentifier() );
+			m_ControlWindow.AddControl( 10000 + pConnector->GetIdentifier(), String, 10000 + pConnector->GetIdentifier(), true );
 		}
 	}
 
@@ -4280,9 +4265,9 @@ void CLinkageView::OnViewParts()
 	m_bAllowEdit = !m_bShowParts;
 	if( m_bShowParts )
 	{
-		CLinkageDoc* pDoc = GetDocument();
-		ASSERT_VALID(pDoc);
-		pDoc->GetPartsDocument( true );
+		//CLinkageDoc* pDoc = GetDocument();
+		//ASSERT_VALID(pDoc);
+		//pDoc->GetDocument( true );
 	}
 	InvalidateRect( 0 );
 }
@@ -7910,6 +7895,8 @@ void CLinkageView::OnSelectSample (UINT ID )
 	{
 		if( ID == GalleryData.GetCommandID( Counter ) )
 		{
+			if( m_bSimulating )
+				StopSimulation();
 			pDoc->SelectSample( Counter );
 			break;
 		}

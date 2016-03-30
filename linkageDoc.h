@@ -42,8 +42,8 @@ class CLinkageDoc : public CDocument
 	static const unsigned int MECHANISMLAYERS = 0xFFFFFFF0;
 	static const unsigned int ALLLAYERS = 0xFFFFFFFF;
 
-	CLinkageDoc *GetPartsDocument( bool bRecompute );
-	void CreatePartsFromDocument( CLinkageDoc *pOriginalDoc );
+	//CLinkageDoc *GetPartsDocument( bool bRecompute );
+	//void CreatePartsFromDocument( CLinkageDoc *pOriginalDoc );
 
 // Overrides
 	// ClassWizard generated virtual function overrides
@@ -232,8 +232,6 @@ private:
 	LinkList m_SelectedLinks;
 	GearConnectionList m_GearConnectionList;
 
-	CLinkageDoc *m_pPartsDoc;
-	
 	int m_AlignConnectorCount;
 
 	double m_UnitScaling;
@@ -266,7 +264,7 @@ private:
 	void PopUndo( void );
 	void PopUndoDelete( void );
 
-	void MovePartsLinkToOrigin( CFPoint Origin, CLink *pPartsLink );
+	// void MovePartsLinkToOrigin( CFPoint Origin, CLink *pPartsLink );
  	
 	void DeleteContents( bool bDeleteUndoInfo );
 

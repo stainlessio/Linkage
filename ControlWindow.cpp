@@ -18,12 +18,14 @@ class CControlWindowControl
 		m_ControlID = 0;
 		m_CommandID = 0;
 		m_Position = 0.0;
+		m_bCentered = false;
 	}
 
 	int m_ControlID;
 	int m_CommandID;
 	CString m_Description;
-	double m_Position; // 0.0 to 1.0.
+	double m_Position; // 0.0 to 1.0 or -1.0 to 1.0 if centered.
+	bool m_bCentered; // true if the zero point is at the center of the control.
 };
 
 
@@ -168,7 +170,11 @@ void CControlWindow::OnLButtonDown(UINT nFlags, CPoint point)
 		{
 			if( point.y >= Rect.top && point.y <= Rect.bottom )
 			{
-				int Location = Rect.left + (int)( Rect.Width() * m_pImplementation->m_Controls[Counter].m_Position );
+				int Location;
+				if( m_pImplementation->m_Controls[Counter].m_bCentered)
+					Location = Rect.left + ( Rect.Width() / 2 ) + (int)( ( Rect.Width() / 2 ) * m_pImplementation->m_Controls[Counter].m_Position );
+				else
+					Location = Rect.left + (int)( Rect.Width() * m_pImplementation->m_Controls[Counter].m_Position );
 				if( point.x >= Location - m_pImplementation->m_HandleSize && point.x <= Location + m_pImplementation->m_HandleSize )
 				{
 					m_pImplementation->m_CaptureControl = Counter;
@@ -200,11 +206,22 @@ void CControlWindow::OnMouseMove(UINT nFlags, CPoint point)
 	if( !m_pImplementation->GetCaptureRange( this, m_pImplementation->m_CaptureControl, Rect ) )
 		return;
 
-	int NewLocation = point.x + m_pImplementation->m_CaptureOffset.x - Rect.left;
-	double NewPosition = (double)NewLocation / (double)Rect.Width();
-	if( NewPosition < 0.0 )
-		NewPosition = 0.0;
-	else if( NewPosition > 1.0 )
+	double NewPosition;
+	if( m_pImplementation->m_Controls[m_pImplementation->m_CaptureControl].m_bCentered )
+	{
+		int NewLocation = point.x + m_pImplementation->m_CaptureOffset.x - ( Rect.left + ( Rect.Width() / 2 ) );
+		NewPosition = (double)NewLocation / (double)( Rect.Width() / 2 );
+		if( NewPosition < -1.0 )
+			NewPosition = -1.0;
+	}
+	else
+	{
+		int NewLocation = point.x + m_pImplementation->m_CaptureOffset.x - Rect.left;
+		NewPosition = (double)NewLocation / (double)Rect.Width();
+		if( NewPosition < 0.0 )
+			NewPosition = 0.0;
+	}
+	if( NewPosition > 1.0 )
 		NewPosition = 1.0;
 
 	m_pImplementation->m_Controls[m_pImplementation->m_CaptureControl].m_Position = NewPosition;
@@ -265,7 +282,11 @@ void CControlWindow::OnPaint()
 		MemoryDC.MoveTo( x2 + m_pImplementation->m_ControlWidth, y - HalfSize - Extra );
 		MemoryDC.LineTo( x2 + m_pImplementation->m_ControlWidth, y + HalfSize + Extra + 1 );
 
-		int xTemp = x2 + (int)( m_pImplementation->m_ControlWidth * m_pImplementation->m_Controls[Counter].m_Position );
+		int xTemp;
+		if( m_pImplementation->m_Controls[Counter].m_bCentered )
+			xTemp = x2 + ( m_pImplementation->m_ControlWidth / 2 ) + (int)( ( m_pImplementation->m_ControlWidth / 2 ) * m_pImplementation->m_Controls[Counter].m_Position );
+		else
+			xTemp = x2 + (int)( m_pImplementation->m_ControlWidth * m_pImplementation->m_Controls[Counter].m_Position );
 		int Offset = HalfSize;
 
 		CRect Box( xTemp - Offset, y - Offset, xTemp + Offset + 1, y + Offset + 1 );
@@ -352,7 +373,7 @@ void CControlWindow::UpdateControl( int ControlID, double Position )
 	}
 }
 
-void CControlWindow::AddControl( int ControlID, const char *pDescription, int CommandID, double InitialPosition )
+void CControlWindow::AddControl( int ControlID, const char *pDescription, int CommandID, bool bCentered, double InitialPosition )
 {
 	if( m_pImplementation == 0 )
 		return;
@@ -364,6 +385,7 @@ void CControlWindow::AddControl( int ControlID, const char *pDescription, int Co
 	m_pImplementation->m_Controls[m_pImplementation->m_ControlCount].m_Description = pDescription;
 	m_pImplementation->m_Controls[m_pImplementation->m_ControlCount].m_ControlID = ControlID;
 	m_pImplementation->m_Controls[m_pImplementation->m_ControlCount].m_Position = InitialPosition;
+	m_pImplementation->m_Controls[m_pImplementation->m_ControlCount].m_bCentered = bCentered;
 
 	m_pImplementation->m_ControlCount++;
 }
