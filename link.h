@@ -80,8 +80,8 @@ class CLink : public CElement
 	int GetConnectorCount( void ) { return m_Connectors.GetCount(); }
 	int GetAnchorCount( void );
 	bool CanOnlySlide( CConnector** pLimit1 = 0, CConnector** pLimit2 = 0, CConnector** pSlider1 = 0, CConnector** pSlider2 = 0, bool *pbSlidersOnLink = 0 );
-	CFPoint *ComputeHull( int *Count = 0 );
-	CFPoint *GetHull( int &Count );
+	CFPoint *ComputeHull( int *Count = 0, bool bUseOriginalPoints = false );
+	CFPoint *GetHull( int &Count, bool bUseOriginalPoints = false );
 
 	void MakePermanent( void );
 
