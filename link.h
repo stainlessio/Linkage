@@ -14,6 +14,17 @@ class LinkList : public CList< class CLink*, class CLink* >
 	~LinkList() {}
 	
 	bool Remove( class CLink *pLink );
+	bool Contains( CLink *pLink )
+	{
+		POSITION Position = GetHeadPosition();
+		while( Position != 0 )
+		{
+			CLink *pTest = GetNext( Position );
+			if( pTest == pLink )
+				return true;
+		}
+		return false;
+	}
 };
 
 class CGearConnection
@@ -103,8 +114,8 @@ class CLink : public CElement
 
 	bool IsGear( void ) { return m_bGear; }
 	void SetGear( bool bSet ) { m_bGear = bSet; }
-	CConnector *GetGearConnector( void ) { return m_bGear ? GetConnector( 0 ) : 0; }
-	bool GetGearRadii( const GearConnectionList &ConnectionList, std::list<double> &RadiusList );
+	CConnector *GetGearConnector( void ) const { return m_bGear ? GetConnector( 0 ) : 0; }
+	virtual bool GetGearRadii( const GearConnectionList &ConnectionList, std::list<double> &RadiusList ) const;
 	bool GetGearsRadius( CGearConnection *pGearConnection, double &Radius1, double &Radius2 );
 	double GetLargestGearRadius( const GearConnectionList &ConnectionList, CConnector **ppGearConnector );
 	bool IsActuator( void ) { return m_bActuator; }
@@ -122,7 +133,7 @@ class CLink : public CElement
 	CConnector *GetStrokeConnector( int Index ) { Index = 0; if( m_bActuator ) return &m_StrokeConnector; else return 0; }
 	void UpdateFromController( void );
 	void UpdateController( void );
-	CConnector *GetConnector( int Index );
+	CConnector *GetConnector( int Index ) const;
 	int GetConnectedSliderCount( void ) { return m_ConnectedSliders.GetCount(); }
 	CConnector *GetConnectedSlider( int Index );
 

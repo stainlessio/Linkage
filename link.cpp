@@ -261,7 +261,7 @@ bool CLink::RotateAround( CConnector* pConnector )
 		
 		if( pConnector->IsInput() )
 		{
-			CList<CLink*,CLink*> *pList = pUseConnector->GetLinksList();
+			CList<CLink*,CLink*> *pList = pUseConnector->GetLinkList();
 			POSITION Position2 = pList->GetHeadPosition();
 			while( Position2 != 0 )
 			{
@@ -945,7 +945,7 @@ CFPoint *CLink::GetHull( int &Count, bool bUseOriginalPoints )
 	return m_pHull;
 }
 
-CConnector *CLink::GetConnector( int Index )
+CConnector *CLink::GetConnector( int Index ) const
 {
 	int Counter = 0;
 	POSITION Position = m_Connectors.GetHeadPosition();
@@ -1019,7 +1019,7 @@ bool CompareDoubles( double &First, double &Second )
 	return First < Second;
 }
 
-bool CLink::GetGearRadii( const GearConnectionList &ConnectionList, std::list<double> &RadiusList )
+bool CLink::GetGearRadii( const GearConnectionList &ConnectionList, std::list<double> &RadiusList ) const
 {
 	/*
 	 * The gear connector of this link could mesh with multiple other gears. It's

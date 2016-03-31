@@ -67,6 +67,7 @@ public:
 	LinkList* GetLinkList( void ) { return &m_Links; }
 	ConnectorList* GetConnectorList( void ) { return &m_Connectors; }
 	GearConnectionList * GetGearConnections( void ) { return &m_GearConnectionList; }
+	GearConnectionList & GetGearConnectionsRef( void ) { return m_GearConnectionList; }
 	
 	void SetUnitScale( double Scale ) { m_UnitScaling = Scale; }
 	double GetUnitScale( void ) { return m_UnitScaling; }

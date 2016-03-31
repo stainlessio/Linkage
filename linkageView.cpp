@@ -88,6 +88,21 @@ wchar_t* ToUnicode( const char *pString )
 	return wcstring;
 }
 
+static int GetLongestHullDimensionLine( CLink *pLink, int &BestEndPoint, CFPoint *pHullPoints, int HullPointCount, CConnector **pStartConnector );
+
+class CTempLink : public CLink
+{
+	public:
+	CTempLink() : CLink(), OriginalLink( *this ) {}
+	CTempLink( const CLink &ExistingLink ) : CLink( ExistingLink ), OriginalLink( ExistingLink ) {}
+
+	const CLink &OriginalLink; // Can't set it from a reference
+
+	virtual bool GetGearRadii( const GearConnectionList &ConnectionList, std::list<double> &RadiusList ) const
+	{
+		return OriginalLink.GetGearRadii( ConnectionList, RadiusList );
+	}
+};
 
 /////////////////////////////////////////////////////////////////////////////
 // CLinkageView
@@ -1640,11 +1655,122 @@ CFPoint CLinkageView::ComputeNextPartLocation( CLink *pPartsLink, CFPoint ThisPa
 	return CFPoint();
 }
 
+class CConnectorPartPoint
+{
+	public:
+	CConnector *pConnector;
+	CFPoint PartPoint;
+};
+
+static void MovePartsLinkToOrigin( CLink *pPartsLink, CFPoint Origin, GearConnectionList *pGearConnections )
+{
+	int HullCount = 0;
+	CFPoint *pPoints = pPartsLink->GetHull( HullCount );
+	int BestStartPoint = -1;
+	int BestEndPoint = -1;
+
+	CConnector *pStartConnector = 0;
+	BestStartPoint = GetLongestHullDimensionLine( pPartsLink, BestEndPoint, pPoints, HullCount, &pStartConnector );
+	if( BestStartPoint < 0 )
+	{
+		if( pPartsLink->IsGear() )
+		{
+			std::list<double> RadiusList;
+			pPartsLink->GetGearRadii( *pGearConnections, RadiusList );
+			if( !RadiusList.empty() )
+			{
+				double LargestRadius = RadiusList.back();
+				pStartConnector = pPartsLink->GetConnector( 0 );
+				if( pStartConnector != 0 )
+					pStartConnector->SetPoint( CFPoint( Origin.x + LargestRadius, Origin.y ) );
+			}
+		}
+		return;
+	}
+
+	POSITION Position = pPartsLink->GetConnectorList()->GetHeadPosition();
+	while( Position != 0 )
+	{
+		CConnector *pConnector = pPartsLink->GetConnectorList()->GetNext( Position );
+		if( pConnector == 0 )
+			continue;
+
+		if( pConnector->GetPoint() == pPoints[BestStartPoint] )
+		{
+			pStartConnector = pConnector;
+			break;
+		}
+	}
+
+	CFLine OrientationLine( pPoints[BestStartPoint], pPoints[BestEndPoint] );
+	double Angle = GetAngle( pPoints[BestStartPoint], pPoints[BestEndPoint] );
+
+	CFPoint AdditionalOffset;
+	Position = pPartsLink->GetConnectorList()->GetHeadPosition();
+	while( Position != 0 )
+	{
+		CConnector *pConnector = pPartsLink->GetConnectorList()->GetNext( Position );
+		if( pConnector == 0 || pConnector == pStartConnector )
+			continue;
+
+		CFPoint Point = pConnector->GetPoint();
+		Point.RotateAround( pPoints[BestStartPoint], -Angle );
+		pConnector->SetPoint( Point );
+		if( Point.x - pPoints[BestStartPoint].x < AdditionalOffset.x )
+			AdditionalOffset.x = Point.x - pPoints[BestStartPoint].x;
+		if( Point.y - pPoints[BestStartPoint].y > AdditionalOffset.y )
+			AdditionalOffset.y = Point.y - pPoints[BestStartPoint].y;
+	}
+
+	Position = pPartsLink->GetConnectorList()->GetHeadPosition();
+	while( Position != 0 )
+	{
+		CConnector *pConnector = pPartsLink->GetConnectorList()->GetNext( Position );
+		if( pConnector == 0 || pConnector == pStartConnector )
+			continue;
+
+		CFPoint Point = pConnector->GetPoint();
+		Point -= pPoints[BestStartPoint];
+		Point += Origin;
+		Point -= AdditionalOffset;
+		pConnector->SetPoint( Point );
+	}
+	Origin -= AdditionalOffset;
+	pStartConnector->SetPoint( Origin );
+}
+
+static CTempLink* GetTemporaryPartsLink( CLink *pLink, CFPoint PartOrigin, GearConnectionList *pGearConnections )
+{
+	CTempLink *pPartsLink = new CTempLink( *pLink );
+	// MUST REMOVE THE COPIED CONNECTORS HERE BECAUSE THEY ARE JUST POINTER COPIES!
+	pPartsLink->RemoveAllConnectors();
+
+	POSITION Position2 = pLink->GetConnectorList()->GetHeadPosition();
+	while( Position2 != 0 )
+	{
+		CConnector *pConnector = pLink->GetConnectorList()->GetNext( Position2 );
+		if( pConnector == 0 )
+			continue;
+
+		CConnector *pPartsConnector = new CConnector( *pConnector );
+		pPartsConnector->SetColor( pPartsLink->GetColor() );
+		pPartsConnector->SetAsAnchor( false );
+		pPartsConnector->SetAsInput( false );
+		pPartsConnector->SetAsDrawing( false );
+		pPartsLink->AddConnector( pPartsConnector );
+	}
+
+	MovePartsLinkToOrigin( pPartsLink, PartOrigin, pGearConnections );
+
+	return pPartsLink;
+}
+
 CFArea CLinkageView::DrawPartsList( CRenderer* pRenderer )
 {
 	CLinkageDoc* pDoc = GetDocument();
 	ASSERT_VALID(pDoc);
 
+	// get the original document area, not the one for the parts list!
 	CFRect Area;
 	pDoc->GetDocumentArea( Area );
 
@@ -1653,85 +1779,78 @@ CFArea CLinkageView::DrawPartsList( CRenderer* pRenderer )
 
 	pRenderer->SelectObject( m_pUsingFont, UnscaledUnits( SMALL_FONT_SIZE ) );
 	pRenderer->SetTextColor( COLOR_TEXT );
-	
-	POSITION Position = 0;
-
-	LinkList* pLinkList = pDoc->GetLinkList();
-	Position = pLinkList->GetHeadPosition();
-	while( Position != NULL )
-	{
-		CLink* pLink = pLinkList->GetNext( Position );
-		if( pLink != 0 )
-			pLink->ComputeHull();
-	}
-
-	/*
-	 * The parts list has no overlapping parts. The order of the drawing is simplied
-	 * as compared to the normal editor drawing order. The code does a kludge and uses
-	 * the scroll position to draw the parts in unique places on the screen and elsewhere.
-	 * of course, there should be a change to the code to be able to pass an offset to the
-	 * drawing functions.
-	 */
 
 	CFPoint PartPoint = Area.TopLeft();
 	CFPoint SaveScrollPosition = m_ScrollPosition;
 	CFArea DocumentArea;
-
 	double LastPartHeight = 0;
 	double yOffset = 0.0;
 
-	Position = pLinkList->GetHeadPosition();
+	GearConnectionList *pGearConnections = pDoc->GetGearConnections();
+
+	POSITION Position = pDoc->GetLinkList()->GetHeadPosition();
 	while( Position != 0 )
 	{
-		CLink* pLink = pLinkList->GetNext( Position );
-		if( pLink != 0  && ( pLink->GetLayers() & CLinkageDoc::MECHANISMLAYER ) != 0 )
-		{
-			m_ScrollPosition.y -= Scale( LastPartHeight );
-			yOffset -= LastPartHeight;
+		CLink *pLink = pDoc->GetLinkList()->GetNext( Position );
+		if( pLink == 0 || ( pLink->GetLayers() & CLinkageDoc::DRAWINGLAYER ) != 0 )
+			continue;
 
-			GearConnectionList *pGearConections = pDoc->GetGearConnections();
+		if( pLink->GetConnectorCount() <= 1 && !pLink->IsGear() )
+			continue;
 
-			CFArea PartArea;
-			pLink->GetArea( *pGearConections, PartArea );
+		CLink *pPartsLink = GetTemporaryPartsLink( pLink, Area.TopLeft(), pGearConnections );
+
+		if( pPartsLink == 0 )
+			continue;
+
+		m_ScrollPosition.y -= Scale( LastPartHeight );
+		yOffset -= LastPartHeight;
+
+		CFArea PartArea;
+		pPartsLink->GetArea( *pGearConnections, PartArea );
 			
-			ConnectorList* pConnectors = pLink->GetConnectorList();
+		ConnectorList* pConnectors = pPartsLink->GetConnectorList();
 
-			DrawLink( pRenderer, pDoc->GetGearConnections(), pDoc->GetViewLayers(), pLink, false, false, true );
-			DrawLink( pRenderer, pDoc->GetGearConnections(), pDoc->GetViewLayers(), pLink, m_bShowLabels, true, false );
-			//POSITION Position2 = pConnectors->GetHeadPosition();
-			//while( Position2 != NULL )
-			//{
-			//	CConnector* pConnector = pConnectors->GetNext( Position2 );
-			//	if( pConnector != 0 )
-			//		DrawSliderTrack( pRenderer, pDoc->GetViewLayers(), pConnector );
-			//}
-			DrawLink( pRenderer, pDoc->GetGearConnections(), pDoc->GetViewLayers(), pLink, m_bShowLabels, false, false );
-			POSITION Position2 = pConnectors->GetHeadPosition();
-			while( Position2 != NULL )
+		DrawLink( pRenderer, pGearConnections, pDoc->GetViewLayers(), pPartsLink, false, false, true );
+		DrawLink( pRenderer, pGearConnections, pDoc->GetViewLayers(), pPartsLink, m_bShowLabels, true, false );
+		
+		//POSITION Position2 = pConnectors->GetHeadPosition();
+		//while( Position2 != NULL )
+		//{
+		//	CConnector* pConnector = pConnectors->GetNext( Position2 );
+		//	if( pConnector != 0 )
+		//		DrawSliderTrack( pRenderer, pDoc->GetViewLayers(), pConnector );
+		//}
+
+		DrawLink( pRenderer, pGearConnections, pDoc->GetViewLayers(), pPartsLink, m_bShowLabels, false, false );
+		POSITION Position2 = pConnectors->GetHeadPosition();
+		while( Position2 != NULL )
+		{
+			CConnector* pConnector = pConnectors->GetNext( Position2 );
+			if( pConnector != 0 )
 			{
-				CConnector* pConnector = pConnectors->GetNext( Position2 );
-				if( pConnector != 0 )
-				{
-					DrawConnector( pRenderer, pDoc->GetViewLayers(), pConnector, m_bShowLabels );
-					// DrawConnector( pRenderer, pDoc->GetViewLayers(), pConnector, m_bShowLabels, false, false, false, true );
-				}
+				DrawConnector( pRenderer, pDoc->GetViewLayers(), pConnector, m_bShowLabels );
+				// DrawConnector( pRenderer, pDoc->GetViewLayers(), pConnector, m_bShowLabels, false, false, false, true );
 			}
-			PartArea += DrawDimensions( pRenderer, pDoc->GetGearConnections(), pDoc->GetViewLayers(), pLink, true, true );
-			Position2 = pConnectors->GetHeadPosition();
-			while( Position2 != NULL )
-			{
-				CConnector* pConnector = pConnectors->GetNext( Position2 );
-				if( pConnector != 0 )
-				PartArea += DrawDimensions( pRenderer, pDoc->GetViewLayers(), pConnector, true, true );
-			}
-
-			CFArea Temp( PartArea );
-			Temp.top += UnscaledUnits( yOffset );
-			Temp.bottom += UnscaledUnits( yOffset );
-			DocumentArea += Temp; // Will only get width properly. Height is affected by the scrol positions.
-
-			LastPartHeight = PartArea.Height() + Unscale( OFFSET_INCREMENT );
 		}
+		PartArea += DrawDimensions( pRenderer, pGearConnections, pDoc->GetViewLayers(), pPartsLink, true, true );
+		Position2 = pConnectors->GetHeadPosition();
+		while( Position2 != NULL )
+		{
+			CConnector* pConnector = pConnectors->GetNext( Position2 );
+			if( pConnector != 0 )
+			PartArea += DrawDimensions( pRenderer, pDoc->GetViewLayers(), pConnector, true, true );
+		}
+
+		CFArea Temp( PartArea );
+		Temp.top += UnscaledUnits( yOffset );
+		Temp.bottom += UnscaledUnits( yOffset );
+		DocumentArea += Temp; // Will only get width properly. Height is affected by the scrol positions.
+
+		LastPartHeight = PartArea.Height() + Unscale( OFFSET_INCREMENT );
+
+		ASSERT( pPartsLink != 0 );
+		delete pPartsLink;
 	}
 
 	m_ScrollPosition = SaveScrollPosition;
@@ -4790,10 +4909,10 @@ void CLinkageView::DrawConnector( CRenderer* pRenderer, unsigned int OnLayers, C
 	{
 		Color = pConnector->IsAlone() ? pConnector->GetColor() : COLOR_DRAWINGDARK;
 		bSkipConnectorDraw = true;
-		POSITION Position = pConnector->GetLinksList()->GetHeadPosition();
+		POSITION Position = pConnector->GetLinkList()->GetHeadPosition();
 		while( Position != 0 )
 		{
-			CLink* pLink = pConnector->GetLinksList()->GetNext( Position );
+			CLink* pLink = pConnector->GetLinkList()->GetNext( Position );
 			if( pLink != 0 && !pLink->IsMeasurementElement() )
 			{
 				bSkipConnectorDraw = false;
@@ -4807,10 +4926,10 @@ void CLinkageView::DrawConnector( CRenderer* pRenderer, unsigned int OnLayers, C
 	{
 		Color = pConnector->GetColor();
 		int UsefulLinkCount = 0;
-		POSITION Position = pConnector->GetLinksList()->GetHeadPosition();
-		if( Position != 0 && pConnector->GetLinksList()->GetCount() == 1 )
+		POSITION Position = pConnector->GetLinkList()->GetHeadPosition();
+		if( Position != 0 && pConnector->GetLinkList()->GetCount() == 1 )
 		{
-			CLink* pLink = pConnector->GetLinksList()->GetNext( Position );
+			CLink* pLink = pConnector->GetLinkList()->GetNext( Position );
 			if (pLink != 0 && pLink->GetConnectorCount() > 1)
 			{
 				++UsefulLinkCount;
@@ -5639,6 +5758,58 @@ CFArea CLinkageView::DrawConnectorLinkDimensions( CRenderer* pRenderer, const Ge
 	return CFArea();
 }
 
+static int GetLongestHullDimensionLine( CLink *pLink, int &BestEndPoint, CFPoint *pHullPoints, int HullPointCount, CConnector **pStartConnector )
+{
+	int BestStartPoint = -1;
+	BestEndPoint = -1;
+
+	if( pLink->GetConnectorCount() == 2 )
+	{
+		BestStartPoint = 0;
+		BestEndPoint = 1;
+	}
+	else
+	{
+		double LargestDistance = 0.0;
+		for( int Counter = 0; Counter < HullPointCount; ++Counter )
+		{
+			double TestDistance = 0;
+			if( Counter < HullPointCount - 1 )
+				TestDistance = Distance( pHullPoints[Counter], pHullPoints[Counter+1] );
+			else
+				TestDistance = Distance( pHullPoints[Counter], pHullPoints[0] );
+			if( TestDistance > LargestDistance )
+			{
+				LargestDistance = TestDistance;
+				BestStartPoint = Counter;
+				// The hull is a clockwise collection of points so the end point of
+				// the measurement is a better visual choice for the start connector.
+				if( Counter < HullPointCount - 1 )
+					BestEndPoint = Counter + 1;
+				else
+					BestEndPoint = 0;
+			}
+		}
+	}
+	if( pStartConnector != 0 && BestStartPoint >= 0 )
+	{
+		*pStartConnector = 0;
+		POSITION Position = pLink->GetConnectorList()->GetHeadPosition();
+		int Counter = 0;
+		while( Position != 0 )
+		{
+			CConnector *pConnector = pLink->GetConnectorList()->GetNext( Position );
+			if( pConnector == 0 )
+				continue;
+
+			if( pConnector->GetPoint() == pHullPoints[BestStartPoint] )
+				*pStartConnector = pConnector;
+		}
+	}
+
+	return BestStartPoint;
+}
+
 CFArea CLinkageView::DrawDimensions( CRenderer* pRenderer, const GearConnectionList *pGearConnections, unsigned int OnLayers, CLink *pLink, bool bDrawLines, bool bDrawText )
 {
 	if( !m_bShowDimensions )
@@ -5677,6 +5848,10 @@ CFArea CLinkageView::DrawDimensions( CRenderer* pRenderer, const GearConnectionL
 	int BestStartPoint = -1;
 	int BestEndPoint = -1;
 
+	CConnector *pStartConnector = 0;
+	BestStartPoint = GetLongestHullDimensionLine( pLink, BestEndPoint, pPoints, HullCount, &pStartConnector );
+
+#if 0
 	if( ConnectorCount == 2 )
 	{
 		BestStartPoint = 0;
@@ -5704,6 +5879,7 @@ CFArea CLinkageView::DrawDimensions( CRenderer* pRenderer, const GearConnectionL
 			}
 		}
 	}
+#endif
 
 	if( BestStartPoint < 0 )
 	{
@@ -5724,8 +5900,9 @@ CFArea CLinkageView::DrawDimensions( CRenderer* pRenderer, const GearConnectionL
 		CFLine MeasurementLine = OrientationLine;
 
 		POSITION Position = pLink->GetConnectorList()->GetHeadPosition();
-		CConnector *pStartConnector = Position == 0 ? 0 : pLink->GetConnectorList()->GetNext( Position );
 		CConnector *pEndConnector = Position == 0 ? 0 : pLink->GetConnectorList()->GetNext( Position );
+		if( pEndConnector == pStartConnector )
+			pEndConnector = Position == 0 ? 0 : pLink->GetConnectorList()->GetNext( Position );
 		if( pStartConnector == 0 || pEndConnector == 0 )
 		{
 			pRenderer->SelectObject( pOldPen );
@@ -5757,7 +5934,6 @@ CFArea CLinkageView::DrawDimensions( CRenderer* pRenderer, const GearConnectionL
 		 * only two connectors. Neither is the perpendicular orientation line.
 		 */
 
-		CConnector *pStartConnector = 0;
 		vector<ConnectorDistance> ConnectorReference( ConnectorCount );
 		vector<ConnectorDistance> ConnectorReferencePerp( ConnectorCount );
 
@@ -5769,8 +5945,6 @@ CFArea CLinkageView::DrawDimensions( CRenderer* pRenderer, const GearConnectionL
 			if( pConnector == 0 )
 				continue;
 
-			if( pConnector->GetPoint() == pPoints[BestStartPoint] )
-				pStartConnector = pConnector;
 			if( Counter < ConnectorCount )
 			{
 				ConnectorReference[Counter].m_pConnector = pConnector;
@@ -5784,13 +5958,6 @@ CFArea CLinkageView::DrawDimensions( CRenderer* pRenderer, const GearConnectionL
 		/*
 		 * Sort the connectors along the orientation lines.
 		 */
-
-		if( pStartConnector == 0 )
-		{
-			int Derf = 0;
-			CFPoint *pPeppermint = pLink->GetHull( Derf );
-			Derf = Derf + 0;
-		}
 
 		if( ConnectorCount > 2 )
 		{
@@ -5980,7 +6147,7 @@ void CLinkageView::DrawLink( CRenderer* pRenderer, const GearConnectionList *pGe
 				pOldPen = pRenderer->SelectObject( &GrayPen );
 
 				CFRect AreaRect;
-				pLink->GetArea( *(pDoc->GetGearConnections()), AreaRect );
+				pLink->GetArea( *pGearConnections, AreaRect );
 			
 				if( pLink->GetConnectorList()->GetCount() > 1 || pLink->IsGear() )
 				{

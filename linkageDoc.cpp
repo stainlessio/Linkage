@@ -1494,10 +1494,10 @@ bool CLinkageDoc::StretchSelected( CFRect OriginalRect, CFRect NewRect, _Directi
 		}
 
 		bool bSkipThisOne = false;
-		POSITION Position2 = pConnector->GetLinksList()->GetHeadPosition();
+		POSITION Position2 = pConnector->GetLinkList()->GetHeadPosition();
 		while( Position2 != 0 )
 		{
-			CLink *pLink = pConnector->GetLinksList()->GetNext( Position2 );
+			CLink *pLink = pConnector->GetLinkList()->GetNext( Position2 );
 			if( pLink == 0 )
 				continue;
 
@@ -1811,10 +1811,10 @@ bool CLinkageDoc::MoveSelected( CFPoint Point, bool bElementSnap, bool bGridSnap
 		{
 			int LockedLinkCount = 0;
 			CLink *pLockedLink = 0;
-			POSITION cPosition = pConnector->GetLinksList()->GetHeadPosition();
+			POSITION cPosition = pConnector->GetLinkList()->GetHeadPosition();
 			while( cPosition != 0 )
 			{
-				CLink *pLink = pConnector->GetLinksList()->GetNext( cPosition );
+				CLink *pLink = pConnector->GetLinkList()->GetNext( cPosition );
 				if( pLink == 0 || !pLink->IsLocked() || pLink->GetConnectorCount() != 2 )
 					continue;
 				++LockedLinkCount;
@@ -2149,10 +2149,10 @@ bool CLinkageDoc::JoinSelected( bool bSaveUndoState )
 		if( pConnector == 0 || !pConnector->IsSelected() )
 			continue;
 
-		POSITION Position2 = pConnector->GetLinksList()->GetHeadPosition();
+		POSITION Position2 = pConnector->GetLinkList()->GetHeadPosition();
 		while( Position2 != 0 )
 		{
-			CLink *pLink = pConnector->GetLinksList()->GetNext( Position2 );
+			CLink *pLink = pConnector->GetLinkList()->GetNext( Position2 );
 			if( pLink == 0 || !pLink->IsLocked() )
 				continue;
 			++LockedLinks;
@@ -2200,10 +2200,10 @@ bool CLinkageDoc::JoinSelected( bool bSaveUndoState )
 		if( pConnector == pKeepConnector )
 			continue;
 
-		POSITION Position2 = pConnector->GetLinksList()->GetHeadPosition();
+		POSITION Position2 = pConnector->GetLinkList()->GetHeadPosition();
 		while( Position2 != 0 )
 		{
-			CLink *pLink = pConnector->GetLinksList()->GetNext( Position2 );
+			CLink *pLink = pConnector->GetLinkList()->GetNext( Position2 );
 			if( pLink == 0 )
 				continue;
 
@@ -2815,7 +2815,7 @@ bool CLinkageDoc::DeleteLink( CLink *pLink, CConnector *pDeletingConnector )
 
 bool CLinkageDoc::DeleteConnector( CConnector *pConnector, CLink *pDeletingLink )
 {
-	CList<CLink*,CLink*> *pList = pConnector->GetLinksList();
+	CList<CLink*,CLink*> *pList = pConnector->GetLinkList();
 	POSITION Position = pList->GetHeadPosition();
 	while( Position != NULL )
 	{
@@ -3273,10 +3273,10 @@ void CLinkageDoc::SplitSelected( void )
 		// a new connector.
 
 		int SplitLinkCount = 0;
-		POSITION Position2 = pConnector->GetLinksList()->GetHeadPosition();	
+		POSITION Position2 = pConnector->GetLinkList()->GetHeadPosition();	
 		while( Position2 != 0 )
 		{
-			CLink *pLink = pConnector->GetLinksList()->GetNext( Position2 );
+			CLink *pLink = pConnector->GetLinkList()->GetNext( Position2 );
 			if( pLink == 0 )
 				continue;
 
@@ -3285,10 +3285,10 @@ void CLinkageDoc::SplitSelected( void )
 
 		if( SplitLinkCount > 1 )
 		{
-			Position2 = pConnector->GetLinksList()->GetHeadPosition();	
+			Position2 = pConnector->GetLinkList()->GetHeadPosition();	
 			while( Position2 != 0 )
 			{
-				CLink *pLink = pConnector->GetLinksList()->GetNext( Position2 );
+				CLink *pLink = pConnector->GetLinkList()->GetNext( Position2 );
 				if( pLink == 0 )
 					continue;
 				
@@ -3771,10 +3771,10 @@ bool CLinkageDoc::ConnectSliderLimits( bool bTestOnly )
 	
 	pUseConnectors[Slider]->SetPoint( pUseConnectors[FirstLimit]->GetPoint().MidPoint( pUseConnectors[SecondLimit]->GetPoint(), .5 ) );
 
-	Position = pUseConnectors[Slider]->GetLinksList()->GetHeadPosition();
+	Position = pUseConnectors[Slider]->GetLinkList()->GetHeadPosition();
 	while( Position != 0 )
 	{
-		CLink *pLink = pUseConnectors[Slider]->GetLinksList()->GetNext( Position );
+		CLink *pLink = pUseConnectors[Slider]->GetLinkList()->GetNext( Position );
 		if( pLink == 0 )
 			continue;
 		pLink->UpdateController();
@@ -4592,10 +4592,10 @@ bool CLinkageDoc::CheckMeshableGears( CLink *pGear1, CLink *pGear2 )
 		{
 			bool bIsGear = false;
 			CLink *pLink = 0;
-			POSITION Position2 = pConnector->GetLinksList()->GetHeadPosition();
+			POSITION Position2 = pConnector->GetLinkList()->GetHeadPosition();
 			while( Position2 != 0 )
 			{
-				pLink = pConnector->GetLinksList()->GetNext( Position2 );
+				pLink = pConnector->GetLinkList()->GetNext( Position2 );
 				if( pLink == 0 )
 					continue;
 
@@ -4638,10 +4638,10 @@ bool CLinkageDoc::CheckMeshableGears( CLink *pGear1, CLink *pGear2 )
 	 else
 		return false;
 
-	Position = pOtherConnector->GetLinksList()->GetHeadPosition();
+	Position = pOtherConnector->GetLinkList()->GetHeadPosition();
 	while( Position != 0 )
 	{
-		CLink *pLink = pOtherConnector->GetLinksList()->GetNext( Position );
+		CLink *pLink = pOtherConnector->GetLinkList()->GetNext( Position );
 		if( pLink == 0 )
 			continue;
 
