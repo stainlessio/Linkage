@@ -1388,6 +1388,75 @@ void CLinkageView::DrawGrid( CRenderer* pRenderer )
 	pRenderer->SelectObject( pOldPen );
 }
 
+void CLinkageView::ClearDebugItems( void )
+{
+	while( true )
+	{
+		CDebugItem *pDebugItem = DebugItemList.Pop();
+		if( pDebugItem == 0 )
+			break;
+	}
+}
+
+void CLinkageView::DrawDebugItems( CRenderer *pRenderer )
+{
+	CPen Pen( PS_SOLID, 1, RGB( 255, 0, 0 ) );
+	CPen *pOldPen = pRenderer->SelectObject( &Pen );
+
+	pRenderer->SetTextAlign( TA_LEFT | TA_TOP );
+	pRenderer->SetTextColor( COLOR_TEXT );
+	CString Label;
+	CFPoint LabelPoint;
+	int Count = 0;
+	POSITION Position = DebugItemList.GetHeadPosition();
+	while( Position != 0 )
+	{
+		CDebugItem *pDebugItem = DebugItemList.GetNext( Position );
+		if( pDebugItem == 0 )
+			break;
+
+		Label.Format( "DEBUG %d", Count );
+
+		if( pDebugItem->m_Type == pDebugItem->DEBUG_OBJECT_POINT )
+		{
+			CFPoint Point = pDebugItem->m_Point;
+			LabelPoint.SetPoint( Point.x + ( m_ConnectorRadius * 2 ), Point.y - ( m_ConnectorRadius * 2 ) );
+			Point = Scale( Point );
+			pRenderer->Arc( Point.x - m_ConnectorRadius * 2, Point.y - m_ConnectorRadius * 2, Point.x + m_ConnectorRadius * 2, Point.y + m_ConnectorRadius * 2,
+				            Point.x, Point.y - m_ConnectorRadius * 2, Point.x, Point.y - m_ConnectorRadius * 2 );
+		}
+		else if( pDebugItem->m_Type == pDebugItem->DEBUG_OBJECT_LINE )
+		{
+			CFLine Line = pDebugItem->m_Line;
+			pRenderer->DrawLine( Scale( Line ) );
+			LabelPoint.SetPoint( Line.m_Start.x + ( m_ConnectorRadius * 2 ), Line.m_Start.y - ( m_ConnectorRadius * 2 ) );
+		}
+		else if( pDebugItem->m_Type == pDebugItem->DEBUG_OBJECT_CIRCLE )
+		{
+			CFCircle Circle = pDebugItem->m_Circle;
+			LabelPoint.SetPoint( Circle.x + ( m_ConnectorRadius * 2 ), Circle.y - ( m_ConnectorRadius * 2 ) );
+			Circle = Scale( Circle );
+			CBrush *pSaveBrush = (CBrush*)pRenderer->SelectStockObject( NULL_BRUSH );
+			pRenderer->Circle( Circle );
+			pRenderer->SelectObject( pSaveBrush );
+		}
+		else if( pDebugItem->m_Type == pDebugItem->DEBUG_OBJECT_ARC )
+		{
+			CFArc Arc = pDebugItem->m_Arc;
+			LabelPoint.SetPoint( Arc.x + ( m_ConnectorRadius * 2 ), Arc.y - ( m_ConnectorRadius * 2 ) );
+			Arc = Scale( Arc );
+			CBrush *pSaveBrush = (CBrush*)pRenderer->SelectStockObject( NULL_BRUSH );
+			pRenderer->Arc( Arc );
+			pRenderer->SelectObject( pSaveBrush );
+		}
+		LabelPoint = Scale( LabelPoint );
+		pRenderer->TextOut(LabelPoint.x, LabelPoint.y, Label );
+		++Count;
+	}
+
+	pRenderer->SelectObject( pOldPen );
+}
+
 CFArea CLinkageView::DrawMechanism( CRenderer* pRenderer )
 {
 	CLinkageDoc* pDoc = GetDocument();
@@ -1577,61 +1646,7 @@ CFArea CLinkageView::DrawMechanism( CRenderer* pRenderer )
 	if( m_bShowAngles )
 		DrawAlignmentLines( pRenderer );
 
-	if( m_bShowDebug )
-	{
-		CPen Pen( PS_SOLID, 1, RGB( 255, 0, 0 ) );
-		CPen *pOldPen = pRenderer->SelectObject( &Pen );
-
-		while( true )
-		{
-			CDebugItem *pDebugItem = DebugItemList.Pop();
-			if( pDebugItem == 0 )
-				break;
-			if( pDebugItem->m_Type == pDebugItem->DEBUG_OBJECT_POINT )
-			{
-				CFPoint Point = pDebugItem->m_Point;
-				Point = Scale( Point );
-				pRenderer->Arc( Point.x - m_ConnectorRadius, Point.y - m_ConnectorRadius, Point.x + m_ConnectorRadius, Point.y + m_ConnectorRadius,
-				              Point.x, Point.y - m_ConnectorRadius, Point.x, Point.y - m_ConnectorRadius );
-			}
-			else if( pDebugItem->m_Type == pDebugItem->DEBUG_OBJECT_LINE )
-			{
-				CFLine Line = pDebugItem->m_Line;
-				pRenderer->DrawLine( Scale( Line ) );
-				//pRenderer->MoveTo( Scale( Line.GetStart() ) );
-				//pRenderer->LineTo( Scale( Line.GetEnd() ) );
-			}
-			else if( pDebugItem->m_Type == pDebugItem->DEBUG_OBJECT_CIRCLE )
-			{
-				CFCircle Circle = pDebugItem->m_Circle;
-				Circle = Scale( Circle );
-				CBrush *pSaveBrush = (CBrush*)pRenderer->SelectStockObject( NULL_BRUSH );
-				pRenderer->Circle( Circle );
-				pRenderer->SelectObject( pSaveBrush );
-			}
-			else if( pDebugItem->m_Type == pDebugItem->DEBUG_OBJECT_ARC )
-			{
-				CFArc Arc = pDebugItem->m_Arc;
-				Arc = Scale( Arc );
-				CBrush *pSaveBrush = (CBrush*)pRenderer->SelectStockObject( NULL_BRUSH );
-				pRenderer->Arc( Arc );
-				pRenderer->SelectObject( pSaveBrush );
-			}
-			delete pDebugItem;
-			pDebugItem = 0;
-		}
-
-		pRenderer->SelectObject( pOldPen );
-	}
-	else
-	{
-		while( true )
-		{
-			CDebugItem *pDebugItem = DebugItemList.Pop();
-			if( pDebugItem == 0 )
-				break;
-		}
-	}
+	DrawDebugItems( pRenderer );
 
 	if( m_bShowSelection && pDoc->IsSelectionAdjustable() )
 		DrawAdjustmentControls( pRenderer );
@@ -1650,20 +1665,22 @@ CFArea CLinkageView::DrawMechanism( CRenderer* pRenderer )
 	return CFArea();
 }
 
-CFPoint CLinkageView::ComputeNextPartLocation( CLink *pPartsLink, CFPoint ThisPartsPoint )
+void CLinkageView::MovePartsLinkToOrigin( CLink *pPartsLink, CFPoint Origin, GearConnectionList *pGearConnections )
 {
-	return CFPoint();
-}
+	if( pPartsLink->GetConnectorCount() == 1 || pPartsLink->IsGear() )
+	{
+		std::list<double> RadiusList;
+		pPartsLink->GetGearRadii( *pGearConnections, RadiusList );
+		if( !RadiusList.empty() )
+		{
+			double LargestRadius = RadiusList.back();
+			CConnector *pConnector = pPartsLink->GetConnector( 0 );
+			if( pConnector != 0 )
+				pConnector->SetPoint( CFPoint( Origin.x, Origin.y ) );
+		}
+		return;
+	}
 
-class CConnectorPartPoint
-{
-	public:
-	CConnector *pConnector;
-	CFPoint PartPoint;
-};
-
-static void MovePartsLinkToOrigin( CLink *pPartsLink, CFPoint Origin, GearConnectionList *pGearConnections )
-{
 	int HullCount = 0;
 	CFPoint *pPoints = pPartsLink->GetHull( HullCount );
 	int BestStartPoint = -1;
@@ -1672,21 +1689,7 @@ static void MovePartsLinkToOrigin( CLink *pPartsLink, CFPoint Origin, GearConnec
 	CConnector *pStartConnector = 0;
 	BestStartPoint = GetLongestHullDimensionLine( pPartsLink, BestEndPoint, pPoints, HullCount, &pStartConnector );
 	if( BestStartPoint < 0 )
-	{
-		if( pPartsLink->IsGear() )
-		{
-			std::list<double> RadiusList;
-			pPartsLink->GetGearRadii( *pGearConnections, RadiusList );
-			if( !RadiusList.empty() )
-			{
-				double LargestRadius = RadiusList.back();
-				pStartConnector = pPartsLink->GetConnector( 0 );
-				if( pStartConnector != 0 )
-					pStartConnector->SetPoint( CFPoint( Origin.x + LargestRadius, Origin.y ) );
-			}
-		}
 		return;
-	}
 
 	POSITION Position = pPartsLink->GetConnectorList()->GetHeadPosition();
 	while( Position != 0 )
@@ -1739,7 +1742,7 @@ static void MovePartsLinkToOrigin( CLink *pPartsLink, CFPoint Origin, GearConnec
 	pStartConnector->SetPoint( Origin );
 }
 
-static CTempLink* GetTemporaryPartsLink( CLink *pLink, CFPoint PartOrigin, GearConnectionList *pGearConnections )
+CTempLink* CLinkageView::GetTemporaryPartsLink( CLink *pLink, CFPoint PartOrigin, GearConnectionList *pGearConnections )
 {
 	CTempLink *pPartsLink = new CTempLink( *pLink );
 	// MUST REMOVE THE COPIED CONNECTORS HERE BECAUSE THEY ARE JUST POINTER COPIES!
@@ -1798,13 +1801,13 @@ CFArea CLinkageView::DrawPartsList( CRenderer* pRenderer )
 		if( pLink->GetConnectorCount() <= 1 && !pLink->IsGear() )
 			continue;
 
-		CLink *pPartsLink = GetTemporaryPartsLink( pLink, Area.TopLeft(), pGearConnections );
+		// m_ScrollPosition.y -= Scale( LastPartHeight );
+		yOffset -= LastPartHeight;
+
+		CLink *pPartsLink = GetTemporaryPartsLink( pLink, CFPoint( PartPoint.x, PartPoint.y + yOffset ), pGearConnections );
 
 		if( pPartsLink == 0 )
 			continue;
-
-		m_ScrollPosition.y -= Scale( LastPartHeight );
-		yOffset -= LastPartHeight;
 
 		CFArea PartArea;
 		pPartsLink->GetArea( *pGearConnections, PartArea );
@@ -1847,7 +1850,7 @@ CFArea CLinkageView::DrawPartsList( CRenderer* pRenderer )
 		Temp.bottom += UnscaledUnits( yOffset );
 		DocumentArea += Temp; // Will only get width properly. Height is affected by the scrol positions.
 
-		LastPartHeight = PartArea.Height() + Unscale( OFFSET_INCREMENT );
+		LastPartHeight = abs( PartArea.Height() ) + Unscale( OFFSET_INCREMENT );
 
 		ASSERT( pPartsLink != 0 );
 		delete pPartsLink;
@@ -3278,7 +3281,10 @@ void CLinkageView::StepSimulation( enum _SimulationControl SimulationControl )
 	//	ControlCount = 0;
 
 	if( m_SimulationSteps != 0 || SimulationControl == INDIVIDUAL || bSetToAbsoluteStep )
+	{
+		ClearDebugItems();
 		m_Simulator.SimulateStep( pDoc, m_SimulationSteps, bSetToAbsoluteStep, pControlIDs, pPositions, ControlCount, AnyAlwaysManual() );
+	}
 
 	m_SimulationSteps = 0;
 
