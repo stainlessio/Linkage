@@ -1646,7 +1646,8 @@ CFArea CLinkageView::DrawMechanism( CRenderer* pRenderer )
 	if( m_bShowAngles )
 		DrawAlignmentLines( pRenderer );
 
-	DrawDebugItems( pRenderer );
+	if( m_bShowDebug )
+		DrawDebugItems( pRenderer );
 
 	if( m_bShowSelection && pDoc->IsSelectionAdjustable() )
 		DrawAdjustmentControls( pRenderer );
