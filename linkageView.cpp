@@ -3138,6 +3138,8 @@ void CLinkageView::StopMechanismSimulate( bool KeepCurrentPositions )
 
 	CloseVideoFile();
 
+	ClearDebugItems();
+
 	if( m_TimerID != 0 )
 		timeKillEvent( m_TimerID );
 		
