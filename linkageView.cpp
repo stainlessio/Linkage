@@ -1204,8 +1204,8 @@ CFRect CLinkageView::GetDocumentArea( bool bWithDimensions, bool bSelectedOnly )
 	CFRect Rect;
 	pDoc->GetDocumentArea( Rect, bSelectedOnly );
 
-	if( !bWithDimensions )
-		return Rect;
+//	if( !bWithDimensions )
+//		return Rect;
 
 	CFArea DocumentArea = Rect;
 
@@ -1227,9 +1227,9 @@ CFRect CLinkageView::GetDocumentArea( bool bWithDimensions, bool bSelectedOnly )
 	if( m_bShowParts )
 	{
 		bool bTemp = m_bShowDimensions;
-		m_bShowDimensions = bWithDimensions;
+//		m_bShowDimensions = bWithDimensions;
 		DocumentArea = DrawPartsList( &NullRenderer );
-		m_bShowDimensions = bTemp;
+//		m_bShowDimensions = bTemp;
 	}
 	else
 	{
@@ -1262,6 +1262,7 @@ CFRect CLinkageView::GetDocumentArea( bool bWithDimensions, bool bSelectedOnly )
 			DocumentArea += DrawGroundDimensions( &NullRenderer, pDoc, pDoc->GetViewLayers(), true, true );
 		}
 	}
+	DocumentArea.InflateRect( Unscale( m_ConnectorRadius * 2 ), Unscale( m_ConnectorRadius * 2 ) );
 	return DocumentArea.GetRect();
 }
 
@@ -1272,26 +1273,27 @@ CFArea CLinkageView::DoDraw( CRenderer* pRenderer )
 
 	CFArea Area;
 
+	if( m_bShowDebug )
+	{
+		// As drawn
+		CFRect Derfus = GetDocumentArea( true ) ;
+		CPen aPen( PS_SOLID, 1, RGB( 90, 255, 90 ) );
+		CPen *pOldPen = pRenderer->SelectObject( &aPen );
+		pRenderer->DrawRect( Scale( Derfus ) );
+		pRenderer->SelectObject( pOldPen );
+		
+		// Original document
+		pDoc->GetDocumentArea( Derfus );
+		CPen xxxPen( PS_SOLID, 1, RGB( 0, 180, 0 ) );
+		pOldPen = pRenderer->SelectObject( &xxxPen );
+		pRenderer->DrawRect( Scale( Derfus ) );
+		pRenderer->SelectObject( pOldPen );
+	}
+
 	if( m_bShowParts )
 		Area = DrawPartsList( pRenderer );
 	else
 		Area = DrawMechanism( pRenderer );
-
-	if( m_bShowDebug )
-	{
-		CFRect Derfus = Scale( GetDocumentArea( true ) );
-		CPen aPen( PS_SOLID, 1, RGB( 90, 255, 90 ) );
-		CPen *pOldPen = pRenderer->SelectObject( &aPen );
-		pRenderer->DrawRect( Derfus );
-		pRenderer->SelectObject( pOldPen );
-
-		pDoc->GetDocumentArea( Derfus );
-		Derfus = Scale( Derfus );
-		CPen xxxPen( PS_SOLID, 1, RGB( 0, 180, 0 ) );
-		pOldPen = pRenderer->SelectObject( &xxxPen );
-		pRenderer->DrawRect( Derfus );
-		pRenderer->SelectObject( pOldPen );
-	}
 
 	return Area;
 }
@@ -1677,7 +1679,7 @@ void CLinkageView::MovePartsLinkToOrigin( CLink *pPartsLink, CFPoint Origin, Gea
 			double LargestRadius = RadiusList.back();
 			CConnector *pConnector = pPartsLink->GetConnector( 0 );
 			if( pConnector != 0 )
-				pConnector->SetPoint( CFPoint( Origin.x, Origin.y ) );
+				pConnector->SetPoint( CFPoint( Origin.x + LargestRadius, Origin.y - LargestRadius ) );
 		}
 		return;
 	}
@@ -1784,8 +1786,7 @@ CFArea CLinkageView::DrawPartsList( CRenderer* pRenderer )
 	pRenderer->SelectObject( m_pUsingFont, UnscaledUnits( SMALL_FONT_SIZE ) );
 	pRenderer->SetTextColor( COLOR_TEXT );
 
-	CFPoint PartPoint = Area.TopLeft();
-	CFPoint SaveScrollPosition = m_ScrollPosition;
+	CFPoint StartPoint = Area.TopLeft();
 	CFArea DocumentArea;
 	double LastPartHeight = 0;
 	double yOffset = 0.0;
@@ -1802,17 +1803,14 @@ CFArea CLinkageView::DrawPartsList( CRenderer* pRenderer )
 		if( pLink->GetConnectorCount() <= 1 && !pLink->IsGear() )
 			continue;
 
-		// m_ScrollPosition.y -= Scale( LastPartHeight );
 		yOffset -= LastPartHeight;
 
-		CLink *pPartsLink = GetTemporaryPartsLink( pLink, CFPoint( PartPoint.x, PartPoint.y + yOffset ), pGearConnections );
+		CLink *pPartsLink = GetTemporaryPartsLink( pLink, CFPoint( StartPoint.x, StartPoint.y + yOffset ), pGearConnections );
 
 		if( pPartsLink == 0 )
 			continue;
 
-		CFArea PartArea;
-		pPartsLink->GetArea( *pGearConnections, PartArea );
-			
+		
 		ConnectorList* pConnectors = pPartsLink->GetConnectorList();
 
 		DrawLink( pRenderer, pGearConnections, pDoc->GetViewLayers(), pPartsLink, false, false, true );
@@ -1837,6 +1835,10 @@ CFArea CLinkageView::DrawPartsList( CRenderer* pRenderer )
 				// DrawConnector( pRenderer, pDoc->GetViewLayers(), pConnector, m_bShowLabels, false, false, false, true );
 			}
 		}
+
+		CFArea PartArea;
+		pPartsLink->GetArea( *pGearConnections, PartArea );
+
 		PartArea += DrawDimensions( pRenderer, pGearConnections, pDoc->GetViewLayers(), pPartsLink, true, true );
 		Position2 = pConnectors->GetHeadPosition();
 		while( Position2 != NULL )
@@ -1846,18 +1848,13 @@ CFArea CLinkageView::DrawPartsList( CRenderer* pRenderer )
 			PartArea += DrawDimensions( pRenderer, pDoc->GetViewLayers(), pConnector, true, true );
 		}
 
-		CFArea Temp( PartArea );
-		Temp.top += UnscaledUnits( yOffset );
-		Temp.bottom += UnscaledUnits( yOffset );
-		DocumentArea += Temp; // Will only get width properly. Height is affected by the scrol positions.
+		DocumentArea += PartArea;
 
 		LastPartHeight = abs( PartArea.Height() ) + Unscale( OFFSET_INCREMENT );
 
 		ASSERT( pPartsLink != 0 );
 		delete pPartsLink;
 	}
-
-	m_ScrollPosition = SaveScrollPosition;
 
 	return DocumentArea;
 }
