@@ -124,7 +124,7 @@
     </Bscmake>
     <Manifest>
       <AdditionalManifestFiles>res\linkage.xml;%(AdditionalManifestFiles)</AdditionalManifestFiles>
-      <EnableDpiAwareness>false</EnableDpiAwareness>
+      <EnableDpiAwareness>No</EnableDpiAwareness>
     </Manifest>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -180,7 +180,7 @@
       <AdditionalManifestFiles>res\linkage.xml;%(AdditionalManifestFiles)</AdditionalManifestFiles>
       <OutputManifestFile>
       </OutputManifestFile>
-      <EnableDpiAwareness>false</EnableDpiAwareness>
+      <EnableDpiAwareness>No</EnableDpiAwareness>
     </Manifest>
     <Bscmake>
       <SuppressStartupBanner>true</SuppressStartupBanner>
@@ -206,7 +206,7 @@ exit 0
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Template|Win32'">
     <Manifest>
-      <EnableDpiAwareness>none</EnableDpiAwareness>
+      <EnableDpiAwareness>No</EnableDpiAwareness>
     </Manifest>
   </ItemDefinitionGroup>
   <ItemGroup>

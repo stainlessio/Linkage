@@ -30,6 +30,17 @@ void CExportImageSettingsDialog::DoDataExchange(CDataExchange* pDX)
 {
 	CDialog::DoDataExchange( pDX );
 
+	if( !pDX->m_bSaveAndValidate )
+	{
+		CWinApp *pApp = AfxGetApp();
+		if( pApp != 0 )
+		{
+			m_ResolutionSelection = pApp->GetProfileInt( "Settings", "ExportResolutionSelection", m_ResolutionSelection );
+			m_ScaleFactor = pApp->GetProfileInt( "Settings", "ExportScaleFactor", m_ScaleFactor );
+			m_Margin = pApp->GetProfileInt( "Settings", "ExportMargin", m_Margin );
+		}
+	}
+
 	DDX_Radio( pDX, IDC_RADIO1, m_ResolutionSelection );
 	DDX_Control( pDX, IDC_SPIN1, m_SpinControl );
 	DDX_Text( pDX, IDC_EDIT1, m_ScaleFactor );
@@ -47,6 +58,7 @@ BEGIN_MESSAGE_MAP(CExportImageSettingsDialog, CDialog)
 	ON_BN_CLICKED( IDC_RADIO3, &CExportImageSettingsDialog::OnBnClickedResolution )
 	ON_BN_CLICKED( IDC_RADIO2, &CExportImageSettingsDialog::OnBnClickedResolution )
 	ON_BN_CLICKED( IDC_RADIO7, &CExportImageSettingsDialog::OnBnClickedResolution )
+	ON_BN_CLICKED( IDC_RADIO9, &CExportImageSettingsDialog::OnBnClickedResolution )
 	ON_EN_CHANGE( IDC_EDIT1, &CExportImageSettingsDialog::OnEnChangeScaleFactor )
 	ON_WM_PAINT()
 	ON_BN_CLICKED( IDC_BUTTON1, &CExportImageSettingsDialog::OnCopy )
@@ -68,6 +80,17 @@ void CExportImageSettingsDialog::OnEnChangeScaleFactor()
 	UpdateImage();
 }
 
+void CExportImageSettingsDialog::SaveSettings( void )
+{
+	CWinApp *pApp = AfxGetApp();
+	if( pApp != 0 )
+	{
+		pApp->WriteProfileInt( "Settings", "ExportResolutionSelection", m_ResolutionSelection );
+		pApp->WriteProfileInt( "Settings", "ExportScaleFactor", m_ScaleFactor );
+		pApp->WriteProfileInt( "Settings", "ExportMargin", m_Margin );
+	}
+}
+
 void CExportImageSettingsDialog::UpdateImage( void )
 {
 	if( !m_bReadyToShowImage )
@@ -78,6 +101,8 @@ void CExportImageSettingsDialog::UpdateImage( void )
 
 	CDataExchange DX( this, TRUE );
 	DoDataExchange( &DX );
+
+	SaveSettings();
 
 	CClientDC dc( this );
 
@@ -93,6 +118,9 @@ void CExportImageSettingsDialog::UpdateImage( void )
 BOOL CExportImageSettingsDialog::OnInitDialog()
 {
 	CDialog::OnInitDialog();
+
+
+
 
 	CRect Rect;
 	m_PreviewArea.GetWindowRect( &Rect );
@@ -126,6 +154,8 @@ int CExportImageSettingsDialog::GetResolutionWidth( void )
 		case 2:
 			return 640;
 		case 3:
+			return 400;
+		case 4:
 			return 100;
 	}
 	return 0;
@@ -142,6 +172,8 @@ int CExportImageSettingsDialog::GetResolutionHeight( void )
 		case 2:
 			return 400;
 		case 3:
+			return 640;
+		case 4:
 			return 100;
 	}
 	return 0;

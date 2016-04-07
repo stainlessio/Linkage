@@ -38,6 +38,7 @@
 #define IDC_RADIO5                      1011
 #define IDC_RADIO6                      1011
 #define IDC_SPIN2                       1011
+#define IDC_RADIO9                      1012
 #define IDC_BUTTON1                     1018
 #define IDC_COMMAND4                    1019
 #define IDC_BUTTON2                     1019
@@ -469,7 +470,7 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        6002
+#define _APS_NEXT_RESOURCE_VALUE        6003
 #define _APS_NEXT_COMMAND_VALUE         7002
 #define _APS_NEXT_CONTROL_VALUE         8001
 #define _APS_NEXT_SYMED_VALUE           9000

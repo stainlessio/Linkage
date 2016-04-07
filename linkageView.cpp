@@ -65,6 +65,7 @@ static COLORREF COLOR_MOTIONPATH = RGB( 60, 60, 60 );
 static COLORREF COLOR_DRAWINGLIGHT = RGB( 200, 200, 200 );
 static COLORREF COLOR_DRAWINGDARK = RGB( 70, 70, 70 );
 static COLORREF COLOR_GRID = RGB( 200, 240, 240 );
+static COLORREF COLOR_GROUND = RGB( 100, 100, 100 );
 
 static const int CONNECTORRADIUS = 5;
 static const int CONNECTORTRIANGLE = 6;
@@ -114,6 +115,7 @@ BEGIN_MESSAGE_MAP(CLinkageView, CView)
 	ON_WM_LBUTTONDOWN()
 	ON_WM_LBUTTONUP()
 	ON_WM_MOUSEMOVE()
+	//ON_MESSAGE(WM_GESTURE, OnGesture)
 	ON_COMMAND(ID_MECHANISM_RESET, OnMechanismReset)
 	ON_COMMAND(ID_MECHANISM_SIMULATE, &CLinkageView::OnMechanismSimulate)
 	ON_COMMAND(ID_CONTROL_WINDOW, &CLinkageView::OnControlWindow)
@@ -1670,7 +1672,7 @@ CFArea CLinkageView::DrawMechanism( CRenderer* pRenderer )
 
 void CLinkageView::MovePartsLinkToOrigin( CLink *pPartsLink, CFPoint Origin, GearConnectionList *pGearConnections )
 {
-	if( pPartsLink->GetConnectorCount() == 1 || pPartsLink->IsGear() )
+	if( pPartsLink->GetConnectorCount() == 1 || pPartsLink->IsGear() && pGearConnections != 0 )
 	{
 		std::list<double> RadiusList;
 		pPartsLink->GetGearRadii( *pGearConnections, RadiusList );
@@ -1745,16 +1747,74 @@ void CLinkageView::MovePartsLinkToOrigin( CLink *pPartsLink, CFPoint Origin, Gea
 	pStartConnector->SetPoint( Origin );
 }
 
+CTempLink* CLinkageView::GetTemporaryGroundLink( LinkList *pDocLinks, ConnectorList *pDocConnectors, CFPoint PartOrigin )
+{
+	int Anchors = 0;
+	POSITION Position = pDocConnectors->GetHeadPosition();
+	while( Position != 0 )
+	{
+		CConnector *pConnector = pDocConnectors->GetNext( Position );
+		if( pConnector == 0 || !pConnector->IsAnchor() )
+			continue;
+
+		++Anchors;
+	}
+
+	if( Anchors == 0 ) // Empty or non-functioning mechanism.
+		return 0;
+
+	Position = pDocLinks->GetHeadPosition();
+	while( Position != 0 )
+	{
+		CLink *pLink = pDocLinks->GetNext( Position );
+		if( pLink == 0  )
+			continue;
+
+		int FoundAnchors = pLink->GetAnchorCount();
+		if( FoundAnchors > 0 && FoundAnchors == Anchors )
+			return 0; // The total anchor count all on this link so there is no need for a ground link.
+	}
+
+	// Create the ground link.
+
+	CTempLink *pPartsLink = new CTempLink();
+	pPartsLink->SetColor( COLOR_GROUND );
+	pPartsLink->SetLocked( false );
+	pPartsLink->SetIdentifier( INT_MAX );
+	pPartsLink->SetName( "Ground" );
+	pPartsLink->SetLayers( CLinkageDoc::MECHANISMLAYER );
+
+	Position = pDocConnectors->GetHeadPosition();
+	while( Position != 0 )
+	{
+		CConnector *pConnector = pDocConnectors->GetNext( Position );
+		if( pConnector == 0 || !pConnector->IsAnchor() )
+			continue;
+
+		CConnector *pPartsConnector = new CConnector( *pConnector );
+		pPartsConnector->SetColor( pPartsLink->GetColor() );
+		pPartsConnector->SetAsAnchor( false );
+		pPartsConnector->SetAsInput( false );
+		pPartsConnector->SetAsDrawing( false );
+		pPartsLink->AddConnector( pPartsConnector );
+	}
+
+	MovePartsLinkToOrigin( pPartsLink, PartOrigin, 0 );
+
+	return pPartsLink;
+}
+
 CTempLink* CLinkageView::GetTemporaryPartsLink( CLink *pLink, CFPoint PartOrigin, GearConnectionList *pGearConnections )
 {
 	CTempLink *pPartsLink = new CTempLink( *pLink );
 	// MUST REMOVE THE COPIED CONNECTORS HERE BECAUSE THEY ARE JUST POINTER COPIES!
 	pPartsLink->RemoveAllConnectors();
+	pPartsLink->SetLocked( false );
 
-	POSITION Position2 = pLink->GetConnectorList()->GetHeadPosition();
-	while( Position2 != 0 )
+	POSITION Position = pLink->GetConnectorList()->GetHeadPosition();
+	while( Position != 0 )
 	{
-		CConnector *pConnector = pLink->GetConnectorList()->GetNext( Position2 );
+		CConnector *pConnector = pLink->GetConnectorList()->GetNext( Position );
 		if( pConnector == 0 )
 			continue;
 
@@ -1794,23 +1854,36 @@ CFArea CLinkageView::DrawPartsList( CRenderer* pRenderer )
 	GearConnectionList *pGearConnections = pDoc->GetGearConnections();
 
 	POSITION Position = pDoc->GetLinkList()->GetHeadPosition();
-	while( Position != 0 )
+	bool bDone = false;
+	for( ; !bDone; ( Position == 0 ? 0 : pDoc->GetLinkList()->GetNext( Position ) ) )
 	{
-		CLink *pLink = pDoc->GetLinkList()->GetNext( Position );
-		if( pLink == 0 || ( pLink->GetLayers() & CLinkageDoc::DRAWINGLAYER ) != 0 )
-			continue;
+		CLink *pPartsLink = 0;
+		if( Position == 0 )
+		{
+			/*
+			 * Generate a ground link for this last pass through the data.
+			 */
 
-		if( pLink->GetConnectorCount() <= 1 && !pLink->IsGear() )
-			continue;
+			bDone = true;
+			pPartsLink = GetTemporaryGroundLink( pDoc->GetLinkList(), pDoc->GetConnectorList(), CFPoint( StartPoint.x, StartPoint.y - yOffset - LastPartHeight ) );
+		}
+		else
+		{
+			CLink *pLink = pDoc->GetLinkList()->GetAt( Position );
+			if( pLink == 0 || ( pLink->GetLayers() & CLinkageDoc::DRAWINGLAYER ) != 0 )
+				continue;
 
-		yOffset -= LastPartHeight;
+			if( pLink->GetConnectorCount() <= 1 && !pLink->IsGear() )
+				continue;
 
-		CLink *pPartsLink = GetTemporaryPartsLink( pLink, CFPoint( StartPoint.x, StartPoint.y + yOffset ), pGearConnections );
+			pPartsLink = GetTemporaryPartsLink( pLink, CFPoint( StartPoint.x, StartPoint.y - yOffset - LastPartHeight ), pGearConnections );
+		}
 
 		if( pPartsLink == 0 )
 			continue;
 
-		
+		yOffset += LastPartHeight;
+
 		ConnectorList* pConnectors = pPartsLink->GetConnectorList();
 
 		DrawLink( pRenderer, pGearConnections, pDoc->GetViewLayers(), pPartsLink, false, false, true );
@@ -1855,6 +1928,12 @@ CFArea CLinkageView::DrawPartsList( CRenderer* pRenderer )
 		ASSERT( pPartsLink != 0 );
 		delete pPartsLink;
 	}
+
+	/*
+	 * Create a ground link if no other single link holds all of the ground connectors.
+	 */
+
+
 
 	return DocumentArea;
 }
@@ -3878,7 +3957,7 @@ void CLinkageView::OnUpdateSelectall( CCmdUI *pCmdUI )
 {
 	CLinkageDoc* pDoc = GetDocument();
 	ASSERT_VALID(pDoc);
-	pCmdUI->Enable( !m_bSimulating && !pDoc->IsEmpty() );
+	pCmdUI->Enable( m_bAllowEdit && !m_bSimulating && !pDoc->IsEmpty() );
 }
 
 void CLinkageView::OnAlignHorizontal()
@@ -4390,9 +4469,9 @@ void CLinkageView::OnViewParts()
 	m_bAllowEdit = !m_bShowParts;
 	if( m_bShowParts )
 	{
-		//CLinkageDoc* pDoc = GetDocument();
-		//ASSERT_VALID(pDoc);
-		//pDoc->GetDocument( true );
+		CLinkageDoc* pDoc = GetDocument();
+		ASSERT_VALID(pDoc);
+		pDoc->SelectElement();
 	}
 	InvalidateRect( 0 );
 }
@@ -5396,6 +5475,33 @@ CFArea CLinkageView::DrawGroundDimensions( CRenderer* pRenderer, CLinkageDoc *pD
 	if( ( OnLayers & CLinkageDoc::MECHANISMLAYERS ) == 0 )
 		return CFArea();
 
+	// Determine if ground dimensions are even needed
+	int Anchors = 0;
+	POSITION Position = pDoc->GetConnectorList()->GetHeadPosition();
+	while( Position != 0 )
+	{
+		CConnector *pConnector = pDoc->GetConnectorList()->GetNext( Position );
+		if( pConnector == 0 || !pConnector->IsAnchor() )
+			continue;
+
+		++Anchors;
+	}
+
+	if( Anchors == 0 ) // Empty or non-functioning mechanism.
+		return 0;
+
+	Position = pDoc->GetLinkList()->GetHeadPosition();
+	while( Position != 0 )
+	{
+		CLink *pLink = pDoc->GetLinkList()->GetNext( Position );
+		if( pLink == 0  )
+			continue;
+
+		int FoundAnchors = pLink->GetAnchorCount();
+		if( FoundAnchors > 0 && FoundAnchors == Anchors )
+			return CFArea(); // The total anchor count all on this link so there is no need for a ground link.
+	}
+
 	CFArea DimensionsArea;
 
 	int ConnectorCount = 0;
@@ -5405,7 +5511,7 @@ CFArea CLinkageView::DrawGroundDimensions( CRenderer* pRenderer, CLinkageDoc *pD
 	double yAllBottomMost = DBL_MAX;
 
 	ConnectorList* pConnectors = pDoc->GetConnectorList();
-	POSITION Position = pConnectors->GetHeadPosition();
+	Position = pConnectors->GetHeadPosition();
 	while( Position != NULL )
 	{
 		CConnector* pConnector = pConnectors->GetNext( Position );
@@ -8083,3 +8189,60 @@ void CLinkageView::UpdateForDocumentChange( void )
 	ShowSelectedElementCoordinates();
 	InvalidateRect( 0 );
 }
+
+#if 0
+
+LRESULT CLinkageView::OnGesture(WPARAM wParam, LPARAM lParam)
+{
+    // Create a structure to populate and retrieve the extra message info.
+    GESTUREINFO gi;  
+    
+    ZeroMemory(&gi, sizeof(GESTUREINFO));
+    
+    gi.cbSize = sizeof(GESTUREINFO);
+
+    BOOL bResult  = GetGestureInfo((HGESTUREINFO)lParam, &gi);
+    BOOL bHandled = FALSE;
+
+    if (bResult){
+        // now interpret the gesture
+        switch (gi.dwID){
+           case GID_ZOOM:
+               // Code for zooming goes here     
+               bHandled = TRUE;
+               break;
+           case GID_PAN:
+               // Code for panning goes here
+               bHandled = TRUE;
+               break;
+           case GID_ROTATE:
+               // Code for rotation goes here
+               bHandled = TRUE;
+               break;
+           case GID_TWOFINGERTAP:
+               // Code for two-finger tap goes here
+               bHandled = TRUE;
+               break;
+           case GID_PRESSANDTAP:
+               // Code for roll over goes here
+               bHandled = TRUE;
+               break;
+           default:
+               // A gesture was not recognized
+               break;
+        }
+    }else{
+        DWORD dwErr = GetLastError();
+        if (dwErr > 0){
+            //MessageBoxW(hWnd, L"Error!", L"Could not retrieve a GESTUREINFO structure.", MB_OK);
+        }
+    }
+    if (bHandled){
+        return 0;
+    }else{
+        return DefWindowProc(hWnd, message, wParam, lParam);
+    }
+  }
+}
+
+#endif

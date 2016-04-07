@@ -71,6 +71,8 @@ artifacts/
 _Chutzpah*
 
 # Visual C++ cache files
+*.opensdf
+*.opendb
 ipch/
 *.aps
 *.ncb

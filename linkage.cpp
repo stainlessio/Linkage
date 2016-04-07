@@ -28,7 +28,7 @@ class CMyDocTemplate : public CSingleDocTemplate
  
 // Constructors
 public:
-    CMyDocTemplate(UINT nIDResource, CRuntimeClass* pDocClass,
+    CMyDocTemplate(UINT nIDResource,  CRuntimeClass* pDocClass,
               CRuntimeClass* pFrameClass, CRuntimeClass* pViewClass) 
 			  : CSingleDocTemplate(nIDResource, pDocClass, pFrameClass, pViewClass) {}
     virtual ~CMyDocTemplate() {}
