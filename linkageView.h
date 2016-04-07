@@ -237,6 +237,8 @@ private:
 	void DrawMotionPath( CRenderer* pRenderer, CConnector* pConnector );
 	void DebugDrawLink( CRenderer* pRenderer, unsigned int OnLayers, CLink *pLink, bool bShowlabels, bool bDrawHighlight = false, bool bDrawFill = false );
 	void DrawLink( CRenderer* pRenderer, const GearConnectionList *pGearConnections, unsigned int OnLayers, CLink *pLink, bool bShowlabels, bool bDrawHighlight = false, bool bDrawFill = false );
+	void DrawDebugItems( CRenderer *pRenderer );
+	void ClearDebugItems( void );
 	void DrawChain( CRenderer* pRenderer, unsigned int OnLayers, CGearConnection *pGearConnection );
 	void DrawFailureMarks( CRenderer* pRenderer, unsigned int OnLayers, CFPoint Point, double Radius );
 	CFArea DrawMeasurementLine( CRenderer* pRenderer, CFLine &InputLine, CFPoint &Firstpoint, CFPoint &SecondPoint, double Offset, bool bDrawLines, bool bDrawText );
@@ -257,7 +259,9 @@ private:
 	void DrawAnicrop( CRenderer *pRenderer );
 	void DrawRuler( CRenderer *pRenderer );
 	double AdjustYCoordinate( double y );
-	CFPoint ComputeNextPartLocation( CLink *pPartsLink, CFPoint ThisPartsPoint );
+	void MovePartsLinkToOrigin( CLink *pPartsLink, CFPoint Origin, GearConnectionList *pGearConnections );
+	class CTempLink* GetTemporaryPartsLink( CLink *pLink, CFPoint PartOrigin, GearConnectionList *pGearConnections );
+	class CTempLink* GetTemporaryGroundLink( LinkList *pDocLinks, ConnectorList *pDocConnectors, CFPoint PartOrigin );
 	
 	bool StartVideoThread( void );
 
@@ -476,6 +480,7 @@ public:
 	afx_msg void OnViewUnscalein();
 	afx_msg void OnViewUnscaleout();
 	afx_msg void OnMenuUnscalefit();
+	//afx_msg LRESULT OnGesture(WPARAM wParam, LPARAM lParam);
 
 	afx_msg void OnSimulatePause();
 	afx_msg void OnSimulateForward();

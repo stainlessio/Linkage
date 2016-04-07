@@ -300,6 +300,11 @@ Received some feature requests recently. These are some NOT YET ADDED:
 2/25/2016 3:51 PM: Fixed bug in arrow key handling - using accelerators kept the ribbbon edit control from getting arrow key presses.
 2/25/2016 3:51 PM: Fixed bug in bit array code where the proper bits were not cleared when changing to certain lengths.
 2/27/2016 11:31 PM: Fixed bug in "always manual" simulation so that the simulation doesn't take multiple steps to get to a new position for the manual control while also trying to just run the rest of the simulation at normal speed.
+4/6/2016 7:38 PM: Finished adding parts list view.
+4/6/2016 7:38 PM: Added a new slider-to-slider simulation algorithm for a previously unhandled type of sliding connection.
+4/6/2016 7:38 PM: Changed the version to 3.2.0.
+
+
 
 
 

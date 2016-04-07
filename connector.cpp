@@ -305,7 +305,7 @@ void CConnector::SlideBetween( class CConnector *pConnector1, class CConnector *
 	if( bSet )
 	{
 		pLink = pConnector1->GetSharingLink( pConnector2 );
-		// The two conectors must share a link.
+		// The two connectors must share a link.
 		if( pLink == 0 )
 			return;
 	}

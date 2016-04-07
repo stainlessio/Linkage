@@ -257,6 +257,8 @@ void CMainFrame::CreateViewPanel( CMFCRibbonCategory* pCategory )
 	pDetailsButton->SetMenu( Menu.GetSafeHmenu() );
 
 	pPanelView->Add( pDetailsButton );
+
+	AddRibbonButton( pPanelView, IDS_RIBBON_VIEW_PARTS, ID_VIEW_PARTS, 86, LARGE );
 }
 
 void CMainFrame::CreateDimensionsPanel( CMFCRibbonCategory* pCategory )

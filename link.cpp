@@ -261,7 +261,7 @@ bool CLink::RotateAround( CConnector* pConnector )
 		
 		if( pConnector->IsInput() )
 		{
-			CList<CLink*,CLink*> *pList = pUseConnector->GetLinksList();
+			CList<CLink*,CLink*> *pList = pUseConnector->GetLinkList();
 			POSITION Position2 = pList->GetHeadPosition();
 			while( Position2 != 0 )
 			{
@@ -922,12 +922,12 @@ void CLink::MakePermanent( void )
 }
 
 
-CFPoint *CLink::ComputeHull( int *Count )
+CFPoint *CLink::ComputeHull( int *Count, bool bUseOriginalPoints )
 {
 	if( m_pHull != 0 )
 		delete [] m_pHull;
 
-	m_pHull = ::GetHull( &m_Connectors, m_HullCount );
+	m_pHull = ::GetHull( &m_Connectors, m_HullCount, bUseOriginalPoints );
 	if( m_pHull == 0 )
 		m_HullCount = 0;
 	if( Count != 0 )
@@ -936,15 +936,16 @@ CFPoint *CLink::ComputeHull( int *Count )
 	return m_pHull;
 }
 
-CFPoint *CLink::GetHull( int &Count )
+CFPoint *CLink::GetHull( int &Count, bool bUseOriginalPoints )
 {
-	if( m_pHull == 0 )
-		ComputeHull( 0 );
+	// Just always compute it      
+	// if( m_pHull == 0 )
+		ComputeHull( 0, bUseOriginalPoints );
 	Count = m_HullCount;
 	return m_pHull;
 }
 
-CConnector *CLink::GetConnector( int Index )
+CConnector *CLink::GetConnector( int Index ) const
 {
 	int Counter = 0;
 	POSITION Position = m_Connectors.GetHeadPosition();
@@ -1018,7 +1019,7 @@ bool CompareDoubles( double &First, double &Second )
 	return First < Second;
 }
 
-bool CLink::GetGearRadii( const GearConnectionList &ConnectionList, std::list<double> &RadiusList )
+bool CLink::GetGearRadii( const GearConnectionList &ConnectionList, std::list<double> &RadiusList ) const
 {
 	/*
 	 * The gear connector of this link could mesh with multiple other gears. It's

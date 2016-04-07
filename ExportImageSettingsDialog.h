@@ -42,6 +42,7 @@ private:
 	CStatic m_PreviewArea;
 	virtual BOOL OnInitDialog();
 	afx_msg void OnPaint();
+	void SaveSettings( void );
 
 public:
 	afx_msg void OnCopy();

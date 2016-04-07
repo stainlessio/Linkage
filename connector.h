@@ -48,7 +48,7 @@ public:
 	void SetAsAnchor( bool bSet ) { m_bAnchor = bSet; }
 	void SetAlwaysManual( bool bSet ) { m_bAlwaysManual = bSet; }
 	void Select( bool bSelected );
-	CList< class CLink*, class CLink* >* GetLinksList( void ) { return &m_Links; }
+	CList< class CLink*, class CLink* >* GetLinkList( void ) { return &m_Links; }
 	void AddMotionPoint( void );
 	
 	void SetIntermediateDrawCircleRadius( double Radius ) { m_DrawCircleRadius = fabs( Radius ); }

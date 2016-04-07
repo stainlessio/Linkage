@@ -19,7 +19,7 @@ void MoveLowest( CFPoint* pPoints, int Count );
 int AreaSign( CFPoint a, CFPoint b, CFPoint c );
 bool Left( CFPoint a, CFPoint b, CFPoint c );
 
-CFPoint* GetHull( ConnectorList* pConnectors, int &ReturnedPointCount )
+CFPoint* GetHull( ConnectorList* pConnectors, int &ReturnedPointCount, bool bUseOriginalPoints )
 {
 	POSITION Position;
 	int Counter;
@@ -32,8 +32,16 @@ CFPoint* GetHull( ConnectorList* pConnectors, int &ReturnedPointCount )
 	for( Counter = 0; Position != NULL && Counter < Count; Counter++ )
 	{
 		CConnector* pConnector = pConnectors->GetNext( Position );
-		PointArray[Counter].x = pConnector->GetPoint().x;
-		PointArray[Counter].y = pConnector->GetPoint().y;
+		if( bUseOriginalPoints )
+		{
+			PointArray[Counter].x = pConnector->GetOriginalPoint().x;
+			PointArray[Counter].y = pConnector->GetOriginalPoint().y;
+		}
+		else
+		{
+			PointArray[Counter].x = pConnector->GetPoint().x;
+			PointArray[Counter].y = pConnector->GetPoint().y;
+		}
 	}
 	
 	/*
