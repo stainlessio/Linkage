@@ -1759,7 +1759,7 @@ class CSimulatorImplementation
 		while( Position != 0 )
 		{
 			CLink *pFirstLink = ConnectedLinks.GetNext( Position );
-			if( pFirstLink == 0 | pFirstLink == pLink )
+			if( pFirstLink == 0 || pFirstLink == pLink )
 				continue;
 			POSITION Position2 = Position;
 			while( Position2 != 0 )

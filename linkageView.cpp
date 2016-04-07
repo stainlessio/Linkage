@@ -888,11 +888,11 @@ CRect CLinkageView::PrepareRenderer( CRenderer &Renderer, CRect *pDrawRect, CBit
 			CFRect NewArea = GetDocumentArea( false );
 			NewArea.Normalize();
 
-			// 4 times is enought to get the chage ratio up to .99995 during testing.
-			for( int Test = 0; Test < 34; ++Test )
+			// 15 times is enought to get the chage ratio up to .99995 during testing.
+			for( int Test = 0; Test < 15; ++Test )
 			{
 				// Zoom out to make room for dimensions. This is not exact because the zoom affects the dimension line sizes and positions.
-				CFRect BigArea = GetDocumentArea( true );
+				CFRect BigArea = GetDocumentArea( m_bShowDimensions );
 				BigArea.Normalize();
 
 				BigArea.left -= Unscale( 1 );
@@ -914,7 +914,7 @@ CRect CLinkageView::PrepareRenderer( CRenderer &Renderer, CRect *pDrawRect, CBit
 				NewArea = BigArea;
 			}
 
-			Area = GetDocumentArea( true );
+			Area = GetDocumentArea( m_bShowDimensions );
 			Area.Normalize();
 
 			// Center the mechanism.
@@ -4668,8 +4668,8 @@ void CLinkageView::OnMenuUnscalefit()
 	int cy = m_DrawingRect.Height();
 
 	// Some margin because the dimensions are not done well and we can't predict them just yet.
-	cx -= 140;
-	cy -= 140;
+	cx -= 20;
+	cy -= 20;
 
 	CFRect Area = GetDocumentArea( m_bShowDimensions );
 
@@ -4685,7 +4685,7 @@ void CLinkageView::OnMenuUnscalefit()
 
 	// Center the mechanism.
 	m_ScreenScrollPosition.x = m_ScreenZoom * ( Area.left + fabs( Area.Width() ) / 2 );
-	m_ScreenScrollPosition.y = m_ScreenZoom * -( Area.bottom + fabs( Area.Height() ) / 2 );
+	m_ScreenScrollPosition.y = m_ScreenZoom * -( Area.top + fabs( Area.Height() ) / 2 );
 
 	SetScrollExtents();
 	InvalidateRect( 0 );

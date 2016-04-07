@@ -2122,6 +2122,24 @@ bool CLinkageDoc::LockSelected( void )
 	return Count > 0;
 }
 
+bool CLinkageDoc::IsLinkLocked( CConnector *pConnector )
+{
+	if( pConnector == 0 )
+		return false;
+
+	POSITION Position = pConnector->GetLinkList()->GetHeadPosition();
+	while( Position != 0 )
+	{
+		CLink *pLink = pConnector->GetLinkList()->GetNext( Position );
+		if( pLink == 0 )
+			continue;
+
+		if( pLink->IsLocked() )
+			return true;
+	}
+	return false;
+}
+
 bool CLinkageDoc::JoinSelected( bool bSaveUndoState )
 {
 	if( m_SelectedConnectors.GetCount() < 2 )
@@ -4159,6 +4177,31 @@ CLinkageDoc::_Units CLinkageDoc::GetUnits( void )
 	return m_Units;
 }
 
+bool CLinkageDoc::ChangeLinkLength( CLink *pLink, double Value, bool bPercentage )
+{
+	CConnector *pConnector = pLink->GetConnector( 0 );
+	CConnector *pConnector2 = pLink->GetConnector( 1 );
+	if( pConnector == 0 || pConnector2 == 0 )
+		return false;
+	if( IsLinkLocked( pConnector ) || IsLinkLocked( pConnector2 ) )
+		return false;
+	CFLine Line( pConnector->GetPoint(), pConnector2->GetPoint() );
+	double LineLength = Line.GetDistance();
+	double NewLineLength = LineLength;
+	if( bPercentage )
+		NewLineLength *= Value / 100;
+	else
+		NewLineLength = Value;
+	double OneEndAdd = ( NewLineLength - LineLength ) / 2;
+	PushUndo();
+	Line.SetDistance( LineLength + OneEndAdd );
+	Line.ReverseDirection();
+	Line.SetDistance( NewLineLength );
+	pConnector->SetPoint( Line.GetEnd() );
+	pConnector2->SetPoint( Line.GetStart() );
+	return true;
+}
+
 bool CLinkageDoc::SetSelectedElementCoordinates( const char *pCoordinateString )
 {
 	CString Text = pCoordinateString;
@@ -4169,7 +4212,7 @@ bool CLinkageDoc::SetSelectedElementCoordinates( const char *pCoordinateString )
 	double yValue = 0.0;
 	char Dummy1;
 	char Dummy2;
-	char Dummy3;
+	char PercentSign;
 	int CoordinateCount = 0;
 	double Percentage = 0.0;
 	
@@ -4177,8 +4220,8 @@ bool CLinkageDoc::SetSelectedElementCoordinates( const char *pCoordinateString )
 	int SelectedLinkCount = GetSelectedLinkCount( true );
 	CConnector *pConnector = (CConnector*)GetSelectedConnector( 0 );
 
-	CoordinateCount = sscanf_s( (const char*)Text, "%lf %c%c", &Percentage, &Dummy1, 1, &Dummy2, 1 );
-	if( CoordinateCount == 2 && Dummy1 == '%' )
+	CoordinateCount = sscanf_s( (const char*)Text, "%lf %c%c", &Percentage, &PercentSign, 1, &Dummy1, 1 );
+	if( CoordinateCount == 2 && PercentSign == '%' )
 	{
 		if( SelectedConnectorCount == 2 && SelectedLinkCount == 0 )
 		{
@@ -4186,8 +4229,21 @@ bool CLinkageDoc::SetSelectedElementCoordinates( const char *pCoordinateString )
 			CConnector *pConnector2 = (CConnector*)GetSelectedConnector( 1 );
 			if( pConnector == 0 || pConnector2 == 0 )
 				return false;
+			if( IsLinkLocked( pConnector ) )
+				return false;
 			CFLine Line( pConnector->GetPoint(), pConnector2->GetPoint() );
 			Line.SetDistance( Line.GetDistance() * Percentage / 100 );
+			PushUndo();
+			pConnector2->SetPoint( Line.GetEnd() );
+		}
+		else if( SelectedConnectorCount == 0 && SelectedLinkCount == 1 )
+		{
+			CLink *pLink = GetSelectedLink( 0, false );
+			if( pLink != 0 && pLink->GetConnectorCount() == 2 && !pLink->IsLocked() )
+			{
+				if( ChangeLinkLength( pLink, Percentage, true ) )
+					return true;
+			}
 		}
 		else
 		{
@@ -4196,9 +4252,6 @@ bool CLinkageDoc::SetSelectedElementCoordinates( const char *pCoordinateString )
 		}
 		return true;
 	}
-
-	if( SelectedLinkCount > 0 )
-		return false;
 
 	CoordinateCount = sscanf_s( (const char*)Text, "%lf , %lf%c", &xValue, &yValue, &Dummy1, 1 );
 
@@ -4210,6 +4263,21 @@ bool CLinkageDoc::SetSelectedElementCoordinates( const char *pCoordinateString )
 	double DocumentScale = GetUnitScale();
 	xValue /= DocumentScale;
 	yValue /= DocumentScale;
+
+	if( SelectedLinkCount > 0 )
+	{
+		if( SelectedLinkCount == 1 && CoordinateCount == 1 )
+		{
+			CLink *pLink = GetSelectedLink( 0, false );
+			if( pLink == 0 || pLink->GetConnectorCount() != 2 || pLink->IsLocked() )
+				return false;
+
+			return ChangeLinkLength( pLink, xValue, false );
+
+		}
+		return false;
+	}
+
 	
 	int ExpectedCoordinateCount = SelectedConnectorCount == 1 ? 2 : 1;
 
@@ -4218,6 +4286,8 @@ bool CLinkageDoc::SetSelectedElementCoordinates( const char *pCoordinateString )
 
 	if( CoordinateCount == 2 )
 	{
+		if( IsLinkLocked( pConnector ) )
+			return false;
 		PushUndo();
 		pConnector->SetPoint( CFPoint( xValue, yValue ) );
 		return true;
@@ -4227,6 +4297,8 @@ bool CLinkageDoc::SetSelectedElementCoordinates( const char *pCoordinateString )
 		// Distance
 		CConnector *pConnector2 = (CConnector*)GetSelectedConnector( 1 );
 		if( pConnector2 == 0 )
+			return false;
+		if( IsLinkLocked( pConnector2 ) )
 			return false;
 		CFLine Line( pConnector->GetPoint(), pConnector2->GetPoint() );
 		Line.SetDistance( xValue );
@@ -4239,6 +4311,8 @@ bool CLinkageDoc::SetSelectedElementCoordinates( const char *pCoordinateString )
 		// Angle
 		CConnector *pConnector2 = GetSelectedConnector( 2 ); 
 		if( pConnector2 != 0 && pConnector2->IsSlider() )
+			return false;
+		if( IsLinkLocked( pConnector2 ) )
 			return false;
 
 		PushUndo();

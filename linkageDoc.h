@@ -310,6 +310,8 @@ private:
 	bool Unfasten( CElement *pElement );
 	bool SetGearRatio( CLink *pGear1, CLink *pGear2, double Size1, double Size2, bool bUseSizeAsSize, CGearConnection::ConnectionType ConnectionType, bool bFromUI );
 	int BuildSelectedLockGroup( ConnectorList *pLockGroup );
+	bool IsLinkLocked( CConnector *pConnector );
+	bool ChangeLinkLength( CLink *pLink, double Value, bool bPercentage );
 
 	//afx_msg void OnSelectSample( UINT nID );
 
