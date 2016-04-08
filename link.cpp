@@ -41,7 +41,8 @@ CLink::CLink( const CLink &ExistingLink )
 	m_bSolid = ExistingLink.m_bSolid;
 	m_ActuatorCPM = ExistingLink.m_ActuatorCPM;
 	m_ActuatorStroke = ExistingLink.m_ActuatorStroke;
-	m_ActuatorExtension = ExistingLink.m_ActuatorExtension;
+	m_ActuatorExtension = 0;
+	m_TempActuatorExtension = 0;
 	m_bAlwaysManual = ExistingLink.m_bAlwaysManual;
 	m_RotationAngle = ExistingLink.m_RotationAngle;
 	m_bGear = ExistingLink.m_bGear;
