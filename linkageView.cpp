@@ -6573,6 +6573,8 @@ void CLinkageView::OnEditUndo()
 	CLinkageDoc* pDoc = GetDocument();
 	ASSERT_VALID(pDoc);
 	pDoc->Undo();
+	if( m_bShowParts )
+		pDoc->SelectElement();
 	UpdateForDocumentChange();
 }
 
