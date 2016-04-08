@@ -1246,6 +1246,11 @@ class CSimulatorImplementation
 			SWAP( pSlider2, pLimit2 );
 		}
 
+		// Check to see if the slider that positions the link is part of the link. This is handled by other
+		// code elsewhere so leave this function.
+		if( pTargetConnector->IsSharingLink( pLimit1 ) )
+			return false;
+
 		// Get a line through the connector slider limits in their original location.
 		CFLine ConnectedLine( pTargetLimit1->GetOriginalPoint(), pTargetLimit2->GetOriginalPoint() );
 

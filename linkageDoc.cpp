@@ -4395,13 +4395,13 @@ bool CLinkageDoc::CanAddConnector( void )
 	{
 		if( GetSelectedConnector(0) == 0 )
 			return false;
-		return GetSelectedConnectorCount() == 1 && GetSelectedConnector(0)->IsAlone() && (GetSelectedConnector(0)->GetLayers() & MECHANISMLAYERS) != 0;
+		return GetSelectedConnectorCount() == 1 && GetSelectedConnector(0)->IsAlone() /*&& (GetSelectedConnector(0)->GetLayers() & MECHANISMLAYERS) != 0*/;
 	}
 	else if( GetSelectedLinkCount( false ) == 1 )
 	{
 		if( GetSelectedLink( 0, false )->IsActuator() )
 			return false;
-		return ( GetSelectedLink( 0, false )->GetLayers() & MECHANISMLAYERS ) != 0 && GetSelectedConnectorCount() == 0 || ( GetSelectedConnectorCount() == 1 && GetSelectedConnector( 0 )->IsAlone() );
+		return /* ( GetSelectedLink( 0, false )->GetLayers() & MECHANISMLAYERS ) != 0 && */ GetSelectedConnectorCount() == 0 || ( GetSelectedConnectorCount() == 1 && GetSelectedConnector( 0 )->IsAlone() );
 	}
 	else
 		return false;

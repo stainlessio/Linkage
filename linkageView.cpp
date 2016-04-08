@@ -3283,7 +3283,7 @@ void CLinkageView::ConfigureControlWindow( enum _SimulationControl SimulationCon
 		{
 			CString String;
 			String.Format( "Link %s", pLink->GetIdentifierString( m_bShowDebug ) );
-			m_ControlWindow.AddControl( pLink->GetIdentifier(), String, pLink->GetIdentifier(), pLink->GetCPM() >= 0 ? 0.0 : 1.0 );
+			m_ControlWindow.AddControl( pLink->GetIdentifier(), String, pLink->GetIdentifier(), false, pLink->GetCPM() >= 0 ? 0.0 : 1.0 );
 		}
 	}
 
@@ -4543,7 +4543,7 @@ void CLinkageView::OnRButtonUp(UINT nFlags, CPoint point)
 	if( m_bSimulating )
 		return;
 
-	if( !m_bMouseMovedEnough )
+	if( !m_bMouseMovedEnough && m_bAllowEdit )
 	{
 		CLinkageDoc* pDoc = GetDocument();
 		ASSERT_VALID(pDoc);
@@ -6346,7 +6346,7 @@ void CLinkageView::DrawLink( CRenderer* pRenderer, const GearConnectionList *pGe
 				LinkLabelOffset = UnscaledUnits( pLink->IsSolid() ? 14 : 6 );
 			}
 
-			if( Count == 2 )
+			if( Count == 2 || true ) // it seems ok to do this all of the time, which works better for some parts list information.
 			{
 				CConnector *pConnector2 = pLink->GetConnectorList()->GetTail();
 				if( pConnector1 != 0 && pConnector2 != 0 && pConnector1 != pConnector2 )
@@ -6363,7 +6363,7 @@ void CLinkageView::DrawLink( CRenderer* pRenderer, const GearConnectionList *pGe
 			else
 			{
 				// A guess to keep the text from overlapping the average point of a link.
-				// Average.y += LinkLabelOffset;
+				//Average.y += AdjustYCoordinate( LinkLabelOffset ) * 1.5;
 				Average.x += LinkLabelOffset;
 			}
 
