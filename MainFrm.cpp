@@ -243,6 +243,7 @@ void CMainFrame::CreateViewPanel( CMFCRibbonCategory* pCategory )
 	AppendMenuItem( pDetailsButton, IDS_RIBBON_ANGLES, ID_VIEW_ANGLES, 12 );
 	AppendMenuItem( pDetailsButton, IDS_RIBBON_VIEW_ANICROP, ID_VIEW_ANICROP, 13 );
 	AppendMenuItem( pDetailsButton, IDS_RIBBON_DIMENSIONS, ID_VIEW_DIMENSIONS, 15 );
+	AppendMenuItem( pDetailsButton, IDS_RIBBON_GROUNDDIMENSIONS, ID_VIEW_GROUNDDIMENSIONS, 88 );
 	AppendMenuItem( pDetailsButton, IDS_RIBBON_VIEW_LARGEFONT, ID_VIEW_LARGEFONT, 78 );
 	AppendMenuItem( pDetailsButton, IDS_RIBBON_SOLIDLINKS, ID_VIEW_SOLIDLINKS, 75 );
 	AppendMenuItem( pDetailsButton, IDS_RIBBON_VIEW_GRID, ID_VIEW_GRID, 85 );

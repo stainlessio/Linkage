@@ -190,6 +190,7 @@
 #define ID_EDIT_JOIN                    4796
 #define ID_EDIT_GRIDSNAP                4797
 #define ID_VIEW_DIMENSIONS              4798
+#define ID_VIEW_GROUNDDIMENSIONS		4799
 #define ID_EDIT_SPLIT                   4801
 #define ID_ALIGN_RIGHTANGLE             4802
 #define ID_ALIGN_RECTANGLE              4803
@@ -315,6 +316,7 @@
 #define ID_VIEW_ANICROP                 5031
 #define ID_EDIT_LOCK                    5032
 #define IDS_RIBBON_LOCK                 5033
+#define IDS_RIBBON_GROUNDDIMENSIONS     5034
 #define ID_SAMPLE_SIMPLE                5100
 #define ID_SAMPLE_ACTUATOR              5101
 #define ID_SAMPLE_ACTUATOR2             5102

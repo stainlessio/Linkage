@@ -103,7 +103,7 @@ public:
 	void SetZoom( double Zoom );
 	void SetOffset( CFPoint Offset );
 	CFPoint GetOffset( void ) { return m_ScreenScrollPosition; }
-	double GetUnscale( void ) { return m_ScreenZoom; }
+	double GetZoom( void ) { return m_ScreenZoom; }
 
 	void HighlightSelected( bool bHighlight ) { m_bSuperHighlight = bHighlight; InvalidateRect( 0 ); }
 
@@ -132,6 +132,7 @@ private:
 	bool m_bGridSnap;
 	bool m_bAutoJoin;
 	bool m_bShowDimensions;
+	bool m_bShowGroundDimensions;
 	bool m_bNewLinksSolid;
 	double m_xGrid;
 	double m_yGrid;
@@ -450,6 +451,8 @@ public:
 	afx_msg void OnUpdateEditAutoJoin(CCmdUI *pCmdUI);
 	afx_msg void OnViewDimensions();
 	afx_msg void OnUpdateViewDimensions(CCmdUI *pCmdUI);
+	afx_msg void OnViewGroundDimensions();
+	afx_msg void OnUpdateViewGroundDimensions(CCmdUI *pCmdUI);
 	afx_msg void OnViewSolidLinks();
 	afx_msg void OnUpdateViewSolidLinks(CCmdUI *pCmdUI);
 	afx_msg void OnViewDrawing();
@@ -477,9 +480,9 @@ public:
 	afx_msg void OnRButtonDown(UINT nFlags, CPoint point);
 	afx_msg void OnRButtonUp(UINT nFlags, CPoint point);
 	afx_msg BOOL OnMouseWheel(UINT nFlags, short zDelta, CPoint pt);
-	afx_msg void OnViewUnscalein();
-	afx_msg void OnViewUnscaleout();
-	afx_msg void OnMenuUnscalefit();
+	afx_msg void OnViewZoomin();
+	afx_msg void OnViewZoomout();
+	afx_msg void OnMenuZoomfit();
 	//afx_msg LRESULT OnGesture(WPARAM wParam, LPARAM lParam);
 
 	afx_msg void OnSimulatePause();

@@ -256,6 +256,8 @@ BEGIN_MESSAGE_MAP(CLinkageView, CView)
 	ON_UPDATE_COMMAND_UI(ID_VIEW_DATA, &CLinkageView::OnUpdateViewData)
 	ON_COMMAND(ID_VIEW_DIMENSIONS, &CLinkageView::OnViewDimensions)
 	ON_UPDATE_COMMAND_UI(ID_VIEW_DIMENSIONS, &CLinkageView::OnUpdateViewDimensions)
+	ON_COMMAND(ID_VIEW_GROUNDDIMENSIONS, &CLinkageView::OnViewGroundDimensions)
+	ON_UPDATE_COMMAND_UI(ID_VIEW_GROUNDDIMENSIONS, &CLinkageView::OnUpdateViewGroundDimensions)
 
 	ON_COMMAND(ID_VIEW_SOLIDLINKS, &CLinkageView::OnViewSolidLinks)
 	ON_UPDATE_COMMAND_UI(ID_VIEW_SOLIDLINKS, &CLinkageView::OnUpdateViewSolidLinks)
@@ -301,9 +303,9 @@ BEGIN_MESSAGE_MAP(CLinkageView, CView)
 	ON_WM_RBUTTONDOWN()
 	ON_WM_RBUTTONUP()
 	ON_WM_MOUSEWHEEL()
-	ON_COMMAND(ID_VIEW_ZOOMIN, &CLinkageView::OnViewUnscalein)
-	ON_COMMAND(ID_VIEW_ZOOMOUT, &CLinkageView::OnViewUnscaleout)
-	ON_COMMAND(ID_VIEW_ZOOMFIT, &CLinkageView::OnMenuUnscalefit)
+	ON_COMMAND(ID_VIEW_ZOOMIN, &CLinkageView::OnViewZoomin)
+	ON_COMMAND(ID_VIEW_ZOOMOUT, &CLinkageView::OnViewZoomout)
+	ON_COMMAND(ID_VIEW_ZOOMFIT, &CLinkageView::OnMenuZoomfit)
 	ON_UPDATE_COMMAND_UI(ID_VIEW_ZOOMIN, &CLinkageView::OnUpdateNotSimulating)
 	ON_UPDATE_COMMAND_UI(ID_VIEW_ZOOMOUT, &CLinkageView::OnUpdateNotSimulating)
 	ON_UPDATE_COMMAND_UI(ID_VIEW_ZOOMFIT, &CLinkageView::OnUpdateNotSimulating)
@@ -353,7 +355,8 @@ CLinkageView::CLinkageView()
 	m_bSnapOn = true;
 	m_bGridSnap = false;
 	m_bAutoJoin = false;
-	m_bShowDimensions = true;
+	m_bShowDimensions = false;
+	m_bShowGroundDimensions = true;
 	m_bNewLinksSolid = false;
 	m_xGrid = 20.0;
 	m_yGrid = 20.0;
@@ -428,6 +431,7 @@ CLinkageView::CLinkageView()
 		m_bGridSnap = pApp->GetProfileInt( "Settings", "Gridsnap", 1 ) != 0;
 		m_bAutoJoin = pApp->GetProfileIntA( "Settings", "AutoJoin", 1 ) != 0;
 		m_bShowDimensions = pApp->GetProfileInt( "Settings", "Showdimensions", 0 ) != 0;
+		m_bShowGroundDimensions = pApp->GetProfileInt( "Settings", "Showgrounddimensions", 1 ) != 0;
 		m_bNewLinksSolid = pApp->GetProfileInt( "Settings", "Newlinkssolid", 0 ) != 0;
 		m_bShowAnicrop = pApp->GetProfileInt( "Settings", "Showanicrop", 0 ) != 0;
 		m_bShowLargeFont = pApp->GetProfileInt( "Settings", "Showlargefont", 0 ) != 0;
@@ -484,6 +488,7 @@ CLinkageView::~CLinkageView()
 		pApp->WriteProfileInt( "Settings", "Gridsnap", m_bGridSnap ? 1 : 0  );
 		pApp->WriteProfileInt( "Settings", "AutoJoin", m_bAutoJoin ? 1 : 0 );
 		pApp->WriteProfileInt( "Settings", "Showdimensions", m_bShowDimensions ? 1 : 0  );
+		pApp->WriteProfileInt( "Settings", "Showgrounddimensions", m_bShowGroundDimensions ? 1 : 0  );
 		pApp->WriteProfileInt( "Settings", "Newlinkssolid", m_bNewLinksSolid ? 1 : 0  );
 		pApp->WriteProfileInt( "Settings", "Showanicrop", m_bShowAnicrop ? 1 : 0  );
 		pApp->WriteProfileInt( "Settings", "Showlargefont", m_bShowLargeFont ? 1 : 0  );
@@ -1765,6 +1770,7 @@ CTempLink* CLinkageView::GetTemporaryGroundLink( LinkList *pDocLinks, ConnectorL
 	if( Anchors == 0 ) // Empty or non-functioning mechanism.
 		return 0;
 
+	#if 0 // Always include the ground link.
 	Position = pDocLinks->GetHeadPosition();
 	while( Position != 0 )
 	{
@@ -1776,6 +1782,7 @@ CTempLink* CLinkageView::GetTemporaryGroundLink( LinkList *pDocLinks, ConnectorL
 		if( FoundAnchors > 0 && FoundAnchors == Anchors )
 			return 0; // The total anchor count all on this link so there is no need for a ground link.
 	}
+	#endif
 
 	// Create the ground link.
 
@@ -1862,6 +1869,8 @@ CFArea CLinkageView::DrawPartsList( CRenderer* pRenderer )
 		CLink *pPartsLink = 0;
 		if( Position == 0 )
 		{
+			if( !m_bShowGroundDimensions )
+				break;
 			/*
 			 * Generate a ground link for this last pass through the data.
 			 */
@@ -4278,6 +4287,18 @@ void CLinkageView::OnUpdateViewDimensions(CCmdUI *pCmdUI)
 	pCmdUI->Enable( !m_bSimulating );
 }
 
+void CLinkageView::OnViewGroundDimensions()
+{
+	m_bShowGroundDimensions = !m_bShowGroundDimensions;
+	InvalidateRect( 0 );
+}
+
+void CLinkageView::OnUpdateViewGroundDimensions(CCmdUI *pCmdUI)
+{
+	pCmdUI->SetCheck( m_bShowGroundDimensions );
+	pCmdUI->Enable( !m_bSimulating );
+}
+
 void CLinkageView::OnViewSolidLinks()
 {
 	m_bNewLinksSolid = !m_bNewLinksSolid;
@@ -4620,7 +4641,7 @@ CPoint CLinkageView::GetDefaultUnscalePoint( void )
 	return CPoint( m_DrawingRect.Width() / 2, m_DrawingRect.Height() / 2 );
 }
 
-void CLinkageView::OnViewUnscalein()
+void CLinkageView::OnViewZoomin()
 {
 	if( m_bSimulating )
 		return;
@@ -4630,7 +4651,7 @@ void CLinkageView::OnViewUnscalein()
 	OnMouseWheel( 0, 120, Point );
 }
 
-void CLinkageView::OnViewUnscaleout()
+void CLinkageView::OnViewZoomout()
 {
 	if( m_bSimulating )
 		return;
@@ -4652,7 +4673,7 @@ void CLinkageView::GetDocumentViewArea( CFRect &Rect, CLinkageDoc *pDoc )
 	CFRect PixelRect = Area;
 	}
 
-void CLinkageView::OnMenuUnscalefit()
+void CLinkageView::OnMenuZoomfit()
 {
 	if( m_bSimulating )
 		return;
@@ -5474,7 +5495,7 @@ void CLinkageView::DrawStackedConnectors( CRenderer* pRenderer, unsigned int OnL
 
 CFArea CLinkageView::DrawGroundDimensions( CRenderer* pRenderer, CLinkageDoc *pDoc, unsigned int OnLayers, CLink *pGroundLink, bool bDrawLines, bool bDrawText)
 {
-	if( !m_bShowDimensions )
+	if( !m_bShowDimensions || !m_bShowGroundDimensions )
 		return CFArea();
 
 	if( ( OnLayers & CLinkageDoc::MECHANISMLAYERS ) == 0 )
@@ -5482,9 +5503,7 @@ CFArea CLinkageView::DrawGroundDimensions( CRenderer* pRenderer, CLinkageDoc *pD
 
 	POSITION Position;
 
-	// Determine if ground dimensions are even needed.
-	// If the caller is passing a link to use as the ground, there's no need to check this.
-	if( pGroundLink == 0 )
+	if( pGroundLink == 0 && false )
 	{
 		int Anchors = 0;
 		Position = pDoc->GetConnectorList()->GetHeadPosition();
@@ -5614,20 +5633,7 @@ CFArea CLinkageView::DrawGroundDimensions( CRenderer* pRenderer, CLinkageDoc *pD
 	 * Draw Measurement Lines.
 	 */
 
-	double Offset = Scale( OrientationLine.GetStart().y - yAllBottomMost );
-	Offset += OFFSET_INCREMENT;
-
-	for( int Counter = 0; Counter < ConnectorCount; ++Counter )
-	{
-		if( fabs( ConnectorReference[Counter].m_Distance ) < 0.001 )
-			continue;
-		CFLine MeasurementLine = OrientationLine;
-		MeasurementLine.SetDistance(  ConnectorReference[Counter].m_Distance );
-		DimensionsArea += DrawMeasurementLine( pRenderer, MeasurementLine, ConnectorReference[Counter].m_pConnector->GetPoint(), pLeftMost->GetPoint(), -Offset, bDrawLines, bDrawText );
-		Offset += OFFSET_INCREMENT;
-	}
-
-	Offset = Scale( OrientationLine.GetStart().x - xAllLeftMost );
+	double Offset = Scale( OrientationLine.GetStart().x - xAllLeftMost );
 	Offset += OFFSET_INCREMENT;
 	for( int Counter = 0; Counter < ConnectorCount; ++Counter )
 	{
@@ -5639,12 +5645,14 @@ CFArea CLinkageView::DrawGroundDimensions( CRenderer* pRenderer, CLinkageDoc *pD
 		Offset += OFFSET_INCREMENT;
 	}
 
+	Offset = Scale( OrientationLine.GetStart().y - yAllBottomMost );
+
 	if( ConnectorCount == 2 )
 	{
-		// Draw a possibly diagonal measurement betwen the anchors but only 
-		// if there are two of them. ANy more than that and the diagonal 
+		// Draw a possibly diagonal measurement between the anchors but only 
+		// if there are two of them. Any more than that and the diagonal 
 		// measurement will not be useful in real life.
-		if( !ConnectorReference[0].m_pConnector->IsSharingLink( ConnectorReference[1].m_pConnector ) )
+		if( ConnectorReference[0].m_pConnector->GetSharingLink( ConnectorReference[1].m_pConnector ) == 0 || pGroundLink != 0 )
 		{
 			// Skip this is they are lined up horizontally or vertically 
 			// because there is already a measurement shown.
@@ -5652,9 +5660,27 @@ CFArea CLinkageView::DrawGroundDimensions( CRenderer* pRenderer, CLinkageDoc *pD
 			    && fabs( ConnectorReference[0].m_pConnector->GetPoint().y - ConnectorReference[1].m_pConnector->GetPoint().y ) > 0.001 )
 			{
 				CFLine MeasurementLine( ConnectorReference[0].m_pConnector->GetPoint(), ConnectorReference[1].m_pConnector->GetPoint() );
-				DimensionsArea += DrawMeasurementLine( pRenderer, MeasurementLine, MeasurementLine.GetEnd(), MeasurementLine.GetStart(), -OFFSET_INCREMENT, bDrawLines, bDrawText );
+
+				double UseOffset = pGroundLink == 0 ? 0 : -OFFSET_INCREMENT;
+				DimensionsArea += DrawMeasurementLine( pRenderer, MeasurementLine, MeasurementLine.GetEnd(), MeasurementLine.GetStart(), UseOffset, bDrawLines, bDrawText );
+				
+				double Angle = MeasurementLine.GetAngle(); 
+				
+				if( Angle < 45 )
+					Offset += OFFSET_INCREMENT;
 			}
 		}
+	}
+
+	Offset += OFFSET_INCREMENT;
+	for( int Counter = 0; Counter < ConnectorCount; ++Counter )
+	{
+		if( fabs( ConnectorReference[Counter].m_Distance ) < 0.001 )
+			continue;
+		CFLine MeasurementLine = OrientationLine;
+		MeasurementLine.SetDistance(  ConnectorReference[Counter].m_Distance );
+		DimensionsArea += DrawMeasurementLine( pRenderer, MeasurementLine, ConnectorReference[Counter].m_pConnector->GetPoint(), pLeftMost->GetPoint(), -Offset, bDrawLines, bDrawText );
+		Offset += OFFSET_INCREMENT;
 	}
 
 	pRenderer->SelectObject( pOldPen );
@@ -7539,11 +7565,11 @@ void CLinkageView::OnChar(UINT nChar, UINT nRepCnt, UINT nFlags)
 	{	
 		case '-':
 		case '_':
-			OnViewUnscalein();
+			OnViewZoomin();
 			break;
 		case '+':
 		case '=':
-			OnViewUnscaleout();
+			OnViewZoomout();
 			break;
 	}
 	CView::OnChar(nChar, nRepCnt, nFlags);

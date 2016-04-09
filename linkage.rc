@@ -658,7 +658,11 @@ BEGIN
     ID_EDIT_PROPERTIES      "Modifies the properties of the selected connector.\nProperties"
     ID_EDIT_JOIN            "Convert the selected connectors into a single connector.\nJoin Connectors"
     ID_EDIT_GRIDSNAP        "Snap to align with an invisible grid.\nGrid Snap"
-    ID_VIEW_DIMENSIONS      "View dimensions.\nView Dimensions"
+    ID_VIEW_DIMENSIONS      "Automatically draw dimension lines for all links.\nAuto Dimensions"
+    ID_VIEW_GROUNDDIMENSIONS "Include ground dimensions with the automatic dimensions. Show the ground link relative to the page in the parts list.\nInclude Ground Dimensions"
+	ID_VIEW_GRID			"Display an automatically sized grid.\nShowGrid"
+	ID_VIEW_PARTS			"Display the mechanism as separate parts.\nParts List"
+	ID_VIEW_LARGEFONT		"Use the large for for labels and other text.\nLarge Text"
 END
 
 STRINGTABLE
@@ -666,6 +670,7 @@ BEGIN
     IDS_SAMPLE_LINK3        "Complex drawing mechanism using sliding connectors.\nSmile 2"
     IDS_SAMPLE_LINK4        "Sliding link drawing mechanism with solid links.\nSliding Link 3"
     IDS_RIBBON_DIMENSIONS   "Auto Dimensions"
+    IDS_RIBBON_GROUNDDIMENSIONS   "Ground Dimensions"
     ID_EDIT_LOCK            "Lock the size and shape of a link.\nLock"
     IDS_RIBBON_LOCK         "Lock"
 END
@@ -952,14 +957,14 @@ BEGIN
     IDS_RIBBON_SLIDE        "Slide\nl"
     IDS_RIBBON_SPLIT        "Split"
     ID_RIBBON_SAMPLE_GALLERY "Open one of the sample mechanisms.\nOpen Sample"
-    ID_VIEW_ZOOMFIT         "Zoom to 100% and move the content to be centered in the window.\nUnscale 100%"
+    ID_VIEW_ZOOMFIT         "Zoom to 100% and move the content to be centered in the window.\Zoom 100%"
     IDS_RIBBON_ALIGN        "Edit"
 END
 
 STRINGTABLE
 BEGIN
-    ID_VIEW_ZOOMIN          "Show a closer and more detailed view of the mechanism.\nUnscale In"
-    ID_VIEW_ZOOMOUT         "Show the mechanism from farther away, making it smaller.\nUnscale Out"
+    ID_VIEW_ZOOMIN          "Show a closer and more detailed view of the mechanism.\Zoom In"
+    ID_VIEW_ZOOMOUT         "Show the mechanism from farther away, making it smaller.\Zoom Out"
 END
 
 STRINGTABLE

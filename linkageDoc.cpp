@@ -764,7 +764,7 @@ bool CLinkageDoc::WriteOut( CArchive& ar, bool bSelectedOnly )
 		CString Units = GetUnitsString( m_Units );
 
 		TempString = "\t<program";
-		AppendXMLAttribute( TempString, "zoom", pView->GetUnscale() );
+		AppendXMLAttribute( TempString, "zoom", pView->GetZoom() );
 		AppendXMLAttribute( TempString, "xoffset", (int)Point.x );
 		AppendXMLAttribute( TempString, "yoffset", (int)Point.y );
 		AppendXMLAttribute( TempString, "scalefactor", m_ScaleFactor );
@@ -776,7 +776,7 @@ bool CLinkageDoc::WriteOut( CArchive& ar, bool bSelectedOnly )
 
 
 //		TempString.Format( "\t<program zoom=\"%lf\" xoffset=\"%d\" yoffset=\"%d\" scalefactor=\"%lf\" units=\"%s\" viewlayers=\"%u\" editlayers=\"%u\"/>", 
-//		                   pView->GetUnscale(), (int)Point.x, (int)Point.y, m_ScaleFactor, (const char*)Units,
+//		                   pView->GetZoom(), (int)Point.x, (int)Point.y, m_ScaleFactor, (const char*)Units,
 //						   m_ViewLayers, m_EditLayers );
 		ar.WriteString( TempString );
 		ar.WriteString( CRLF );
