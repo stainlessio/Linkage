@@ -29,6 +29,10 @@ public:
 	CConnector();
 	CConnector( const CConnector &ExistingConnector );
 	virtual ~CConnector() {}
+
+	virtual bool IsLink( void ) { return false; }
+	virtual bool IsConnector( void ) { return true; }
+
 	void Reset( void );
 
 	void Reset( bool bClearMotionPath );

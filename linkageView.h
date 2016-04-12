@@ -268,7 +268,7 @@ private:
 
 	void SetScrollExtents( bool bEnableBars = true );
 	void OnScroll( int WhichBar, UINT nSBCode, UINT nPos );
-	void OnScroll( int xPos, int yPos, bool Tacking );
+	//void OnScroll( int xPos, int yPos, bool Tacking );
 
 	CRect GetDocumentScrollingRect( void );
 
@@ -317,6 +317,7 @@ private:
 	double Scale( double Distance );
 	CFArc Unscale( CFArc TheArc );
 	CFArc Scale( CFArc TheArc );
+	void ShowSelectedElementStatus( void );
 
 	bool CLinkageView::AnyAlwaysManual( void );
 

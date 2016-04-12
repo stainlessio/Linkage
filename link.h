@@ -61,6 +61,10 @@ class CLink : public CElement
 	CLink( const CLink &ExistingLink );
 	virtual ~CLink();
 
+	virtual bool IsLink( void ) { return true; }
+	virtual bool IsConnector( void ) { return false; }
+
+
 	CString GetIdentifierString( bool bDebugging );
 	ConnectorList* GetConnectorList( void ) { return &m_Connectors; }
 	void AddConnector( class CConnector* pConnector );

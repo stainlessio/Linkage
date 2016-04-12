@@ -849,4 +849,3 @@ void CMainFrame::OnDropFiles(HDROP hDropInfo)
 {
 	CFrameWndEx::OnDropFiles(hDropInfo);
 }
-

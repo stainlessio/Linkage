@@ -2576,7 +2576,7 @@ void CLinkageView::OnButtonUp(UINT nFlags, CPoint point)
 	m_MouseAction = ACTION_NONE;
 
 	CFPoint DocumentPoint = Unscale( point );
-	SetLocationAsStatus( DocumentPoint );
+	//SetLocationAsStatus( DocumentPoint );
 
 	SetScrollExtents();
 }
@@ -2853,6 +2853,8 @@ void CLinkageView::OnMouseEndDrag(UINT nFlags, CPoint point)
 		m_SelectionContainerRect = GetDocumentArea( false, true );
 		TempPoint.SetPoint( m_SelectionContainerRect.left, m_SelectionContainerRect.top );
 		m_SelectionRotatePoint += TempPoint;
+
+		ShowSelectedElementStatus();
 	}
 
 	if( m_bSnapOn && m_bAutoJoin && 
@@ -2863,9 +2865,41 @@ void CLinkageView::OnMouseEndDrag(UINT nFlags, CPoint point)
 
 	m_SelectionContainerRect = GetDocumentArea( false, true );
 	m_SelectionAdjustmentRect = GetDocumentAdjustArea( true );
-	ShowSelectedElementCoordinates();
+	//ShowSelectedElementCoordinates();
 
 	InvalidateRect( 0 );
+}
+
+void CLinkageView::ShowSelectedElementStatus( void )
+{
+	CLinkageDoc* pDoc = GetDocument();
+	ASSERT_VALID(pDoc);
+
+	CElement *pElement = 0;
+
+	if( pDoc->GetSelectedConnectorCount() == 1 )
+	{
+		pElement = pDoc->GetSelectedConnector( 0 );
+	}
+	else if( pDoc->GetSelectedLinkCount( false ) == 1 )
+	{
+		pElement = pDoc->GetSelectedLink( 0, false );
+	}
+	else
+		return;
+
+	if( pElement == 0 )
+		return;
+
+	CString String;
+	if( pElement->IsLink() )
+		String = "Link ";
+	else if( pElement->IsConnector() )
+		String = "Connector ";
+	
+	String += pElement->GetIdentifierString( m_bShowDebug );
+
+	SetStatusText( String );
 }
 
 void CLinkageView::OnMouseEndSelect(UINT nFlags, CPoint point)
@@ -2912,6 +2946,8 @@ void CLinkageView::OnMouseEndSelect(UINT nFlags, CPoint point)
 	}
 	else
 		m_VisibleAdjustment = ADJUSTMENT_NONE;
+
+	ShowSelectedElementStatus();
 
 	ShowSelectedElementCoordinates();
 	InvalidateRect( 0 );
@@ -2967,15 +3003,6 @@ void CLinkageView::OnMouseMove(UINT nFlags, CPoint point)
 	if( m_bSimulating )
 		return;
 
-	if( m_MouseAction != ACTION_DRAG )
-	{
-		CFPoint DocumentPoint = Unscale( point );
-		SetLocationAsStatus( DocumentPoint );
-	}
-		
-	if( m_MouseAction == ACTION_NONE )
-		return;
-
 	if( !m_bMouseMovedEnough )
 	{
 		if( abs( point.x - m_DragStartPoint.x ) < 2
@@ -2993,6 +3020,15 @@ void CLinkageView::OnMouseMove(UINT nFlags, CPoint point)
 			pDoc->StartChangeSelected();
 		}
 	}
+
+	if( m_MouseAction != ACTION_DRAG )
+	{
+		CFPoint DocumentPoint = Unscale( point );
+		SetLocationAsStatus( DocumentPoint );
+	}
+
+	if( m_MouseAction == ACTION_NONE )
+		return;
 
 	switch( m_MouseAction )
 	{
@@ -7589,7 +7625,10 @@ void CLinkageView::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 		ASSERT_VALID(pDoc);
 
 		if( pDoc->SelectNext( ShiftControlPressed ? pDoc->PREVIOUS : pDoc->NEXT ) )
+		{
+			ShowSelectedElementStatus();
 			UpdateForDocumentChange();
+		}
 	}
 	else if( nChar == VK_LEFT || nChar == VK_RIGHT )
 	{

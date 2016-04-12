@@ -89,6 +89,9 @@ class CElement
 	void AddFastenLink( class CLink *pLink );
 	void RemoveFastenElement( class CElement *pElement );
 
+	virtual bool IsLink( void ) = 0;
+	virtual bool IsConnector( void ) = 0;
+
 	protected:
 
 	int m_Identifier;
