@@ -430,8 +430,6 @@ CLinkageView::CLinkageView()
 		m_bSnapOn = pApp->GetProfileInt( "Settings", "Snapon", 1 ) != 0;
 		m_bGridSnap = pApp->GetProfileInt( "Settings", "Gridsnap", 1 ) != 0;
 		m_bAutoJoin = pApp->GetProfileIntA( "Settings", "AutoJoin", 1 ) != 0;
-		m_bShowDimensions = pApp->GetProfileInt( "Settings", "Showdimensions", 0 ) != 0;
-		m_bShowGroundDimensions = pApp->GetProfileInt( "Settings", "Showgrounddimensions", 1 ) != 0;
 		m_bNewLinksSolid = pApp->GetProfileInt( "Settings", "Newlinkssolid", 0 ) != 0;
 		m_bShowAnicrop = pApp->GetProfileInt( "Settings", "Showanicrop", 0 ) != 0;
 		m_bShowLargeFont = pApp->GetProfileInt( "Settings", "Showlargefont", 0 ) != 0;
@@ -439,6 +437,11 @@ CLinkageView::CLinkageView()
 		m_bShowGrid = pApp->GetProfileInt( "Settings", "ShowGrid", 0 ) != 0;
 		m_bShowParts = pApp->GetProfileInt( "Settings", "ShowParts", 0 ) != 0;
 		m_bAllowEdit = !m_bShowParts;
+
+		GetSetGroundDimensionVisbility( false );
+
+		m_bShowDimensions = pApp->GetProfileInt( "Settings", "Showdimensions", 0 ) != 0;
+		m_bShowGroundDimensions = pApp->GetProfileInt( "Settings", "Showgrounddimensions", 1 ) != 0;
 								
 		m_Rotate0 = pApp->LoadIcon( IDI_ICON5 );
 		m_Rotate1 = pApp->LoadIcon( IDI_ICON1 );
@@ -456,6 +459,33 @@ CLinkageView::CLinkageView()
 	m_TimerID = 0;
 }
 
+void CLinkageView::GetSetGroundDimensionVisbility( bool bSave )
+{
+	CWinApp *pApp = AfxGetApp();
+	if( pApp == 0 )
+		return;
+
+	CString ShowDimensionsName = m_bShowParts ? "PartsShowdimensions" : "Showdimensions";
+	CString ShowGroundDimensionsName = m_bShowParts ? "PartsShowgrounddimensions" : "Showgrounddimensions";
+
+	// Not sure if I want to have separate dimension settings for the parts list while not haveing other settings be separate - it might be confusing to users.
+	// Just use the one set of settings for now - and think about this for a while.
+	ShowDimensionsName = "Showdimensions";
+	ShowGroundDimensionsName = "Showgrounddimensions";
+
+
+	if( bSave )
+	{
+		pApp->WriteProfileInt( "Settings", ShowDimensionsName, m_bShowDimensions ? 1 : 0  );
+		pApp->WriteProfileInt( "Settings", ShowGroundDimensionsName, m_bShowGroundDimensions ? 1 : 0  );
+	}
+	else
+	{
+		m_bShowDimensions = pApp->GetProfileInt( "Settings", ShowDimensionsName, 0 ) != 0;
+		m_bShowGroundDimensions = pApp->GetProfileInt( "Settings", ShowGroundDimensionsName, 1 ) != 0;
+	}
+}
+
 void CLinkageView::SetupFont( void )
 {
 	if( m_bShowLargeFont )
@@ -470,32 +500,36 @@ void CLinkageView::SetupFont( void )
 	}
 }
 
+void CLinkageView::SaveSettings( void )
+{
+	CWinApp *pApp = AfxGetApp();
+	if( pApp == 0 )
+		return;
+
+	pApp->WriteProfileInt( "Settings", "Showlabels", m_bShowLabels ? 1 : 0  );
+	pApp->WriteProfileInt( "Settings", "Showangles", m_bShowAngles ? 1 : 0  );
+	pApp->WriteProfileInt( "Settings", "Showdebug", m_bShowDebug ? 1 : 0  );
+	pApp->WriteProfileInt( "Settings", "ShowBold", m_bShowBold ? 1 : 0  );
+	pApp->WriteProfileInt( "Settings", "Showdata", m_bShowData ? 1 : 0  );
+	pApp->WriteProfileInt( "Settings", "Snapon", m_bSnapOn ? 1 : 0  );
+	pApp->WriteProfileInt( "Settings", "Gridsnap", m_bGridSnap ? 1 : 0  );
+	pApp->WriteProfileInt( "Settings", "AutoJoin", m_bAutoJoin ? 1 : 0 );
+	pApp->WriteProfileInt( "Settings", "Newlinkssolid", m_bNewLinksSolid ? 1 : 0  );
+	pApp->WriteProfileInt( "Settings", "Showanicrop", m_bShowAnicrop ? 1 : 0  );
+	pApp->WriteProfileInt( "Settings", "Showlargefont", m_bShowLargeFont ? 1 : 0  );
+	pApp->WriteProfileInt( "Settings", "ShowGrid", m_bShowGrid ? 1 : 0  );
+	pApp->WriteProfileInt( "Settings", "ShowParts", m_bShowParts ? 1 : 0  );
+	pApp->WriteProfileInt( "Settings", "PrintFullSize", m_bPrintFullSize ? 1 : 0 );
+	GetSetGroundDimensionVisbility( true );
+}
+
 CLinkageView::~CLinkageView()
 {
 	if( m_pPopupGallery != 0 )
 		delete m_pPopupGallery;
 	m_pPopupGallery = 0;
 
-	CWinApp *pApp = AfxGetApp();
-	if( pApp != 0 )
-	{
-		pApp->WriteProfileInt( "Settings", "Showlabels", m_bShowLabels ? 1 : 0  );
-		pApp->WriteProfileInt( "Settings", "Showangles", m_bShowAngles ? 1 : 0  );
-		pApp->WriteProfileInt( "Settings", "Showdebug", m_bShowDebug ? 1 : 0  );
-		pApp->WriteProfileInt( "Settings", "ShowBold", m_bShowBold ? 1 : 0  );
-		pApp->WriteProfileInt( "Settings", "Showdata", m_bShowData ? 1 : 0  );
-		pApp->WriteProfileInt( "Settings", "Snapon", m_bSnapOn ? 1 : 0  );
-		pApp->WriteProfileInt( "Settings", "Gridsnap", m_bGridSnap ? 1 : 0  );
-		pApp->WriteProfileInt( "Settings", "AutoJoin", m_bAutoJoin ? 1 : 0 );
-		pApp->WriteProfileInt( "Settings", "Showdimensions", m_bShowDimensions ? 1 : 0  );
-		pApp->WriteProfileInt( "Settings", "Showgrounddimensions", m_bShowGroundDimensions ? 1 : 0  );
-		pApp->WriteProfileInt( "Settings", "Newlinkssolid", m_bNewLinksSolid ? 1 : 0  );
-		pApp->WriteProfileInt( "Settings", "Showanicrop", m_bShowAnicrop ? 1 : 0  );
-		pApp->WriteProfileInt( "Settings", "Showlargefont", m_bShowLargeFont ? 1 : 0  );
-		pApp->WriteProfileInt( "Settings", "ShowGrid", m_bShowGrid ? 1 : 0  );
-		pApp->WriteProfileInt( "Settings", "ShowParts", m_bShowParts ? 1 : 0  );
-		pApp->WriteProfileInt( "Settings", "PrintFullSize", m_bPrintFullSize ? 1 : 0 );
-	}
+	SaveSettings();
 
 	m_bSimulating = false;
 	if( m_TimerID != 0 )
@@ -4245,12 +4279,14 @@ void CLinkageView::InsertQuad( CFPoint *pPoint )
 void CLinkageView::OnViewLabels()
 {
 	m_bShowLabels = !m_bShowLabels;
+	SaveSettings();
 	InvalidateRect( 0 );
 }
 
 void CLinkageView::OnViewAngles()
 {
 	m_bShowAngles = !m_bShowAngles;
+	SaveSettings();
 	InvalidateRect( 0 );
 }
 
@@ -4269,6 +4305,7 @@ void CLinkageView::OnUpdateViewAngles(CCmdUI *pCmdUI)
 void CLinkageView::OnEditSnap()
 {
 	m_bSnapOn = !m_bSnapOn;
+	SaveSettings();
 }
 
 void CLinkageView::OnUpdateEditSnap(CCmdUI *pCmdUI)
@@ -4280,6 +4317,7 @@ void CLinkageView::OnUpdateEditSnap(CCmdUI *pCmdUI)
 void CLinkageView::OnEditGridSnap()
 {
 	m_bGridSnap = !m_bGridSnap;
+	SaveSettings();
 }
 
 void CLinkageView::OnUpdateEditGridSnap(CCmdUI *pCmdUI)
@@ -4291,6 +4329,7 @@ void CLinkageView::OnUpdateEditGridSnap(CCmdUI *pCmdUI)
 void CLinkageView::OnEditAutoJoin()
 {
 	m_bAutoJoin = !m_bAutoJoin;
+	SaveSettings();
 }
 
 void CLinkageView::OnUpdateEditAutoJoin(CCmdUI *pCmdUI)
@@ -4302,6 +4341,7 @@ void CLinkageView::OnUpdateEditAutoJoin(CCmdUI *pCmdUI)
 void CLinkageView::OnViewData()
 {
 	m_bShowData = !m_bShowData;
+	SaveSettings();
 	InvalidateRect( 0 );
 }
 
@@ -4314,6 +4354,7 @@ void CLinkageView::OnUpdateViewData(CCmdUI *pCmdUI)
 void CLinkageView::OnViewDimensions()
 {
 	m_bShowDimensions = !m_bShowDimensions;
+	SaveSettings();
 	InvalidateRect( 0 );
 }
 
@@ -4326,6 +4367,7 @@ void CLinkageView::OnUpdateViewDimensions(CCmdUI *pCmdUI)
 void CLinkageView::OnViewGroundDimensions()
 {
 	m_bShowGroundDimensions = !m_bShowGroundDimensions;
+	SaveSettings();
 	InvalidateRect( 0 );
 }
 
@@ -4338,6 +4380,7 @@ void CLinkageView::OnUpdateViewGroundDimensions(CCmdUI *pCmdUI)
 void CLinkageView::OnViewSolidLinks()
 {
 	m_bNewLinksSolid = !m_bNewLinksSolid;
+	SaveSettings();
 	InvalidateRect( 0 );
 }
 
@@ -4472,12 +4515,14 @@ void CLinkageView::OnUpdateEditMechanism(CCmdUI *pCmdUI)
 void CLinkageView::OnViewDebug()
 {
 	m_bShowDebug = !m_bShowDebug;
+	SaveSettings();
 	InvalidateRect( 0 );
 }
 
 void CLinkageView::OnViewBold()
 {
 	m_bShowBold = !m_bShowBold;
+	SaveSettings();
 	InvalidateRect( 0 );
 }
 
@@ -4490,6 +4535,7 @@ void CLinkageView::OnUpdateViewAnicrop(CCmdUI *pCmdUI)
 void CLinkageView::OnViewAnicrop()
 {
 	m_bShowAnicrop = !m_bShowAnicrop;
+	SaveSettings();
 	InvalidateRect( 0 );
 }
 
@@ -4504,6 +4550,7 @@ void CLinkageView::OnViewLargeFont()
 	m_bShowLargeFont = !m_bShowLargeFont;
 	m_pUsingFont = m_bShowLargeFont ? &m_MediumFont : &m_SmallFont;
 	SetupFont();
+	SaveSettings();
 	InvalidateRect( 0 );
 }
 
@@ -4516,6 +4563,7 @@ void CLinkageView::OnUpdateViewGrid(CCmdUI *pCmdUI)
 void CLinkageView::OnViewGrid()
 {
 	m_bShowGrid = !m_bShowGrid;
+	SaveSettings();
 	InvalidateRect( 0 );
 }
 
@@ -4535,6 +4583,8 @@ void CLinkageView::OnViewParts()
 		ASSERT_VALID(pDoc);
 		pDoc->SelectElement();
 	}
+	GetSetGroundDimensionVisbility( false );
+	SaveSettings();
 	InvalidateRect( 0 );
 }
 
@@ -4807,6 +4857,7 @@ void CLinkageView::OnFilePrintSetup()
 void CLinkageView::OnPrintFull()
 {
 	m_bPrintFullSize = !m_bPrintFullSize;
+	SaveSettings();
 }
 
 void CLinkageView::OnUpdatePrintFull( CCmdUI *pCmdUI )

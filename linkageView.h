@@ -318,6 +318,8 @@ private:
 	CFArc Unscale( CFArc TheArc );
 	CFArc Scale( CFArc TheArc );
 	void ShowSelectedElementStatus( void );
+	void GetSetGroundDimensionVisbility( bool bSave );
+	void SaveSettings( void );
 
 	bool CLinkageView::AnyAlwaysManual( void );
 
