@@ -1144,7 +1144,7 @@ void CLinkageView::DrawAlignmentLines( CRenderer *pRenderer )
 
 	double Angle = GetAngle( Points[1], Points[0], Points[2] );
 
-	if( PointCount > 2 ) // && fabs( Angle ) >= 0.5 && fabs( Angle ) < 359.5 )
+	if( PointCount == 3 ) // && fabs( Angle ) >= 0.5 && fabs( Angle ) < 359.5 )
 	{
 		CFPoint TempPoint;
 		TempPoint = Scale( Points[0] );
