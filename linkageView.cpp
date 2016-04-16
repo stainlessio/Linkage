@@ -1144,7 +1144,7 @@ void CLinkageView::DrawAlignmentLines( CRenderer *pRenderer )
 
 	double Angle = GetAngle( Points[1], Points[0], Points[2] );
 
-	if( PointCount > 2 && Angle >= 0.5 && Angle < 359.5 )
+	if( PointCount > 2 ) // && fabs( Angle ) >= 0.5 && fabs( Angle ) < 359.5 )
 	{
 		CFPoint TempPoint;
 		TempPoint = Scale( Points[0] );
@@ -1170,7 +1170,8 @@ void CLinkageView::DrawAlignmentLines( CRenderer *pRenderer )
 		if( Angle <= 180 )
 			pRenderer->Arc( Points[1].x, Points[1].y, ArcRadius, Points[2].x, Points[2].y, Points[0].x, Points[0].y );
 		else
-			pRenderer->Arc( Points[1].x, Points[1].y, ArcRadius, Points[0].x, Points[0].y, Points[2].x, Points[2].y );
+			pRenderer->Arc( Points[1].x, Points[1].y, ArcRadius, Points[2].x, Points[2].y, Points[0].x, Points[0].y );
+			//pRenderer->Arc( Points[1].x, Points[1].y, ArcRadius, Points[0].x, Points[0].y, Points[2].x, Points[2].y );
 	}
 
 	pRenderer->SelectObject( pOldPen );
