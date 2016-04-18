@@ -5,11 +5,10 @@
 #define __countof(x)	((sizeof(x)/sizeof(x[0])))
 #endif
 
-CAviFile:: CAviFile(LPCSTR lpszFileName /* =_T("Output.avi") */, 
+CAviFile:: CAviFile(LPCSTR lpszFileName /* =_T("Output.avi") */,
 			DWORD dwCodec /* = mmioFOURCC('M','P','G','4') */,
 			DWORD dwFrameRate /* = 1 */)
 {
-
 	AVIFileInit();
 
 	m_hHeap=NULL;
@@ -49,7 +48,6 @@ CAviFile::~CAviFile(void)
 	AVIFileExit();
 }
 
-
 void CAviFile::GetCompressorList( CStringList &List, BITMAPINFO &SourceBitmapInfo )
 {
 	///////////////////////////////////////////////////////////
@@ -59,11 +57,9 @@ void CAviFile::GetCompressorList( CStringList &List, BITMAPINFO &SourceBitmapInf
 
 	int fccType = ICTYPE_VIDEO;	//0 to get all installed codecs
 	for (int i=0; ICInfo(fccType, i, &icinfo); i++) {
-
 		hIC = ICOpen(icinfo.fccType, icinfo.fccHandler, ICMODE_QUERY);
 
 		if (hIC) {
-
 			//Find out the compressor name.
 			ICGetInfo(hIC, &icinfo, sizeof(icinfo));
 
@@ -72,7 +68,7 @@ void CAviFile::GetCompressorList( CStringList &List, BITMAPINFO &SourceBitmapInf
 			{
 				if( icinfo.dwFlags != 0 )
 				{
-					if( ICCompressQuery( hIC, &SourceBitmapInfo, NULL ) == ICERR_OK ) 
+					if( ICCompressQuery( hIC, &SourceBitmapInfo, NULL ) == ICERR_OK )
 					{
 						CString Temp = CString( icinfo.szDescription );
 						if( icinfo.fccHandler == 1129730893 )
@@ -131,19 +127,19 @@ void CAviFile::SetErrorMessage(LPCTSTR lpszErrorMessage)
 {
 	m_szErrMsg = lpszErrorMessage;
 }
-	
+
 HRESULT CAviFile::InitMovieCreation(int nFrameWidth, int nFrameHeight, int nBitsPerPixel)
 {
 	int	nMaxWidth=GetSystemMetrics(SM_CXSCREEN),nMaxHeight=GetSystemMetrics(SM_CYSCREEN);
 
 	m_hAviDC = CreateCompatibleDC(NULL);
-	if(m_hAviDC==NULL)	
+	if(m_hAviDC==NULL)
 	{
 		SetErrorMessage("Unable to Create Compatible DC");
 		m_LastError = E_FAIL;
 		return E_FAIL;
 	}
-	
+
 	if(nFrameWidth > nMaxWidth)	nMaxWidth= nFrameWidth;
 	if(nFrameHeight > nMaxHeight)	nMaxHeight = nFrameHeight;
 
@@ -154,10 +150,10 @@ HRESULT CAviFile::InitMovieCreation(int nFrameWidth, int nFrameHeight, int nBits
 		m_LastError = E_FAIL;
 		return E_FAIL;
 	}
-	
+
 	m_lpBits=HeapAlloc(m_hHeap, HEAP_ZERO_MEMORY|HEAP_NO_SERIALIZE, nMaxWidth*nMaxHeight*4);
-	if(m_lpBits==NULL)	
-	{	
+	if(m_lpBits==NULL)
+	{
 		SetErrorMessage("Unable to Allocate Memory on Heap");
 		m_LastError = E_FAIL;
 		return E_FAIL;
@@ -203,7 +199,7 @@ HRESULT CAviFile::InitMovieCreation(int nFrameWidth, int nFrameHeight, int nBits
 
 	if(FAILED(hResult))
 	{
-		// One reason this error might occur is if you are using a Codec that is not 
+		// One reason this error might occur is if you are using a Codec that is not
 		// available on your system. Check the mmioFOURCC() code you are using and make
 		// sure you have that codec installed properly on your machine.
 		SetErrorMessage("Unable to Create Compressed Stream: Check your CODEC options");
@@ -225,7 +221,7 @@ HRESULT CAviFile::InitMovieCreation(int nFrameWidth, int nFrameHeight, int nBits
 	if(FAILED(AVIStreamSetFormat(m_pAviCompressedStream,0,(LPVOID)&bmpInfo, bmpInfo.bmiHeader.biSize)))
 	{
 		// One reason this error might occur is if your bitmap does not meet the Codec requirements.
-		// For example, 
+		// For example,
 		//   your bitmap is 32bpp while the Codec supports only 16 or 24 bpp; Or
 		//   your bitmap is 274 * 258 size, while the Codec supports only sizes that are powers of 2; etc...
 		// Possible solution to avoid this is: make your bitmap suit the codec requirements,
@@ -238,15 +234,14 @@ HRESULT CAviFile::InitMovieCreation(int nFrameWidth, int nFrameHeight, int nBits
 	return S_OK;	// Everything went Fine
 }
 
-
 HRESULT	CAviFile::AppendFrameFirstTime(HBITMAP	hBitmap, int Count)
 {
 	BITMAP Bitmap;
 
 	GetObject(hBitmap, sizeof(BITMAP), &Bitmap);
 
-	if(SUCCEEDED(InitMovieCreation( Bitmap.bmWidth, 
-									Bitmap.bmHeight, 
+	if(SUCCEEDED(InitMovieCreation( Bitmap.bmWidth,
+									Bitmap.bmHeight,
 									Bitmap.bmBitsPixel)))
 	{
 		m_nAppendFuncSelector=2;		//Point to the UsualAppend Function
@@ -265,8 +260,8 @@ HRESULT	CAviFile::AppendFrameFirstTime( CDIBSection *pDIBSection, int Count )
 
 	GetObject( pDIBSection->m_Bitmap, sizeof(BITMAP), &Bitmap);
 
-	if(SUCCEEDED(InitMovieCreation( Bitmap.bmWidth, 
-									Bitmap.bmHeight, 
+	if(SUCCEEDED(InitMovieCreation( Bitmap.bmWidth,
+									Bitmap.bmHeight,
 									Bitmap.bmBitsPixel)))
 	{
 		m_nAppendFuncSelector=2;		//Point to the UsualAppend Function
@@ -285,10 +280,10 @@ HRESULT CAviFile::AppendFrameUsual(HBITMAP hBitmap, int Count)
 
 	bmpInfo.bmiHeader.biBitCount=0;
 	bmpInfo.bmiHeader.biSize=sizeof(BITMAPINFOHEADER);
-	
+
 	GetDIBits(m_hAviDC,hBitmap,0,0,NULL,&bmpInfo,DIB_RGB_COLORS);
 
-	bmpInfo.bmiHeader.biCompression=BI_RGB;	
+	bmpInfo.bmiHeader.biCompression=BI_RGB;
 
 	GetDIBits(m_hAviDC,hBitmap,0,bmpInfo.bmiHeader.biHeight,m_lpBits,&bmpInfo,DIB_RGB_COLORS);
 

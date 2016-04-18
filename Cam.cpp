@@ -1,11 +1,10 @@
 #include "stdafx.h"
 #include "Cam.h"
 
-
-CCam::CCam( void ) 
-{ 
-	m_RotationAngle = 0; 
-	m_pDrawingPath = 0; 
+CCam::CCam( void )
+{
+	m_RotationAngle = 0;
+	m_pDrawingPath = 0;
 	m_DrawingPathCount = 0;
 }
 
@@ -41,7 +40,6 @@ CSingleNoseCam::CSingleNoseCam( void )
 	m_NoseRadius = 0;
 }
 
-
 bool CSingleNoseCam::GetDefinitionValue( int Index, double &Value )
 {
 	switch( Index )
@@ -74,10 +72,10 @@ void CSingleNoseCam::ComputeDrawingPath( void )
 	m_DrawingPathCount = 0;
 }
 
-CBezierCam::CBezierCam( void ) 
+CBezierCam::CBezierCam( void )
 {
-	m_pPoints = 0; 
-	m_PointCount = 0; 
+	m_pPoints = 0;
+	m_PointCount = 0;
 }
 
 bool CBezierCam::GetDefinitionValue( int Index, double &Value )

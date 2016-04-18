@@ -54,7 +54,7 @@ CString CLinkageDoc::GetUnitsString( CLinkageDoc::_Units Units )
 	switch( Units )
 	{
 		case CLinkageDoc::INCH: return CString( "Inches" ); break;
-		case CLinkageDoc::MM: 
+		case CLinkageDoc::MM:
 		default: return CString( "Millimeters" ); break;
 	}
 }
@@ -80,7 +80,7 @@ void CLinkageDoc::SetLinkConnector( CLink* pLink, CConnector* pConnector )
 {
 	if( pLink == 0 || pConnector == 0 )
 		return;
-		
+
 	pLink->AddConnector( pConnector );
 	pConnector->AddLink( pLink );
 }
@@ -131,7 +131,7 @@ BOOL CLinkageDoc::OnNewDocument()
 	m_pCapturedConnector = 0;
 	m_SelectedConnectors.RemoveAll();
 	m_SelectedLinks.RemoveAll();
-	
+
 	m_pCapturedConnector = 0;
 	m_pCapturedController = 0;
 	m_pUndoList = 0;
@@ -155,7 +155,7 @@ BOOL CLinkageDoc::OnNewDocument()
 	m_HighestLinkID = -1;
 
 	CFrameWnd *pFrame = (CFrameWnd*)AfxGetMainWnd();
-	CLinkageView *pView = pFrame == 0 ? 0 : (CLinkageView*)pFrame->GetActiveView();	
+	CLinkageView *pView = pFrame == 0 ? 0 : (CLinkageView*)pFrame->GetActiveView();
 	if( pView != 0 )
 	{
 		pView->SetOffset( CPoint( 0, 0 ) );
@@ -164,8 +164,6 @@ BOOL CLinkageDoc::OnNewDocument()
 
 	return TRUE;
 }
-
-
 
 /////////////////////////////////////////////////////////////////////////////
 // CLinkageDoc serialization
@@ -255,11 +253,11 @@ bool CLinkageDoc::ReadIn( CArchive& ar, bool bSelectAll, bool bObeyUnscaleOffset
 	CString Data;
 	ar.Read( Data.GetBuffer( (int)Length + 1 ), (unsigned int)Length );
 	Data.ReleaseBuffer( (int)Length );
-	
+
 	QuickXMLNode XMLData;
 	if( !XMLData.Parse( Data ) )
 		return false;
-	
+
 	QuickXMLNode *pRootNode = XMLData.GetFirstChild();
 	if( pRootNode == 0 || !pRootNode->IsLink() || pRootNode->GetText() != "linkage2" )
 		return false;
@@ -272,7 +270,7 @@ bool CLinkageDoc::ReadIn( CArchive& ar, bool bSelectAll, bool bObeyUnscaleOffset
 	CString Value;
 
 	QuickXMLNode *pSelectedNode = 0;
-	
+
 	/*
 	 * Get program information first. Skip anything else.
 	 */
@@ -280,7 +278,7 @@ bool CLinkageDoc::ReadIn( CArchive& ar, bool bSelectAll, bool bObeyUnscaleOffset
 	{
 		if( !pNode->IsLink() )
 			continue;
-			
+
 		if( pNode->GetText() == "program" )
 		{
 			Value = pNode->GetAttribute( "zoom" );
@@ -315,7 +313,7 @@ bool CLinkageDoc::ReadIn( CArchive& ar, bool bSelectAll, bool bObeyUnscaleOffset
 	}
 
 	CFPoint UpperLeft( DBL_MAX, DBL_MAX );
-	
+
 	/*
 	 * Get connector information. Some data is skipped here because all of
 	 * the connectors are needed to handle sliding connector information.
@@ -324,7 +322,7 @@ bool CLinkageDoc::ReadIn( CArchive& ar, bool bSelectAll, bool bObeyUnscaleOffset
 	{
 		if( !pNode->IsLink() )
 			continue;
-			
+
 		if( pNode->GetText() == "connector" )
 		{
 			CConnector *pConnector = new CConnector;
@@ -382,7 +380,7 @@ bool CLinkageDoc::ReadIn( CArchive& ar, bool bSelectAll, bool bObeyUnscaleOffset
 			m_Connectors.AddTail( pConnector );
 		}
 	}
-	
+
 	/*
 	 * Read the link information.
 	 */
@@ -390,7 +388,7 @@ bool CLinkageDoc::ReadIn( CArchive& ar, bool bSelectAll, bool bObeyUnscaleOffset
 	{
 		if( !pNode->IsLink() )
 			continue;
-			
+
 		if( pNode->GetText() == "Link" || pNode->GetText() == "element" )
 		{
 			CLink *pLink = new CLink;
@@ -469,12 +467,12 @@ bool CLinkageDoc::ReadIn( CArchive& ar, bool bSelectAll, bool bObeyUnscaleOffset
 			m_Links.AddTail( pLink );
 		}
 	}
-	
+
 	for( QuickXMLNode *pNode = pRootNode->GetFirstChild(); pNode != 0; pNode = pNode->GetNextSibling() )
 	{
 		if( !pNode->IsLink() )
 			continue;
-			
+
 		if( pNode->GetText() == "Link" || pNode->GetText() == "element" )
 		{
 			CString Value;
@@ -511,14 +509,14 @@ bool CLinkageDoc::ReadIn( CArchive& ar, bool bSelectAll, bool bObeyUnscaleOffset
 	{
 		if( !pNode->IsLink() )
 			continue;
-			
+
 		if( pNode->GetText() == "connector" )
 		{
 			Value = pNode->GetAttribute( "id" );
 			int TestIdentifier = atoi( Value ) + OffsetConnectorIdentifer;
 
 			/*
-			 * Find the connector for this entry that is now part of the 
+			 * Find the connector for this entry that is now part of the
 			 * document.
 			 */
 			CConnector *pConnector = FindConnector( TestIdentifier );
@@ -539,7 +537,7 @@ bool CLinkageDoc::ReadIn( CArchive& ar, bool bSelectAll, bool bObeyUnscaleOffset
 			Value = pNode->GetAttribute( "slider" );
 			if( Value != "true" )
 				continue;
-				
+
 			/*
 			 * Loop through the child connector list and find the actual
 			 * document connectors that have been created and connect things.
@@ -552,7 +550,7 @@ bool CLinkageDoc::ReadIn( CArchive& ar, bool bSelectAll, bool bObeyUnscaleOffset
 					continue;
 				Value = pLimiterNode->GetAttribute( "id" );
 				int LimitIdentifier = atoi( Value ) + OffsetConnectorIdentifer;
-				
+
 				CConnector *pLimitConnector = FindConnector( LimitIdentifier );
 				if( pLimitConnector != 0 )
 				{
@@ -574,7 +572,7 @@ bool CLinkageDoc::ReadIn( CArchive& ar, bool bSelectAll, bool bObeyUnscaleOffset
 	{
 		if( !pNode->IsLink() )
 			continue;
-			
+
 		if( pNode->GetText() == "ratios" )
 		{
 			for( QuickXMLNode *pRatioNode = pNode->GetFirstChild(); pRatioNode != 0; pRatioNode = pRatioNode->GetNextSibling() )
@@ -599,7 +597,7 @@ bool CLinkageDoc::ReadIn( CArchive& ar, bool bSelectAll, bool bObeyUnscaleOffset
 					int GearLinkIdentifier = atoi( Value ) + OffsetConnectorIdentifer;
 					Value = pGearLinkNode->GetAttribute( "size" );
 					double Size = atof( Value );
-				
+
 					CLink *pGearLink = FindLink( GearLinkIdentifier );
 					if( pGearLink != 0 )
 					{
@@ -630,7 +628,6 @@ bool CLinkageDoc::ReadIn( CArchive& ar, bool bSelectAll, bool bObeyUnscaleOffset
 		}
 	}
 
-
 	if( pSelectedNode != 0 && bUseSavedSelection && !bSelectAll )
 	{
 		// Select connectors based on the <selected> elements so that the selection is in the same order as when originally selected.
@@ -638,7 +635,7 @@ bool CLinkageDoc::ReadIn( CArchive& ar, bool bSelectAll, bool bObeyUnscaleOffset
 		{
 			if( !pNode->IsLink() )
 				continue;
-			
+
 			Value = pNode->GetAttribute( "id" );
 			int TestIdentifier = atoi( Value ) + OffsetLinkIdentifer;
 			if( TestIdentifier < 0 )
@@ -670,16 +667,16 @@ bool CLinkageDoc::ReadIn( CArchive& ar, bool bSelectAll, bool bObeyUnscaleOffset
 			}
 		}
 	}
-	
+
 	// Detect paste operations or any operation that adds to an existing
-	// document. Any addition to an existing document causes the ID's to 
-	// be adjusted to use the lowest ID's available. Only stand-alone 
+	// document. Any addition to an existing document causes the ID's to
+	// be adjusted to use the lowest ID's available. Only stand-alone
 	// document read operations result in maintaining the original ID's
 
 	bool bChangeIdentifiers = ( OffsetConnectorIdentifer > 0 || OffsetLinkIdentifer > 0 );
 	int NewHighConnectorID = m_HighestConnectorID;
 	int NewHighLinkID = m_HighestLinkID;
-	
+
 	POSITION Position = m_Connectors.GetHeadPosition();
 	while( Position != 0 )
 	{
@@ -700,7 +697,7 @@ bool CLinkageDoc::ReadIn( CArchive& ar, bool bSelectAll, bool bObeyUnscaleOffset
 		if( UseID > NewHighConnectorID )
 			NewHighConnectorID = UseID;
 	}
-	
+
 	Position = m_Links.GetHeadPosition();
 	while( Position != 0 )
 	{
@@ -731,7 +728,7 @@ bool CLinkageDoc::ReadIn( CArchive& ar, bool bSelectAll, bool bObeyUnscaleOffset
 	{
 		//AfxMessageBox( "ObeyUnscaleOffset" );
 		CFrameWnd *pFrame = (CFrameWnd*)AfxGetMainWnd();
-		CLinkageView *pView = pFrame == 0 ? 0 : (CLinkageView*)pFrame->GetActiveView();	
+		CLinkageView *pView = pFrame == 0 ? 0 : (CLinkageView*)pFrame->GetActiveView();
 		if( pView != 0 )
 		{
 			pView->SetOffset( Offset );
@@ -741,9 +738,9 @@ bool CLinkageDoc::ReadIn( CArchive& ar, bool bSelectAll, bool bObeyUnscaleOffset
 		SetUnits( GetUnitsValue( Units ) );
 		m_ScaleFactor = ScaleFactor;
 	}
-		
+
 	SetSelectedModifiableCondition();
-	
+
 	return true;
 }
 
@@ -753,11 +750,11 @@ bool CLinkageDoc::WriteOut( CArchive& ar, bool bSelectedOnly )
 
 	ar.WriteString( "<linkage2>" );
 	ar.WriteString( CRLF );
-	
+
 	CString TempString;
-	
+
 	CFrameWnd *pFrame = (CFrameWnd*)AfxGetMainWnd();
-	CLinkageView *pView = pFrame == 0 ? 0 : (CLinkageView*)pFrame->GetActiveView();	
+	CLinkageView *pView = pFrame == 0 ? 0 : (CLinkageView*)pFrame->GetActiveView();
 	if( pView != 0 )
 	{
 		CFPoint Point = pView->GetOffset();
@@ -773,15 +770,13 @@ bool CLinkageDoc::WriteOut( CArchive& ar, bool bSelectedOnly )
 		AppendXMLAttribute( TempString, "editlayers", m_EditLayers );
 		TempString += "/>";
 
-
-
-//		TempString.Format( "\t<program zoom=\"%lf\" xoffset=\"%d\" yoffset=\"%d\" scalefactor=\"%lf\" units=\"%s\" viewlayers=\"%u\" editlayers=\"%u\"/>", 
+//		TempString.Format( "\t<program zoom=\"%lf\" xoffset=\"%d\" yoffset=\"%d\" scalefactor=\"%lf\" units=\"%s\" viewlayers=\"%u\" editlayers=\"%u\"/>",
 //		                   pView->GetZoom(), (int)Point.x, (int)Point.y, m_ScaleFactor, (const char*)Units,
 //						   m_ViewLayers, m_EditLayers );
 		ar.WriteString( TempString );
 		ar.WriteString( CRLF );
 	}
-	
+
 	POSITION Position = m_Connectors.GetHeadPosition();
 	while( Position != 0 )
 	{
@@ -791,7 +786,7 @@ bool CLinkageDoc::WriteOut( CArchive& ar, bool bSelectedOnly )
 		if( bSelectedOnly &&!pConnector->IsSelected() && !pConnector->IsLinkSelected() )
 			continue;
 		CFPoint Point = pConnector->GetOriginalPoint();
-		
+
 		CConnector *pSlideStart;
 		CConnector *pSlideEnd;
 		bool bSlideLimits = pConnector->IsSlider() && pConnector->GetSlideLimits( pSlideStart, pSlideEnd ) && pSlideStart != 0 && pSlideEnd != 0;
@@ -822,7 +817,7 @@ bool CLinkageDoc::WriteOut( CArchive& ar, bool bSelectedOnly )
 
 //		TempString.Format( "\t<connector id=\"%d\" selected=\"%s\" name=\"%s\" layer=\"%d\" anchor=\"%s\" input=\"%s\" draw=\"%s\" "
 //						   "measurementelement=\"%s\" rpm=\"%lf\" x=\"%lf\" y=\"%lf\" slider=\"%s\" alwaysmanual=\"%s\" drawcircle=\"%f\" fasten=\"%s\" "
-//						   "slideradius=\"%f\" color=\"%d\">", 
+//						   "slideradius=\"%f\" color=\"%d\">",
 //						   pConnector->GetIdentifier(), pConnector->IsSelected() ? "true" : "false", (const char*)pConnector->GetName(), pConnector->GetLayers(),
 //		                   pConnector->IsAnchor() ? "true" : "false", pConnector->IsInput() ? "true" : "false",  pConnector->IsDrawing() ? "true" : "false",
 //						   pConnector->IsMeasurementElement() ? "true" : "false",
@@ -831,7 +826,7 @@ bool CLinkageDoc::WriteOut( CArchive& ar, bool bSelectedOnly )
 //		                   pConnector->GetSlideRadius(), (COLORREF)pConnector->GetColor() );
 		ar.WriteString( TempString );
 		ar.WriteString( CRLF );
-		
+
 		if( bSlideLimits )
 		{
 			TempString.Format( "\t\t<slidelimit id=\"%d\"/>", pSlideStart->GetIdentifier() );
@@ -854,16 +849,16 @@ bool CLinkageDoc::WriteOut( CArchive& ar, bool bSelectedOnly )
 			continue;
 		if( bSelectedOnly && !pLink->IsSelected() && !pLink->IsAnySelected() )
 			continue;
-			
+
 		/*
 		 * We may end up with multiple Links sharing a single connector
-		 * while having no other connectors. This is because of the way a 
+		 * while having no other connectors. This is because of the way a
 		 * connector can alone be selected. Instead of trying to detect this,
-		 * the code that reads data will detect this after things have been 
+		 * the code that reads data will detect this after things have been
 		 * read using the normalizing function. We can ignore the problem
 		 * since it only makes the files a tony bit confusing if read by eye.
 		 */
-			
+
 //		CString FastenId;
 //		FastenId.Format( "%d", pLink->GetFastenedTo() == 0 ? 0 : pLink->GetFastenedTo()->GetIdentifier() );
 
@@ -887,10 +882,10 @@ bool CLinkageDoc::WriteOut( CArchive& ar, bool bSelectedOnly )
 		TempString += ">";
 
 //		TempString.Format( "\t<Link id=\"%d\" selected=\"%s\" name=\"%s\" layer=\"%d\" linesize=\"%d\" solid=\"%s\" actuator=\"%s\" alwaysmanual=\"%s\" "
-//						   "measurementelement=\"%s\" throw=\"%lf\" cpm=\"%lf\" fasten=\"%s\" gear=\"%s\" color=\"%d\">", 
+//						   "measurementelement=\"%s\" throw=\"%lf\" cpm=\"%lf\" fasten=\"%s\" gear=\"%s\" color=\"%d\">",
 //		                   pLink->GetIdentifier(), pLink->IsSelected() ? "true" : "false", (const char*)pLink->GetName(), pLink->GetLayers(),
 //						   pLink->GetLineSize(), pLink->IsSolid() ? "true" : "false",
-//		                   pLink->IsActuator() ? "true" : "false", pLink->IsAlwaysManual() ? "true" : "false", 
+//		                   pLink->IsActuator() ? "true" : "false", pLink->IsAlwaysManual() ? "true" : "false",
 //						   pLink->IsMeasurementElement() ? "true" : "false",
 //						   pLink->GetStroke(), pLink->GetCPM(), pLink->GetFastenedTo() == 0 ? "" : (const char*)FastenId,
 //						   pLink->IsGear() ? "true" : "false", (COLORREF)pLink->GetColor() );
@@ -979,7 +974,7 @@ bool CLinkageDoc::WriteOut( CArchive& ar, bool bSelectedOnly )
 	// that have already been saved. These get an Link just for them.
 	ar.WriteString( "</linkage2>" );
 	ar.WriteString( CRLF );
-	
+
 	return true;
 }
 
@@ -1016,7 +1011,7 @@ bool CLinkageDoc::ClearSelection( void )
 		if( pLink == 0 )
 			continue;
 		if( pLink->IsSelected() )
-			bChanged = true; 
+			bChanged = true;
 		pLink->Select( false );
 	}
 	Position = m_Connectors.GetHeadPosition();
@@ -1026,16 +1021,16 @@ bool CLinkageDoc::ClearSelection( void )
 		if( pConnector == 0 )
 			continue;
 		if( pConnector->IsSelected() )
-			bChanged = true; 
+			bChanged = true;
 		pConnector->Select( false );
 	}
 	m_pCapturedConnector = 0;
 	m_pCapturedController = 0;
 	m_SelectedConnectors.RemoveAll();
 	m_SelectedLinks.RemoveAll();
-	
+
 	SetSelectedModifiableCondition();
-	
+
 	return bChanged;
 }
 
@@ -1063,7 +1058,7 @@ bool CLinkageDoc::DeSelectElement( CLink *pLink )
 
 	if( !m_SelectedLinks.Remove( pLink ) )
 		return false;
-	
+
 	pLink->Select( false );
 
 	return true;
@@ -1076,7 +1071,7 @@ bool CLinkageDoc::DeSelectElement( CConnector *pConnector )
 
 	if( !m_SelectedConnectors.Remove( pConnector ) )
 		return false;
-	
+
 	pConnector->Select( false );
 
 	if( m_pCapturedConnector == pConnector )
@@ -1102,7 +1097,7 @@ bool CLinkageDoc::SelectElement( CFRect Rect, bool bMultiSelect, bool &bSelectio
 	bSelectionChanged = false;
 	if( !bMultiSelect )
 		bSelectionChanged = ClearSelection();
-	
+
 	POSITION Position = m_Links.GetHeadPosition();
 	while( Position != 0 )
 	{
@@ -1126,9 +1121,9 @@ bool CLinkageDoc::SelectElement( CFRect Rect, bool bMultiSelect, bool &bSelectio
 	}
 	m_pCapturedConnector = 0;
 	m_pCapturedController = 0;
-	
+
 	SetSelectedModifiableCondition();
-	
+
 	return bSelectionChanged;
 }
 
@@ -1141,7 +1136,7 @@ bool CLinkageDoc::FindElement( CFPoint Point, double GrabDistance, CLink *&pFoun
 	while( Position != 0 )
 	{
 		CConnector* pConnector = m_Connectors.GetNext( Position );
-		if( pConnector != 0 && pConnector->PointOnConnector( Point, GrabDistance ) 
+		if( pConnector != 0 && pConnector->PointOnConnector( Point, GrabDistance )
 		    && ( pConnector->GetLayers() & m_EditLayers ) != 0 )
 		{
 			pFoundConnector = pConnector;
@@ -1152,7 +1147,7 @@ bool CLinkageDoc::FindElement( CFPoint Point, double GrabDistance, CLink *&pFoun
 	while( Position != NULL )
 	{
 		CLink* pLink = m_Links.GetNext( Position );
-		if( pLink != 0 && pLink->PointOnLink( m_GearConnectionList, Point, GrabDistance ) 
+		if( pLink != 0 && pLink->PointOnLink( m_GearConnectionList, Point, GrabDistance )
 		    && ( pLink->GetLayers() & m_EditLayers ) != 0 )
 		{
 			pFoundLink = pLink;
@@ -1177,7 +1172,7 @@ bool CLinkageDoc::AutoJoinSelected( void )
 	while( Position != NULL )
 	{
 		CConnector* pCheckConnector = m_Connectors.GetNext( Position );
-		if( pCheckConnector == 0 || pCheckConnector == pConnector 
+		if( pCheckConnector == 0 || pCheckConnector == pConnector
 		    || ( pConnector->GetLayers() & pCheckConnector->GetLayers() ) == 0 )
 			continue;
 
@@ -1200,32 +1195,32 @@ bool CLinkageDoc::SelectElement( CFPoint Point, double GrabDistance, bool bMulti
 	CConnector* pSelectingConnector = 0;
 	CLink *pSelectingLink = 0;
 	CConnector *pSelectingController = 0;
-	
+
 	bSelectionChanged = false;
-	
+
 	// Check only the already selected items first before checking all items.
-	// This makes it easier to drag a pasted item that is selected but not 
+	// This makes it easier to drag a pasted item that is selected but not
 	// checked first otherwise.
-	
+
 	POSITION Position = m_Connectors.GetHeadPosition();
 	while( Position != 0 )
 	{
 		CConnector* pConnector = m_Connectors.GetNext( Position );
-		if( pConnector != 0 && pConnector->IsSelected() && pConnector->PointOnConnector( Point, GrabDistance ) 
+		if( pConnector != 0 && pConnector->IsSelected() && pConnector->PointOnConnector( Point, GrabDistance )
 		    && ( pConnector->GetLayers() & m_EditLayers ) != 0 )
 		{
 			pSelectingConnector = pConnector;
 			break;
 		}
 	}
-	
+
 	if( pSelectingConnector == 0 && pSelectingLink == 0 && pSelectingController == 0 )
 	{
 		Position = m_Links.GetHeadPosition();
 		while( Position != NULL )
 		{
 			CLink* pLink = m_Links.GetNext( Position );
-			if( pLink != 0 && pLink->IsSelected() && pLink->PointOnLink( m_GearConnectionList, Point, GrabDistance ) 
+			if( pLink != 0 && pLink->IsSelected() && pLink->PointOnLink( m_GearConnectionList, Point, GrabDistance )
 			    && ( pLink->GetLayers() & m_EditLayers ) != 0 )
 			{
 				if( pLink->GetConnectorCount() == 1 && !pLink->IsGear() )
@@ -1240,7 +1235,7 @@ bool CLinkageDoc::SelectElement( CFPoint Point, double GrabDistance, bool bMulti
 	/*
 	 * Test for selecting an unselected connector, controller, or link.
 	 */
-	
+
 	if( pSelectingConnector == 0 && pSelectingLink == 0 && pSelectingController == 0 )
 	{
 		Position = m_Links.GetHeadPosition();
@@ -1274,14 +1269,14 @@ bool CLinkageDoc::SelectElement( CFPoint Point, double GrabDistance, bool bMulti
 			}
 		}
 	}
-		
+
 	if( pSelectingConnector == 0 && pSelectingLink == 0 && pSelectingController == 0 )
 	{
 		Position = m_Links.GetHeadPosition();
 		while( Position != NULL )
 		{
 			CLink* pLink = m_Links.GetNext( Position );
-			if( pLink != NULL && pLink->PointOnLink( m_GearConnectionList, Point, GrabDistance ) 
+			if( pLink != NULL && pLink->PointOnLink( m_GearConnectionList, Point, GrabDistance )
 			    && ( pLink->GetLayers() & m_EditLayers ) != 0 )
 			{
 				CConnector *pStrokeConnector = pLink->GetStrokeConnector( 0 );
@@ -1306,9 +1301,9 @@ bool CLinkageDoc::SelectElement( CFPoint Point, double GrabDistance, bool bMulti
 		m_pCapturedController = pSelectingController;
 		m_CaptureOffset.x = Point.x - pSelectingController->GetPoint().x;
 		m_CaptureOffset.y = Point.y - pSelectingController->GetPoint().y;
-		
+
 		SetSelectedModifiableCondition();
-		
+
 		return true;
 	}
 
@@ -1341,14 +1336,14 @@ bool CLinkageDoc::SelectElement( CFPoint Point, double GrabDistance, bool bMulti
 				 */
 				m_SelectedConnectors.AddHead( pSelectingConnector );
 			}
-			 
+
 			m_pCapturedConnector = 0;
 			m_pCapturedController = 0;
 			pSelectingConnector->Select( !pSelectingConnector->IsSelected() );
 			bSelectionChanged = true;
-			
+
 			SetSelectedModifiableCondition();
-			
+
 			return true;
 		}
 		else
@@ -1362,12 +1357,12 @@ bool CLinkageDoc::SelectElement( CFPoint Point, double GrabDistance, bool bMulti
 			m_CaptureOffset.x = Point.x - pSelectingConnector->GetPoint().x;
 			m_CaptureOffset.y = Point.y - pSelectingConnector->GetPoint().y;
 		}
-		
+
 		SetSelectedModifiableCondition();
-		
+
 		return m_pCapturedConnector != 0;
 	}
-	
+
 	if( pSelectingLink != 0 )
 	{
 		m_pCapturedConnector = 0;
@@ -1399,7 +1394,7 @@ bool CLinkageDoc::SelectElement( CFPoint Point, double GrabDistance, bool bMulti
 				 */
 				m_SelectedLinks.AddHead( pSelectingLink );
 			}
-			 
+
 			pSelectingLink->Select( !pSelectingLink->IsSelected() );
 			bSelectionChanged = true;
 			SetSelectedModifiableCondition();
@@ -1424,7 +1419,7 @@ bool CLinkageDoc::SelectElement( CFPoint Point, double GrabDistance, bool bMulti
 		ClearSelection();
 	else
 		SetSelectedModifiableCondition();
-	
+
 	return false;
 }
 
@@ -1467,12 +1462,12 @@ bool CLinkageDoc::StretchSelected( CFRect OriginalRect, CFRect NewRect, _Directi
 		CConnector* pConnector = m_Connectors.GetNext( Position );
 		if( pConnector == 0 )
 			continue;
-			
+
 		if( !pConnector->IsSelected() && !pConnector->IsLinkSelected() )
 			continue;
-			
+
 		CFPoint Scale( OriginalRect.Width() == 0 ? 1 : NewRect.Width() / OriginalRect.Width(), OriginalRect.Height() == 0 ? 1 : NewRect.Height() / OriginalRect.Height() );
-		
+
 		CFPoint OldPoint = pConnector->GetOriginalPoint();
 		CFPoint NewPoint;
 		NewPoint.x = NewRect.left + ( ( OldPoint.x - OriginalRect.left ) * Scale.x );
@@ -1513,7 +1508,7 @@ bool CLinkageDoc::StretchSelected( CFRect OriginalRect, CFRect NewRect, _Directi
 	}
 
 	FixupSliderLocations();
-		
+
     SetModifiedFlag( true );
 	return true;
 }
@@ -1524,7 +1519,7 @@ bool CLinkageDoc::MoveCapturedController( CFPoint Point )
 	CFPoint Offset;
 	Offset.x = ( Point.x - m_CaptureOffset.x ) - Temp.x;
 	Offset.y = ( Point.y - m_CaptureOffset.y ) - Temp.y;
-	
+
 	if( Offset.x == 0.0 && Offset.y == 0.0 )
 		return false;
 
@@ -1555,9 +1550,9 @@ bool CLinkageDoc::MoveCapturedController( CFPoint Point )
 CFPoint CLinkageDoc::CheckForSnap( double SnapDistance, bool bElementSnap, bool bGridSnap, double xGrid, double yGrid, CFPoint &ReferencePoint )
 {
 	CFPoint Adjustment( 0, 0 );
-	
+
 	bool bSnapGrid = false;
-	
+
 	if( bGridSnap )
 	{
 		POSITION Position = m_Connectors.GetHeadPosition();
@@ -1566,13 +1561,13 @@ CFPoint CLinkageDoc::CheckForSnap( double SnapDistance, bool bElementSnap, bool 
 			CConnector* pConnector = m_Connectors.GetNext( Position );
 			if( pConnector == 0 )
 				continue;
-			
+
 			if( !pConnector->IsSelected() && !pConnector->IsLinkSelected() )
 				continue;
 
 			if( pConnector->IsSlider() )
 				continue;
-			
+
 			CFPoint ConnectorPoint = pConnector->GetPoint();
 
 			double xMin = ( (int)( ConnectorPoint.x / xGrid ) ) * xGrid;
@@ -1615,7 +1610,7 @@ CFPoint CLinkageDoc::CheckForSnap( double SnapDistance, bool bElementSnap, bool 
 	/*
 	 * Item snap overrides grid snap to make auto-join easier.
 	 */
-	
+
 	bool bSnapItem = false;
 
 	if( bElementSnap )
@@ -1632,10 +1627,10 @@ CFPoint CLinkageDoc::CheckForSnap( double SnapDistance, bool bElementSnap, bool 
 			CConnector* pConnector = m_Connectors.GetNext( Position );
 			if( pConnector == 0 || ( pConnector->GetLayers() & m_EditLayers ) == 0 )
 				continue;
-			
+
 			if( !pConnector->IsSelected() && !pConnector->IsLinkSelected() )
 				continue;
-			
+
 			if( pConnector->IsSlider() )
 				continue;
 
@@ -1647,13 +1642,13 @@ CFPoint CLinkageDoc::CheckForSnap( double SnapDistance, bool bElementSnap, bool 
 				CConnector* pCheckConnector = m_Connectors.GetNext( Position2 );
 				if( pCheckConnector == 0 || ( pConnector->GetLayers() & m_EditLayers ) == 0 )
 					continue;
-			
+
 				if( pCheckConnector->IsSelected() || pCheckConnector->IsLinkSelected() )
 					continue;
 
 				/*
 				 * This is a snap to the horizontal or vertical position of the
-				 * connector, not a snap to both coordinates. Check the distance 
+				 * connector, not a snap to both coordinates. Check the distance
 				 * in each direction instead of an absolute distance.
 				 */
 
@@ -1685,10 +1680,10 @@ CFPoint CLinkageDoc::CheckForSnap( double SnapDistance, bool bElementSnap, bool 
 			CConnector* pConnector = m_Connectors.GetNext( Position );
 			if( pConnector == 0 )
 				continue;
-			
+
 			if( !pConnector->IsSelected() && !pConnector->IsLinkSelected() )
 				continue;
-			
+
 			CFPoint ConnectorPoint = pConnector->GetPoint();
 			ConnectorPoint += Adjustment;
 			pConnector->SetIntermediatePoint( ConnectorPoint );
@@ -1705,20 +1700,20 @@ CFPoint CLinkageDoc::CheckForSnap( double SnapDistance, bool bElementSnap, bool 
 int CLinkageDoc::BuildSelectedLockGroup( ConnectorList *pLockGroup )
 {
 	/*
-	 * Build a list of all connectors that are selected or are attached to links that are locked and 
+	 * Build a list of all connectors that are selected or are attached to links that are locked and
 	 * have a selected connector.
 	 */
 
 	CBitArray LockedConnectors;
 	LockedConnectors.SetLength( 0 );
-	
+
 	POSITION Position = m_Connectors.GetHeadPosition();
 	while( Position != 0 )
 	{
 		CConnector* pConnector = m_Connectors.GetNext( Position );
 		if( pConnector == 0 )
 			continue;
-			
+
 		if( !pConnector->IsSelected() && !pConnector->IsLinkSelected() )
 			continue;
 
@@ -1739,7 +1734,7 @@ int CLinkageDoc::BuildSelectedLockGroup( ConnectorList *pLockGroup )
 			POSITION Position2 = pLink->GetConnectorList()->GetHeadPosition();
 			while( Position2 != 0 )
 			{
-				CConnector *pConnector = pLink->GetConnectorList()->GetNext( Position2 ); 
+				CConnector *pConnector = pLink->GetConnectorList()->GetNext( Position2 );
 				if( pConnector == 0 )
 					continue;
 				if( LockedConnectors.GetBit( pConnector->GetIdentifier() ) )
@@ -1754,7 +1749,7 @@ int CLinkageDoc::BuildSelectedLockGroup( ConnectorList *pLockGroup )
 				POSITION Position2 = pLink->GetConnectorList()->GetHeadPosition();
 				while( Position2 != 0 )
 				{
-					CConnector *pConnector = pLink->GetConnectorList()->GetNext( Position2 ); 
+					CConnector *pConnector = pLink->GetConnectorList()->GetNext( Position2 );
 					if( pConnector == 0 || LockedConnectors.GetBit( pConnector->GetIdentifier() ) )
 						continue;
 
@@ -1770,7 +1765,7 @@ int CLinkageDoc::BuildSelectedLockGroup( ConnectorList *pLockGroup )
 	Position = m_Connectors.GetHeadPosition();
 	while( Position != 0 )
 	{
-		CConnector *pConnector = m_Connectors.GetNext( Position ); 
+		CConnector *pConnector = m_Connectors.GetNext( Position );
 		if( pConnector == 0 )
 			continue;
 		if( LockedConnectors.GetBit( pConnector->GetIdentifier() ) )
@@ -1795,7 +1790,7 @@ bool CLinkageDoc::MoveSelected( CFPoint Point, bool bElementSnap, bool bGridSnap
 	CFPoint Offset;
 	Offset.x = ( Point.x - m_CaptureOffset.x ) - OriginalPoint.x;
 	Offset.y = ( Point.y - m_CaptureOffset.y ) - OriginalPoint.y;
-	
+
 	if( Offset.x == 0.0 && Offset.y == 0.0 )
 		return false;
 
@@ -1834,7 +1829,6 @@ bool CLinkageDoc::MoveSelected( CFPoint Point, bool bElementSnap, bool bGridSnap
 				pConnector->RotateAround( pCenter->GetOriginalPoint(), Angle );
 				pConnector->MakePermanent();
 
-
 				return true;
 			}
 		}
@@ -1848,7 +1842,7 @@ bool CLinkageDoc::MoveSelected( CFPoint Point, bool bElementSnap, bool bGridSnap
 		CConnector* pConnector = MoveConnectors.GetNext( Position );
 		if( pConnector == 0 )
 			continue;
-			
+
 		CFPoint ConnectorPoint = pConnector->GetOriginalPoint();
 		ConnectorPoint += Offset;
 		pConnector->SetIntermediatePoint( ConnectorPoint );
@@ -1895,7 +1889,7 @@ bool CLinkageDoc::FixupSliderLocation( CConnector *pConnector )
 	if( !pConnector->IsSlider() || pStart == 0 || pEnd == 0 )
 		return false;
 
-	if( pStart->IsSelected() || pEnd->IsSelected() 
+	if( pStart->IsSelected() || pEnd->IsSelected()
 		|| pStart->IsLinkSelected() || pEnd->IsLinkSelected() )
 	{
 		// The slider needs to be placed on the path at a position that
@@ -1975,7 +1969,7 @@ bool CLinkageDoc::FixupSliderLocations( void )
 			CConnector* pConnector = m_Connectors.GetNext( Position );
 			if( pConnector == 0 )
 				continue;
-			
+
 			if( !pConnector->IsSlider() )
 				continue;
 
@@ -2009,10 +2003,10 @@ bool CLinkageDoc::FixupGearConnections( void )
 }
 
 bool CLinkageDoc::RotateSelected( CFPoint CenterPoint, double Angle )
-{	
+{
 	if( Angle == 0 )
 		return true;
-		
+
 	ConnectorList RotateConnectors;
 	int RotateCount = BuildSelectedLockGroup( &RotateConnectors );
 	POSITION Position = RotateConnectors.GetHeadPosition();
@@ -2021,14 +2015,14 @@ bool CLinkageDoc::RotateSelected( CFPoint CenterPoint, double Angle )
 		CConnector* pConnector = RotateConnectors.GetNext( Position );
 		if( pConnector == 0 )
 			continue;
-			
+
 		pConnector->MovePoint( pConnector->GetOriginalPoint() );
 		pConnector->RotateAround( CenterPoint, Angle );
 		pConnector->MakePermanent();
 	}
 
 	FixupSliderLocations();
-		
+
     SetModifiedFlag( true );
 	return true;
 }
@@ -2047,7 +2041,7 @@ bool CLinkageDoc::FinishChangeSelected( void )
 		CConnector* pConnector = m_Connectors.GetNext( Position );
 		if( pConnector == 0 )
 			continue;
-			
+
 		pConnector->SetPoint( pConnector->GetPoint() );
 		pConnector->SetDrawCircleRadius( pConnector->GetDrawCircleRadius() );
 		pConnector->SetSlideRadius( pConnector->GetSlideRadius() );
@@ -2075,7 +2069,7 @@ void CLinkageDoc::Reset( bool bClearMotionPath, bool KeepCurrentPositions )
 		PushUndo();
 
 	ClearSelection();
-	
+
 	POSITION Position;
 
 	Position = m_Connectors.GetHeadPosition();
@@ -2089,7 +2083,7 @@ void CLinkageDoc::Reset( bool bClearMotionPath, bool KeepCurrentPositions )
 			pConnector->SetPoint( pConnector->GetPoint() );
 		pConnector->Reset( bClearMotionPath );
 	}
-	
+
 	Position = m_Links.GetHeadPosition();
 	while( Position != NULL )
 	{
@@ -2209,9 +2203,8 @@ bool CLinkageDoc::JoinSelected( bool bSaveUndoState )
 		if( pConnector == 0 || !pConnector->IsSelected() )
 			continue;
 
-
 		CombinedLayers |= pConnector->GetLayers();
-			
+
 		AveragePoint += pConnector->GetOriginalPoint();
 
 		// After this is stuff to be done to the links that are being deleted.
@@ -2266,7 +2259,6 @@ bool CLinkageDoc::JoinSelected( bool bSaveUndoState )
 				if( pTestConnector == 0 || !pTestConnector->IsSelected() || pTestConnector == pKeepConnector )
 					continue;
 
-		
 				if( pLimit1 == pTestConnector )
 					pLimit1 = pKeepConnector;
 				else if( pLimit2 == pTestConnector )
@@ -2296,7 +2288,7 @@ bool CLinkageDoc::JoinSelected( bool bSaveUndoState )
 	m_SelectedConnectors.AddHead( pKeepConnector );
 
 	NormalizeConnectorLinks();
-	
+
 	SetSelectedModifiableCondition();
 
 	FixupSliderLocations();
@@ -2312,14 +2304,14 @@ void CLinkageDoc::ConnectSelected( void )
 
 	// Make a new Link and add the selected connectors to it.
 	// Do not move anything.
-	
+
 	if( GetSelectedConnectorCount() <= 1 )
 		return;
-	
+
 	CLink *pLink = new CLink();
 	if( pLink == 0 )
 		return;
-		
+
 	int NewID = m_IdentifiedLinks.FindAndSetBit();
 	if( NewID > m_HighestLinkID )
 		m_HighestLinkID = NewID;
@@ -2344,7 +2336,7 @@ void CLinkageDoc::ConnectSelected( void )
 			m_IdentifiedLinks.ClearBit( pLoneLink->GetIdentifier() );
 			delete pLoneLink;
 		}
-			
+
 		Layers = pConnector->GetLayers();
 		pLink->SetLayers( Layers );
 		pConnector->AddLink( pLink );
@@ -2354,9 +2346,9 @@ void CLinkageDoc::ConnectSelected( void )
 	pLink->SetColor( ( Layers & DRAWINGLAYER ) != 0 ? RGB( 200, 200, 200 ) : Colors[pLink->GetIdentifier() % COLORS_COUNT] );
 
 	m_Links.AddTail( pLink );
-	
+
 	SetSelectedModifiableCondition();
-	
+
     SetModifiedFlag( true );
 }
 
@@ -2395,7 +2387,7 @@ void CLinkageDoc::MakeSelectedAtAngle( double Angle )
     SetModifiedFlag( true );
 
 	NormalizeConnectorLinks();
-	
+
 	SetSelectedModifiableCondition();
 }
 
@@ -2411,7 +2403,7 @@ void CLinkageDoc::MakeRightAngleSelected( void )
     SetModifiedFlag( true );
 
 	NormalizeConnectorLinks();
-	
+
 	SetSelectedModifiableCondition();
 }
 
@@ -2473,7 +2465,7 @@ void CLinkageDoc::AlignSelected( _Direction Direction )
 				TempLine += MovePoint;
 				if( Intersects( TempLine, Line, MovePoint ) )
 					pConnector->SetPoint( MovePoint );
-				
+
 				ConnectorReference[Counter].m_pConnector = pConnector;
 				ConnectorReference[Counter].m_Distance = Distance( Line.m_Start, MovePoint );
 
@@ -2602,10 +2594,9 @@ void CLinkageDoc::AlignSelected( _Direction Direction )
     SetModifiedFlag( true );
 
 	NormalizeConnectorLinks();
-	
+
 	SetSelectedModifiableCondition();
 }
-
 
 void CLinkageDoc::MakeParallelogramSelected( bool bMakeRectangle )
 {
@@ -2644,7 +2635,7 @@ void CLinkageDoc::MakeParallelogramSelected( bool bMakeRectangle )
 	FinishChangeSelected();
 
 	NormalizeConnectorLinks();
-	
+
 	SetSelectedModifiableCondition();
 }
 
@@ -2664,7 +2655,7 @@ void CLinkageDoc::MakeAnchorSelected( void )
 	}
 
 	FinishChangeSelected();
-	
+
 	SetSelectedModifiableCondition();
 }
 
@@ -2688,7 +2679,7 @@ void CLinkageDoc::CombineSelected( void )
 			pKeepLink = pLink;
 			continue;
 		}
-		
+
 		POSITION Position2 = pLink->GetConnectorList()->GetHeadPosition();
 		while( Position2 != NULL )
 		{
@@ -2705,18 +2696,18 @@ void CLinkageDoc::CombineSelected( void )
 		delete pLink;
 	    SetModifiedFlag( true );
 	}
-	
+
 	NormalizeConnectorLinks();
 
 	FinishChangeSelected();
-	
+
 	SetSelectedModifiableCondition();
 }
 
 void CLinkageDoc::DeleteSelected( void )
 {
 	PushUndo();
-	
+
 	POSITION Position = m_Links.GetHeadPosition();
 	while( Position != 0 )
 	{
@@ -2730,7 +2721,7 @@ void CLinkageDoc::DeleteSelected( void )
 		// Start over because the list may have changed.
 		POSITION Position = m_Links.GetHeadPosition();
 	}
-	
+
 	Position = m_Connectors.GetHeadPosition();
 	while( Position != NULL )
 	{
@@ -2746,7 +2737,7 @@ void CLinkageDoc::DeleteSelected( void )
 	}
 
 	NormalizeConnectorLinks();
-	
+
 	SetSelectedModifiableCondition();
 }
 
@@ -2845,7 +2836,7 @@ bool CLinkageDoc::DeleteConnector( CConnector *pConnector, CLink *pDeletingLink 
 		if( pLink->GetConnectorCount() == 1 )
 		{
 			DeleteLink( pLink, pConnector );
-			continue;			
+			continue;
 		}
 
 		pLink->RemoveConnector( pConnector );
@@ -2903,7 +2894,7 @@ void CLinkageDoc::NormalizeConnectorLinks( void )
 		}
 
 		CConnector *pConnector = 0;
-			
+
 		if( pLink->GetConnectorCount() == 1 )
 			pConnector = pLink->GetConnectorList()->GetHead();
 		else if( pLink->GetConnectorCount() > 1 )
@@ -2929,11 +2920,11 @@ void CLinkageDoc::NormalizeConnectorLinks( void )
 }
 void CLinkageDoc::SetViewLayers( unsigned int Layers )
 {
-	m_ViewLayers = Layers; 
+	m_ViewLayers = Layers;
 	SetEditLayers( m_EditLayers & m_ViewLayers );
 }
 
-void CLinkageDoc::SetEditLayers( unsigned int Layers ) 
+void CLinkageDoc::SetEditLayers( unsigned int Layers )
 {
 	m_EditLayers = Layers;
 
@@ -2978,7 +2969,7 @@ int CLinkageDoc::GetSelectedLinkCount( bool bOnlyWithMultipleConnectors )
 		CLink* pLink = m_SelectedLinks.GetNext( Position );
 		if( pLink == 0 )
 			continue;
-			
+
 		if( pLink->IsSelected() )
 		{
 			if( !bOnlyWithMultipleConnectors || pLink->GetConnectorCount() > 1 )
@@ -2996,7 +2987,7 @@ bool CLinkageDoc::FindRoomFor( CFRect NeedRect, CFPoint &PlaceHere )
 	for( int Counter = 0; Counter < 2000; ++Counter )
 	{
 		CFRect TestRect( PlaceHere.x, PlaceHere.y, PlaceHere.x+NeedRect.Width(), PlaceHere.y+NeedRect.Height() );
-		
+
 		bool bOverlapped = false;
 		POSITION Position = m_Links.GetHeadPosition();
 		while( Position != NULL )
@@ -3007,7 +2998,7 @@ bool CLinkageDoc::FindRoomFor( CFRect NeedRect, CFPoint &PlaceHere )
 			CFRect Rect;
 			pLink->GetArea( m_GearConnectionList, Rect );
 			Rect.InflateRect( 8, 8 );
-			
+
 			if( TestRect.IsOverlapped( Rect ) )
 			{
 				bOverlapped = true;
@@ -3040,28 +3031,28 @@ void CLinkageDoc::InsertLink( unsigned int Layers, double ScaleFactor, CFPoint D
 	 * right now, there is no clever way to generate the location for
 	 * the new connectors so 3 is the maximum.
 	 */
-	if( ConnectorCount > MAX_CONNECTOR_COUNT ) 
+	if( ConnectorCount > MAX_CONNECTOR_COUNT )
 		return;
 
 	PushUndo();
 
 	ClearSelection();
-	
-	static CFPoint AddPoints[MAX_CONNECTOR_COUNT][MAX_CONNECTOR_COUNT] = 
+
+	static CFPoint AddPoints[MAX_CONNECTOR_COUNT][MAX_CONNECTOR_COUNT] =
 	{
 		{ CFPoint( 0, 0 ), CFPoint( 0, 0 ), CFPoint( 0, 0 ), CFPoint( 0, 0 ) },
 		{ CFPoint( 0, 0 ), CFPoint( 1.0, 1.0 ), CFPoint( 0, 0 ), CFPoint( 0, 0 ) },
 		{ CFPoint( 0, 0 ), CFPoint( 0, 1.0 ), CFPoint( 1.0, 1.0 ), CFPoint( 0, 0 ) },
 		{ CFPoint( 0, 0 ), CFPoint( 0, 1.0 ), CFPoint( 1.0, 1.0 ), CFPoint( 1.0, 0 ) }
 	};
-		
+
 	CConnector **Connectors = new CConnector* [ConnectorCount];
 	if( Connectors == 0 )
 		return;
 	int Index;
 	for( Index = 0; Index < ConnectorCount; ++Index )
 		Connectors[Index] = 0;
-		
+
 	CLink *pLink = new CLink;
 	if( pLink == 0 )
 	{
@@ -3092,23 +3083,23 @@ void CLinkageDoc::InsertLink( unsigned int Layers, double ScaleFactor, CFPoint D
 		pConnector->SetPoint( CFPoint( AddPoints[ConnectorCount-1][Index].x * ScaleFactor, AddPoints[ConnectorCount-1][Index].y * ScaleFactor ) );
 		pConnector->AddLink( pLink );
 		pLink->AddConnector( pConnector );
-		
+
 		bAnchor = false;
 		bRotating = false;
 	}
 
 	CFRect Rect( 0, 0, 0, 0 );
-	
+
 	pLink->GetArea( m_GearConnectionList, Rect );
 	CFPoint Offset( -Rect.left, -Rect.bottom );
 	Rect.left += Offset.x;
 	Rect.top += Offset.x;
 	Rect.right += Offset.x;
 	Rect.bottom += Offset.x;
-	
+
 	Rect.right += 16;
 	Rect.bottom += 16;
-	
+
 	CFPoint Place = DesiredPoint;
 	if( !bForceToPoint )
 		FindRoomFor( Rect, Place );
@@ -3124,7 +3115,7 @@ void CLinkageDoc::InsertLink( unsigned int Layers, double ScaleFactor, CFPoint D
 //		delete pLink;
 //		return;
 //	}
-	
+
 	int NewID = m_IdentifiedLinks.FindAndSetBit();
 	if( NewID > m_HighestLinkID )
 		m_HighestLinkID = NewID;
@@ -3167,7 +3158,6 @@ void CLinkageDoc::InsertLink( unsigned int Layers, double ScaleFactor, CFPoint D
 
 	delete [] Connectors;
 }
-
 
 void CLinkageDoc::DeleteContents( bool bDeleteUndoInfo )
 {
@@ -3282,7 +3272,7 @@ void CLinkageDoc::SplitSelected( void )
 			++SplitCount;
 			continue;
 		}
-			
+
 		if( pConnector->GetLinkCount() <= 1 )
 			continue;
 
@@ -3291,7 +3281,7 @@ void CLinkageDoc::SplitSelected( void )
 		// a new connector.
 
 		int SplitLinkCount = 0;
-		POSITION Position2 = pConnector->GetLinkList()->GetHeadPosition();	
+		POSITION Position2 = pConnector->GetLinkList()->GetHeadPosition();
 		while( Position2 != 0 )
 		{
 			CLink *pLink = pConnector->GetLinkList()->GetNext( Position2 );
@@ -3303,13 +3293,13 @@ void CLinkageDoc::SplitSelected( void )
 
 		if( SplitLinkCount > 1 )
 		{
-			Position2 = pConnector->GetLinkList()->GetHeadPosition();	
+			Position2 = pConnector->GetLinkList()->GetHeadPosition();
 			while( Position2 != 0 )
 			{
 				CLink *pLink = pConnector->GetLinkList()->GetNext( Position2 );
 				if( pLink == 0 )
 					continue;
-				
+
 				CConnector *pNewConnector = new CConnector( *pConnector );
 				if( pNewConnector == 0 )
 					continue;
@@ -3330,7 +3320,7 @@ void CLinkageDoc::SplitSelected( void )
 //				pNewConnector->SetAsInput( pConnector->IsInput() );
 //				pNewConnector->SetRPM( pConnector->GetRPM() );
 //				pNewConnector->SetPoint( Point );
-			
+
 				SetModifiedFlag( true );
 				++SplitCount;
 			}
@@ -3373,13 +3363,13 @@ void CLinkageDoc::Copy( bool bCut )
 
     memcpy( pTextMemory, pData, Size );
     memcpy( pMemory, pData, Size );
-    
+
     ::GlobalUnlock( hTextMemory );
     ::GlobalUnlock( hMemory );
     ::SetClipboardData( CF_TEXT, hTextMemory );
     ::SetClipboardData( CF_Linkage, hMemory );
     ::CloseClipboard();
-    
+
     if( bCut )
 		DeleteSelected();
 }
@@ -3405,7 +3395,7 @@ void CLinkageDoc::Paste( void )
 		::CloseClipboard();
 		return;
     }
-    
+
 	SelectElement();
 
     /*
@@ -3423,23 +3413,23 @@ void CLinkageDoc::Paste( void )
 		::CloseClipboard();
 		return;
     }
-    
+
     CMemFile mFile;
     mFile.Attach( pMemory, Size, 0 );
     CArchive ar( &mFile, CArchive::load );
 
 	CFrameWnd *pFrame = (CFrameWnd*)AfxGetMainWnd();
-	CLinkageView *pView = pFrame == 0 ? 0 : (CLinkageView*)pFrame->GetActiveView();	
+	CLinkageView *pView = pFrame == 0 ? 0 : (CLinkageView*)pFrame->GetActiveView();
 	if( pView != 0 )
 		pView->HighlightSelected( true );
-    
+
     PushUndo();
 
     ReadIn( ar, true, false, false, true );
     mFile.Detach();
     ::GlobalUnlock( hMemory );
     ::CloseClipboard();
-    
+
     SetModifiedFlag( true );
 }
 
@@ -3457,18 +3447,18 @@ void CLinkageDoc::SelectSample( int Index )
 		ExampleName = ExampleName.Mid( EOL + 1 );
 
 	ExampleName += " Example";
-		
+
 	if (!SaveModified())
 		return;
 
 	OnNewDocument();
-	
+
 	SetTitle( ExampleName );
-	
+
     CMemFile mFile;
     mFile.Attach( (BYTE*)ExampleData.GetBuffer(), ExampleData.GetLength(), 0 );
     CArchive ar( &mFile, CArchive::load );
-    
+
     ReadIn( ar, false, true, false, false );
     mFile.Detach();
     ExampleData.ReleaseBuffer();
@@ -3493,7 +3483,7 @@ void CLinkageDoc::GetDocumentArea( CFRect &BoundingRect, bool bSelectedOnly )
 		BoundingRect.top = max( BoundingRect.top, Rect.top );
 		BoundingRect.bottom = min( BoundingRect.bottom, Rect.bottom );
 	}
-	
+
 	Position = m_Connectors.GetHeadPosition();
 	while( Position != 0 )
 	{
@@ -3506,7 +3496,7 @@ void CLinkageDoc::GetDocumentArea( CFRect &BoundingRect, bool bSelectedOnly )
 		BoundingRect.top = max( BoundingRect.top, Rect.top );
 		BoundingRect.bottom = min( BoundingRect.bottom, Rect.bottom );
 	}
-	
+
 	if( BoundingRect.left == DBL_MAX
 		|| BoundingRect.top == -DBL_MAX
 		|| BoundingRect.bottom == DBL_MAX
@@ -3532,7 +3522,7 @@ void CLinkageDoc::GetDocumentAdjustArea( CFRect &BoundingRect, bool bSelectedOnl
 		BoundingRect.top = max( BoundingRect.top, Rect.top );
 		BoundingRect.bottom = min( BoundingRect.bottom, Rect.bottom );
 	}
-	
+
 	if( bSelectedOnly )
 	{
 		// If checking selected elements then check individual connectors.
@@ -3549,7 +3539,7 @@ void CLinkageDoc::GetDocumentAdjustArea( CFRect &BoundingRect, bool bSelectedOnl
 			BoundingRect.bottom = min( BoundingRect.bottom, Rect.bottom );
 		}
 	}
-	
+
 	if( BoundingRect.left == DBL_MAX
 		|| BoundingRect.top == -DBL_MAX
 		|| BoundingRect.bottom == DBL_MAX
@@ -3566,10 +3556,10 @@ bool CLinkageDoc::IsSelectionAdjustable( void )
 {
 	int ConnectorCount = GetSelectedConnectorCount();
 	int LinkCount = GetSelectedLinkCount( false );
-	
+
 	if( ConnectorCount > 1 || LinkCount > 1 )
 		return true;
-		
+
 	if( LinkCount == 1 )
 	{
 		// If it has more than a single connector then it can be adjusted.
@@ -3579,11 +3569,11 @@ bool CLinkageDoc::IsSelectionAdjustable( void )
 			CLink* pLink = m_Links.GetNext( Position );
 			if( pLink == 0 || !pLink->IsSelected() )
 				continue;
-				
+
 			return pLink->GetConnectorCount() > 1;
 		}
 	}
-	
+
 	return false;
 }
 
@@ -3619,11 +3609,11 @@ void CLinkageDoc::PushUndo( void )
 
     int Size = (int)mFile.GetLength();
     BYTE* pData = mFile.Detach();
-	
+
 	CUndoRecord *pNewRecord = new CUndoRecord( pData );
 	if( pNewRecord == 0 )
 		return;
-		
+
 	++m_UndoCount;
 
 	if( m_UndoCount > MAX_UNDO )
@@ -3641,13 +3631,13 @@ void CLinkageDoc::PushUndo( void )
 			}
 		}
 	}
-	
+
 	if( m_pUndoList != 0 )
 		m_pUndoList->m_pPrevious = pNewRecord;
-	
+
 	pNewRecord->m_pNext = m_pUndoList;
 	m_pUndoList = pNewRecord;
-	
+
 	if( m_pUndoListEnd == 0 )
 		m_pUndoListEnd = pNewRecord;
 
@@ -3658,21 +3648,21 @@ void CLinkageDoc::PopUndo( void )
 {
 	if( m_UndoCount == 0 || m_pUndoList == 0 )
 		return;
-		
+
 	DeleteContents( false );
 
 	BYTE *pData = 0;
 	m_pUndoList->ClearContent( &pData );
-	
+
     CMemFile mFile;
     mFile.Attach( pData, strlen( (char*)pData ), 0 );
     CArchive ar( &mFile, CArchive::load );
-    
+
     ReadIn( ar, false, false, true, false );
     mFile.Detach();
 
 	PopUndoDelete();
-    
+
     SetModifiedFlag( true );
 
     UpdateAllViews( 0 );
@@ -3684,7 +3674,7 @@ void CLinkageDoc::PopUndoDelete( void )
 	delete m_pUndoList;
 	m_pUndoList = pNewUndoList;
 	--m_UndoCount;
-	
+
 	if( m_pUndoList == 0 )
 	{
 		m_UndoCount = 0; // Make sure this is correct now.
@@ -3695,11 +3685,11 @@ void CLinkageDoc::PopUndoDelete( void )
 bool CLinkageDoc::Undo( void )
 {
 	bool bResult = m_UndoCount > 0 && m_pUndoList != 0;
-	
+
 	PopUndo();
 //	m_pCapturedConnector = 0;
 //	m_SelectedConnectors.RemoveAll();
-	
+
 	// Set the identifier bits in the new document.
 	POSITION Position = m_Connectors.GetHeadPosition();
 	while( Position != 0 )
@@ -3712,7 +3702,7 @@ bool CLinkageDoc::Undo( void )
 			m_HighestConnectorID = NewID;
 		m_IdentifiedConnectors.SetBit( NewID );
 	}
-	
+
 	Position = m_Links.GetHeadPosition();
 	while( Position != 0 )
 	{
@@ -3724,7 +3714,7 @@ bool CLinkageDoc::Undo( void )
 			m_HighestLinkID = NewID;
 		m_IdentifiedLinks.SetBit( NewID );
 	}
-	
+
 	return bResult;
 }
 
@@ -3735,7 +3725,7 @@ bool CLinkageDoc::ConnectSliderLimits( bool bTestOnly )
 
 	if( GetSelectedConnectorCount() != 3 )
 		return false;
-		
+
 	CConnector *pUseConnectors[3] = { 0, 0, 0 };
 
 	int Index = 0;
@@ -3779,14 +3769,14 @@ bool CLinkageDoc::ConnectSliderLimits( bool bTestOnly )
 
 	if( ShareCount != 1 )
 		return false;
-	
+
 	if( bTestOnly )
 		return true;
-		
+
 	pUseConnectors[Slider]->SlideBetween( pUseConnectors[FirstLimit], pUseConnectors[SecondLimit] );
 
 	// Test code... pUseConnectors[Slider]->SetSlideRadius( 400 );
-	
+
 	pUseConnectors[Slider]->SetPoint( pUseConnectors[FirstLimit]->GetPoint().MidPoint( pUseConnectors[SecondLimit]->GetPoint(), .5 ) );
 
 	Position = pUseConnectors[Slider]->GetLinkList()->GetHeadPosition();
@@ -3801,7 +3791,7 @@ bool CLinkageDoc::ConnectSliderLimits( bool bTestOnly )
     SetModifiedFlag( true );
 
 	FinishChangeSelected();
-    
+
     return true;
 }
 
@@ -3860,7 +3850,7 @@ void CLinkageDoc::SetSelectedModifiableCondition( void )
 	}
 
 	CLink *pFastenToLink = 0;
-	
+
 	Position = m_Links.GetHeadPosition();
 	while( Position != 0 )
 	{
@@ -3924,7 +3914,7 @@ void CLinkageDoc::SetSelectedModifiableCondition( void )
 	{
 		if (pConnector1->GetLinkCount() <= 1 && !pConnector1->IsSlider() )
 			m_bSelectionSplittable = false;
-	}	
+	}
 
 	m_bSelectionTriangle = SelectedRealLinks == 0 && SelectedConnectors == 3;
 	m_bSelectionRectangle = SelectedRealLinks == 0 && SelectedConnectors == 4;
@@ -3961,7 +3951,7 @@ void CLinkageDoc::SetSelectedModifiableCondition( void )
 					{
 						m_bSelectionFastenable = false;
 						break;
-					}	
+					}
 				}
 			}
 		}
@@ -4135,7 +4125,7 @@ bool CLinkageDoc::SelectNext( _SelectDirection SelectDirection )
 			return false;
 		SelectElement( pLink );
 	}
-	
+
 	SetSelectedModifiableCondition();
 	return true;
 }
@@ -4148,12 +4138,12 @@ void CLinkageDoc::InsertXml( CFPoint DesiredPoint, bool bForceToPoint, const cha
 	unsigned int Size = strlen( pXml );
     mFile.Attach( (BYTE*)pXml, Size, 0 );
     CArchive ar( &mFile, CArchive::load );
-    
+
     PushUndo();
-    
+
     ReadIn( ar, true, false, false, false );
     mFile.Detach();
-    
+
     SetModifiedFlag( true );
 }
 
@@ -4167,7 +4157,7 @@ void CLinkageDoc::SetUnits( CLinkageDoc::_Units Units )
 	switch( Units )
 	{
 		case INCH: m_UnitScaling = 1 / OneInch; break;
-		case MM: 
+		case MM:
 		default: m_UnitScaling = 24.5 / OneInch; break;
 	}
 }
@@ -4215,7 +4205,7 @@ bool CLinkageDoc::SetSelectedElementCoordinates( const char *pCoordinateString )
 	char PercentSign;
 	int CoordinateCount = 0;
 	double Percentage = 0.0;
-	
+
 	int SelectedConnectorCount = GetSelectedConnectorCount();
 	int SelectedLinkCount = GetSelectedLinkCount( true );
 	CConnector *pConnector = (CConnector*)GetSelectedConnector( 0 );
@@ -4273,12 +4263,10 @@ bool CLinkageDoc::SetSelectedElementCoordinates( const char *pCoordinateString )
 				return false;
 
 			return ChangeLinkLength( pLink, xValue, false );
-
 		}
 		return false;
 	}
 
-	
 	int ExpectedCoordinateCount = SelectedConnectorCount == 1 ? 2 : 1;
 
 	if( CoordinateCount != ExpectedCoordinateCount )
@@ -4309,7 +4297,7 @@ bool CLinkageDoc::SetSelectedElementCoordinates( const char *pCoordinateString )
 	else if( SelectedConnectorCount == 3 )
 	{
 		// Angle
-		CConnector *pConnector2 = GetSelectedConnector( 2 ); 
+		CConnector *pConnector2 = GetSelectedConnector( 2 );
 		if( pConnector2 != 0 && pConnector2->IsSlider() )
 			return false;
 		if( IsLinkLocked( pConnector2 ) )
@@ -4580,7 +4568,7 @@ bool CLinkageDoc::ConnectGears( CLink *pLink1, CLink *pLink2, double Size1, doub
 		CGearConnection *pConnection = m_GearConnectionList.GetNext( Position );
 		if( pConnection == 0 )
 			continue;
-			
+
 		if( ( pConnection->m_pGear1 == pLink1 && pConnection->m_pGear2 == pLink2 )
 		    || ( pConnection->m_pGear2 == pLink1 && pConnection->m_pGear1 == pLink2 ) )
 		{
@@ -4614,7 +4602,7 @@ bool CLinkageDoc::DisconnectGear( CLink *pLink )
 		CGearConnection *pConnection = m_GearConnectionList.GetNext( Position );
 		if( pConnection == 0 )
 			continue;
-			
+
 		if( pConnection->m_pGear1 == pLink || pConnection->m_pGear2 == pLink )
 		{
 			delete pConnection;
@@ -4839,7 +4827,7 @@ void CLinkageDoc::RemoveGearRatio( CConnector *pGearConnector, CLink *pGearLink 
 		if( pTestGearConnection == 0 || pTestGearConnection->m_pGear1 == 0 || pTestGearConnection->m_pGear2 == 0 )
 			continue;
 
-		if( pTestGearConnection->m_pGear1 == pGearLink || pTestGearConnection->m_pGear2 == pGearLink 
+		if( pTestGearConnection->m_pGear1 == pGearLink || pTestGearConnection->m_pGear2 == pGearLink
 		    || pTestGearConnection->m_pGear1->GetGearConnector() == pGearConnector || pTestGearConnection->m_pGear2->GetGearConnector() == pGearConnector )
 		{
 			m_GearConnectionList.RemoveAt( CurrentPosition );
@@ -4873,7 +4861,7 @@ void CLinkageDoc::FastenThese( CLink *pFastenThis, CConnector *pFastenToThis )
 
 CLinkageDoc *CLinkageDoc::GetPartsDocument( bool bRecompute )
 {
-	/* 
+	/*
 	 * The parts document is a copy of the document but with some HUGE changes.
 	 * Each part if rotated and aligned so that the bottom left corner of the part is at
 	 * 0,0 in the document space. There are no connections between links; each link has a
@@ -5051,7 +5039,4 @@ void CLinkageDoc::CreatePartsFromDocument( CLinkageDoc *pOriginalDoc )
 	m_Links.AddTail( pGroundLink );
 }
 #endif
-
-
-
 

@@ -119,7 +119,6 @@ void CConnectorPropertiesDialog::DoDataExchange(CDataExchange* pDX)
 		m_ColorControl.SetColor( m_Color );
 }
 
-
 BEGIN_MESSAGE_MAP(CConnectorPropertiesDialog, CMyDialog)
 	ON_BN_CLICKED(IDC_RADIO1, &CConnectorPropertiesDialog::OnBnClickedRadio)
 	ON_BN_CLICKED(IDC_RADIO2, &CConnectorPropertiesDialog::OnBnClickedRadio)
@@ -129,7 +128,6 @@ BEGIN_MESSAGE_MAP(CConnectorPropertiesDialog, CMyDialog)
 	ON_BN_CLICKED(IDC_CHECK4, &CConnectorPropertiesDialog::OnBnClickedCheck4)
 	ON_STN_CLICKED( IDC_COLOR, &CConnectorPropertiesDialog::OnStnClickedColor )
 END_MESSAGE_MAP()
-
 
 // CConnectorPropertiesDialog message handlers
 
@@ -143,11 +141,9 @@ void CConnectorPropertiesDialog::OnBnClickedRadio()
 BOOL CConnectorPropertiesDialog::OnInitDialog()
 {
 	CMyDialog::OnInitDialog();
-	
+
 	return TRUE;
 }
-
-
 
 void CConnectorPropertiesDialog::OnBnClickedCheck4()
 {
@@ -160,6 +156,6 @@ void CConnectorPropertiesDialog::OnStnClickedColor()
 	if( dlg.DoModal() == IDOK )
 	{
 		m_Color = dlg.GetColor();
-		m_ColorControl.SetColor( m_Color ); 
+		m_ColorControl.SetColor( m_Color );
 	}
 }

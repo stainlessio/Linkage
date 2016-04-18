@@ -22,7 +22,7 @@ BOOL CMyDialog::OnInitDialog()
 
 	if( !m_Label.IsEmpty() )
 		SetWindowText( m_Label );
-	
+
 	return TRUE;
 }
 
@@ -120,7 +120,6 @@ void AFXAPI CMyDialog::MyAfxTextFloatFormat(CDataExchange* pDX, int nIDC,
         AfxSetWindowText( hWndCtrl, szBuffer );
     }
 }
-
 
 BEGIN_MESSAGE_MAP(CMyDialog, CDialog)
 	ON_WM_ERASEBKGND()

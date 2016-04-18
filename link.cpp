@@ -8,7 +8,7 @@
 
 extern CDebugItemList DebugItemList;
 
-CLink::CLink() 
+CLink::CLink()
 {
 	m_Identifier = 0;
 	m_MoveCount = 0;
@@ -78,7 +78,7 @@ void CLink::GetArea( const GearConnectionList &GearConnections, CFRect &Rect )
 {
 	CFRect AreaRect( DBL_MAX, -DBL_MAX, -DBL_MAX, DBL_MAX );
 	int ConnectorCount = 0;
-	
+
 	POSITION Position = m_Connectors.GetHeadPosition();
 	while( Position != 0 )
 	{
@@ -87,7 +87,7 @@ void CLink::GetArea( const GearConnectionList &GearConnections, CFRect &Rect )
 			continue;
 		CFRect TempRect;
 		pConnector->GetArea( TempRect );
-		
+
 		AreaRect.left = min( AreaRect.left, TempRect.left );
 		AreaRect.right = max( AreaRect.right, TempRect.right );
 		AreaRect.top = max( AreaRect.top, TempRect.top );
@@ -111,7 +111,7 @@ void CLink::GetAdjustArea( const GearConnectionList &GearConnections, CFRect &Re
 {
 	CFRect AreaRect( DBL_MAX, -DBL_MAX, -DBL_MAX, DBL_MAX );
 	int ConnectorCount = 0;
-	
+
 	POSITION Position = m_Connectors.GetHeadPosition();
 	while( Position != 0 )
 	{
@@ -120,7 +120,7 @@ void CLink::GetAdjustArea( const GearConnectionList &GearConnections, CFRect &Re
 			continue;
 		CFRect TempRect;
 		pConnector->GetAdjustArea( TempRect );
-		
+
 		AreaRect.left = min( AreaRect.left, TempRect.left );
 		AreaRect.right = max( AreaRect.right, TempRect.right );
 		AreaRect.top = max( AreaRect.top, TempRect.top );
@@ -192,9 +192,9 @@ bool CLink::PointOnLink( const GearConnectionList &GearConnections, CFPoint Poin
 	// Point on one of the lines method next. This lets the user click outside of the polygon and still get a hit.
 
 	CFPoint *pPreviousPoint = &Points[PointCount-1];
-	
+
 	bool bResult = false;
-	
+
 	for( int Counter = 0; Counter < PointCount; ++Counter )
 	{
 		double Distance = DistanceToLine( *pPreviousPoint, Points[Counter], CFPoint( Point ) );
@@ -220,9 +220,9 @@ void CLink::Reset( void )
 {
 	m_ActuatorExtension = 0;
 	m_TempActuatorExtension = 0;
-	m_RotationAngle = 0.0; 
+	m_RotationAngle = 0.0;
 	m_TempRotationAngle = 0.0;
-	SetPositionValid( true ); 
+	SetPositionValid( true );
 
 	POSITION Position = m_Connectors.GetHeadPosition();
 	while( Position != 0 )
@@ -243,7 +243,7 @@ bool CLink::RotateAround( CConnector* pConnector )
 		return false;
 
 	pConnector->SetTempFixed( true );
-		
+
 	CFPoint Offset;
 	Offset.x = pConnector->GetTempPoint().x - pConnector->GetOriginalPoint().x;
 	Offset.y = pConnector->GetTempPoint().y - pConnector->GetOriginalPoint().y;
@@ -254,12 +254,12 @@ bool CLink::RotateAround( CConnector* pConnector )
 		CConnector* pUseConnector = m_Connectors.GetNext( Position );
 		if( pUseConnector == 0 || pUseConnector == pConnector )
 			continue;
-			
+
 		// Is this connector connected to something fixed? If so, we should
-		// get an error instead of trying to move it. This will break 
+		// get an error instead of trying to move it. This will break
 		// locomotive drive wheel assemblies but that is acceptable at this
 		// time.
-		
+
 		if( pConnector->IsInput() )
 		{
 			CList<CLink*,CLink*> *pList = pUseConnector->GetLinkList();
@@ -276,7 +276,7 @@ bool CLink::RotateAround( CConnector* pConnector )
 					CConnector* pAnotherConnector = pLink->GetConnectorList()->GetNext( Position3 );
 					if( pAnotherConnector == 0 || pAnotherConnector == pConnector || pAnotherConnector == pUseConnector )
 						continue;
-						
+
 					// Any connectors of this link that are fixed/anchors will
 					// make us unable to move pUseConnector.
 					if( pAnotherConnector->IsFixed() || pAnotherConnector->IsTempFixed() )
@@ -289,7 +289,7 @@ bool CLink::RotateAround( CConnector* pConnector )
 				}
 			}
 		}
-					
+
 		CFPoint Temp = pUseConnector->GetOriginalPoint();
 
 		if( IsActuator() )
@@ -302,7 +302,7 @@ bool CLink::RotateAround( CConnector* pConnector )
 		Temp.x += Offset.x;
 		Temp.y += Offset.y;
 		pUseConnector->MovePoint( Temp );
-		
+
 		pUseConnector->RotateAround( pConnector->GetTempPoint(), pConnector->GetTempRotationAngle() );
 		pUseConnector->SetTempFixed( true );
 		++m_MoveCount;
@@ -337,7 +337,7 @@ bool CLink::RotateAround( CConnector* pConnector )
 					Temp.x += Offset.x;
 					Temp.y += Offset.y;
 					pMoveConnector->MovePoint( Temp );
-		
+
 					pMoveConnector->RotateAround( pConnector->GetTempPoint(), pConnector->GetTempRotationAngle() );
 					pMoveConnector->SetTempFixed( true );
 				}
@@ -371,10 +371,10 @@ bool CLink::FixAll( void )
 	// There are at least two fixed connectors. Either move all of the others
 	// to move the link into position or return false because some cannot be
 	// moved to the proper location.
-	
+
 	if( GetFixedConnectorCount() < 2 )
 		return false;
-		
+
 	CConnector *pPreviousFixed = 0;
 	CConnector *pFixed1 = 0;
 	CConnector *pFixed2 = 0;
@@ -394,7 +394,7 @@ bool CLink::FixAll( void )
 				// Check to make sure it's probably in the right place already.
 				double d1 = Distance( pFixed1->GetOriginalPoint(), pPreviousFixed->GetOriginalPoint() );
 				double d2 = Distance( pFixed1->GetPoint(), pPreviousFixed->GetPoint() );
-				
+
 				double Difference = fabs( d2 - d1 );
 				if( Difference > ( d1 / 1000.0 ) )
 					return false;
@@ -403,17 +403,17 @@ bool CLink::FixAll( void )
 			pPreviousFixed = pConnector;
 		}
 	}
-	
+
 	if( pFixed1 == 0 || pFixed2 == 0 )
 		return false;
-		
+
 	// All of the fixed connectors are where they should be. Rotate the rest
 	// to match.
-	
+
 	pFixed1->SetRotationAngle( GetAngle( pFixed1->GetTempPoint(), pFixed2->GetTempPoint(), pFixed1->GetOriginalPoint(), pFixed2->GetOriginalPoint() ) );
 	if( !RotateAround( pFixed1 ) )
 		return false;
-		
+
 	return true;
 }
 void CLink::InitializeForMove( void )
@@ -424,7 +424,7 @@ void CLink::InitializeForMove( void )
 		CConnector* pConnector = m_Connectors.GetNext( Position );
 		if( pConnector == 0 )
 			continue;
-			
+
 		pConnector->MovePoint( pConnector->GetPoint() );
 		pConnector->SetPositionValid( true );
 	}
@@ -433,14 +433,14 @@ void CLink::InitializeForMove( void )
 int CLink::GetFixedConnectorCount( void )
 {
 	int Count = 0;
-	
+
 	POSITION Position = m_Connectors.GetHeadPosition();
 	while( Position != 0 )
 	{
 		CConnector* pConnector = m_Connectors.GetNext( Position );
 		if( pConnector == 0 )
 			continue;
-			
+
 		if( pConnector->IsAnchor() || pConnector->IsTempFixed() )
 			++Count;
 	}
@@ -450,14 +450,14 @@ int CLink::GetFixedConnectorCount( void )
 int CLink::GetInputConnectorCount( void )
 {
 	int Count = 0;
-	
+
 	POSITION Position = m_Connectors.GetHeadPosition();
 	while( Position != 0 )
 	{
 		CConnector* pConnector = m_Connectors.GetNext( Position );
 		if( pConnector == 0 )
 			continue;
-			
+
 		if( pConnector->IsAnchor() && pConnector->IsInput() )
 			++Count;
 	}
@@ -468,14 +468,14 @@ CConnector * CLink::GetFixedConnector( void )
 {
 	int Count = 0;
 	CConnector* pFixedConnector = 0;
-	
+
 	POSITION Position = m_Connectors.GetHeadPosition();
 	while( Position != 0 )
 	{
 		CConnector* pConnector = m_Connectors.GetNext( Position );
 		if( pConnector == 0 )
 			continue;
-			
+
 		if( pConnector->IsAnchor() || pConnector->IsTempFixed() )
 		{
 			pFixedConnector = pConnector;
@@ -489,14 +489,14 @@ CConnector* CLink::GetCommonConnector( CLink *pLink1, CLink *pLink2 )
 {
 	if( pLink1 == 0 || pLink2 == 0)
 		return 0;
-		
+
 	POSITION Position1 = pLink1->GetConnectorList()->GetHeadPosition();
 	while( Position1 != 0 )
 	{
 		CConnector* pConnector1 = pLink1->GetConnectorList()->GetNext( Position1 );
 		if( pConnector1 == 0 )
 			continue;
-			
+
 		POSITION Position2 = pLink2->GetConnectorList()->GetHeadPosition();
 		while( Position2 != 0 )
 		{
@@ -533,7 +533,7 @@ void CLink::AddConnector( class CConnector* pConnector )
 {
 	if( m_Connectors.Find( pConnector ) != 0 )
 		return;
-	m_Connectors.AddTail( pConnector ); 
+	m_Connectors.AddTail( pConnector );
 }
 
 void CLink::SlideBetween( class CConnector *pSlider, class CConnector *pConnector1, class CConnector *pConnector2 )
@@ -545,7 +545,7 @@ void CLink::SlideBetween( class CConnector *pSlider, class CConnector *pConnecto
 	{
 		if( m_ConnectedSliders.Find( pSlider ) != 0 )
 			return;
-		m_ConnectedSliders.AddTail( pSlider ); 
+		m_ConnectedSliders.AddTail( pSlider );
 	}
 }
 
@@ -602,7 +602,7 @@ bool CLink::IsSelected( bool bIsSelectedConnector )
 	// that has only one connector and it's selected
 	// is considered a selected Link (but not drawn
 	// that way for the user).
-	
+
 	if( GetConnectorCount() == 1 && !IsGear() )
 	{
 		CConnector *pConnector = m_Connectors.GetHead();
@@ -646,7 +646,6 @@ CString CLink::GetIdentifierString( bool bDebugging )
 		return m_Name;
 }
 
-
 bool CLink::CanOnlySlide( CConnector** pLimit1, CConnector** pLimit2, CConnector** pSlider1, CConnector** pSlider2, bool *pbSlidersOnLink )
 {
 	/*
@@ -655,7 +654,7 @@ bool CLink::CanOnlySlide( CConnector** pLimit1, CConnector** pLimit2, CConnector
 	 * then switch to testing the connectos on this link that are
 	 * sliders. In either case, if we find two sliders that slide on
 	 * this link or this link slides on another, return true with some
-	 * infomation about the sliders. Note that sliders on another link 
+	 * infomation about the sliders. Note that sliders on another link
 	 * must be fixed but sliders on this link require that the other link
 	 * be fixed.
 	 *
@@ -680,7 +679,7 @@ bool CLink::CanOnlySlide( CConnector** pLimit1, CConnector** pLimit2, CConnector
 				if( !pCheckSlider1->IsFixed() )
 					continue;
 			}
-			
+
 			CConnector* pLimit1_1 = 0;
 			CConnector* pLimit1_2 = 0;
 			if( !pCheckSlider1->GetSlideLimits( pLimit1_1, pLimit1_2 ) )
@@ -709,7 +708,7 @@ bool CLink::CanOnlySlide( CConnector** pLimit1, CConnector** pLimit2, CConnector
 				CConnector* pLimit2_2 = 0;
 				if( !pCheckSlider2->GetSlideLimits( pLimit2_1, pLimit2_2 ) )
 					continue;
-				
+
 				if( Try == 1 )
 				{
 					if( !pLimit2_1->IsFixed() || !pLimit2_2->IsFixed() )
@@ -763,13 +762,12 @@ void CLink::SetActuator( bool bActuator )
 		m_bActuator = false;
 		return;
 	}
-	
+
 	bool bNewActuator = bActuator && !m_bActuator;
-	m_bActuator = bActuator; 
+	m_bActuator = bActuator;
 
 	if( bNewActuator )
 	{
-
 		POSITION Position = m_Connectors.GetHeadPosition();
 		if( Position == 0 )
 			return;
@@ -825,8 +823,8 @@ void CLink::IncrementExtension( double Increment )
 
 void CLink::SetExtension( double Value )
 {
-	m_TempActuatorExtension = Value; 
-	
+	m_TempActuatorExtension = Value;
+
 	// The extension is used to calculate the position of the actuator
 	// where one complete cycle is twice the throw distsance. Because
 	// of this, this code can subtract the throw distance times two
@@ -864,7 +862,7 @@ double CLink::GetActuatedConnectorDistance( CConnector *pConnector1, CConnector*
 
 void CLink::SetStroke( double Stroke )
 {
-	m_ActuatorStroke = Stroke; 
+	m_ActuatorStroke = Stroke;
 	m_ActuatorExtension = 0;
 	m_TempActuatorExtension = 0;
 
@@ -922,7 +920,6 @@ void CLink::MakePermanent( void )
 	m_RotationAngle = m_TempRotationAngle;
 }
 
-
 CFPoint *CLink::ComputeHull( int *Count, bool bUseOriginalPoints )
 {
 	if( m_pHull != 0 )
@@ -939,7 +936,7 @@ CFPoint *CLink::ComputeHull( int *Count, bool bUseOriginalPoints )
 
 CFPoint *CLink::GetHull( int &Count, bool bUseOriginalPoints )
 {
-	// Just always compute it      
+	// Just always compute it
 	// if( m_pHull == 0 )
 		ComputeHull( 0, bUseOriginalPoints );
 	Count = m_HullCount;
@@ -1041,7 +1038,7 @@ bool CLink::GetGearRadii( const GearConnectionList &ConnectionList, std::list<do
 		CGearConnection *pConnection = ConnectionList.GetNext( Position );
 		if( pConnection == 0 )
 			continue;
-			
+
 		if( pConnection->m_pGear1 != this && pConnection->m_pGear2 != this )
 			continue;
 

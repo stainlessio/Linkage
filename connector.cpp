@@ -10,8 +10,8 @@ static CString GetAlphaIdentifier( int ID )
 {
 	if( ID < 52 )
 		return CString( ALPHABET[ID] );
-	
-	CString TempString; 
+
+	CString TempString;
 	TempString.Format( "%c%d", ALPHABET[ID%52], ID / 52 );
 	return TempString;
 }
@@ -45,7 +45,7 @@ void CConnector::Reset( void )
 	m_Color = RGB( 200, 200, 200 );
 }
 
-CConnector::CConnector() 
+CConnector::CConnector()
 {
 	Reset();
 }
@@ -94,9 +94,8 @@ bool CConnector::PointOnConnector( CFPoint Point, double TestDistance )
 void CConnector::AddLink( class CLink* pLink )
 {
 	if( m_Links.Find( pLink ) == 0 )
-		m_Links.AddTail( pLink ); 
+		m_Links.AddTail( pLink );
 }
-
 
 CLink* CConnector::GetLink( int Index )
 {
@@ -127,20 +126,20 @@ int CConnector::GetSelectedLinkCount( void )
 void CConnector::RotateAround( CFPoint& Point, double Angle )
 {
 	SetTempFixed( true );
-	
+
 	m_TempPoint.RotateAround( Point, Angle );
 
 /*	Angle *= 0.0174532925; // Convert to radians.
-	
+
 	double x = m_TempPoint.x - Point.x;
 	double y = m_TempPoint.y - Point.y;
-	
+
 	double Cosine = cos( Angle );
 	double Sine = sin( Angle );
-	
+
 	double x1 = x * Cosine - y * Sine;
 	double y1 = x * Sine + y * Cosine;
-	
+
 	m_TempPoint.x = x1 + Point.x;
 	m_TempPoint.y = y1 + Point.y;
 	*/
@@ -194,7 +193,7 @@ CFPoint * CConnector::GetMotionPath( int &StartPoint, int &PointCount, int &MaxP
 {
 	if( m_PointCount < 2 )
 		return 0;
-		
+
 	StartPoint = m_StartPoint;
 	PointCount = m_PointCount;
 	MaxPoint = MAX_DRAWING_POINTS - 1;
@@ -205,17 +204,17 @@ void CConnector::AddMotionPoint( void )
 {
 	if( !m_bDrawingConnector )
 		return;
-		
+
 	++m_DrawingPointCounter;
 	if( m_DrawingPointCounter < 3 )
 		return;
-		
+
 	m_DrawingPointCounter = 0;
-		
+
 	CFPoint Point = GetPoint();
 
 	if( m_PointCount < MAX_DRAWING_POINTS )
-	{	
+	{
 		if( m_PointCount > 0 && m_DrawingPoints[m_PointCount] == Point )
 			return;
 		m_DrawingPoints[m_PointCount] = Point;
@@ -233,13 +232,13 @@ void CConnector::AddMotionPoint( void )
 	}
 }
 
-void CConnector::Reset( bool bClearMotionPath ) 
+void CConnector::Reset( bool bClearMotionPath )
 {
-	m_Point = m_OriginalPoint; 
-	m_PreviousPoint = m_OriginalPoint; 
-	m_RotationAngle = 0.0; 
+	m_Point = m_OriginalPoint;
+	m_PreviousPoint = m_OriginalPoint;
+	m_RotationAngle = 0.0;
 	m_TempRotationAngle = 0.0;
-	SetPositionValid( true ); 
+	SetPositionValid( true );
 	if( bClearMotionPath )
 	{
 		m_StartPoint = 0;
@@ -301,7 +300,7 @@ void CConnector::SlideBetween( class CConnector *pConnector1, class CConnector *
 
 	bool bSet = pConnector1 != 0;
 	CLink *pLink = 0;
-	
+
 	if( bSet )
 	{
 		pLink = pConnector1->GetSharingLink( pConnector2 );
@@ -416,17 +415,17 @@ class CConnector * ConnectorList::Find( class CConnector *pConnector )
 }
 
 bool CConnector::GetSlideLimits( CFPoint &Point1, CFPoint &Point2 )
-{ 
+{
 	if(  m_pSlideLimits[0] != 0 )
 		Point1 = m_pSlideLimits[0]->GetPoint();
 	if(  m_pSlideLimits[1] != 0 )
 		Point2 = m_pSlideLimits[1]->GetPoint();
-	return IsSlider() && m_pSlideLimits[0] != 0; 
+	return IsSlider() && m_pSlideLimits[0] != 0;
 }
 
-CFPoint CConnector::GetTempPoint( void ) 
+CFPoint CConnector::GetTempPoint( void )
 {
-	return IsAnchor() ? m_OriginalPoint : m_TempPoint; 
+	return IsAnchor() ? m_OriginalPoint : m_TempPoint;
 }
 
 bool CConnector::GetSliderArc( CFArc &TheArc,bool bGetOriginal )
@@ -470,10 +469,10 @@ double CConnector::GetSlideRadius( void )
 	CConnector *pLimit2;
 	if( !GetSlideLimits( pLimit1, pLimit2 ) )
 		return 0;
-	return sign * max( fabs( m_SlideRadius ), ( Distance( pLimit1->GetPoint(), pLimit2->GetPoint() ) / 2 ) + 0.0009 ); 
+	return sign * max( fabs( m_SlideRadius ), ( Distance( pLimit1->GetPoint(), pLimit2->GetPoint() ) / 2 ) + 0.0009 );
 }
 
-double CConnector::GetOriginalSlideRadius( void ) 
+double CConnector::GetOriginalSlideRadius( void )
 {
 	if( m_OriginalSlideRadius == 0 )
 		return 0;
@@ -484,5 +483,5 @@ double CConnector::GetOriginalSlideRadius( void )
 	CConnector *pLimit2;
 	if( !GetSlideLimits( pLimit1, pLimit2 ) )
 		return 0;
-	return sign * max( fabs( m_OriginalSlideRadius ), ( Distance( pLimit1->GetOriginalPoint(), pLimit2->GetOriginalPoint() ) / 2 ) + 0.0009 ); 
+	return sign * max( fabs( m_OriginalSlideRadius ), ( Distance( pLimit1->GetOriginalPoint(), pLimit2->GetOriginalPoint() ) / 2 ) + 0.0009 );
 }

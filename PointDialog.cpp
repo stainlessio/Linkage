@@ -55,19 +55,17 @@ void CPointPropertiesDialog::DoDataExchange(CDataExchange* pDX)
 		m_ColorControl.SetColor( m_Color );
 }
 
-
 BEGIN_MESSAGE_MAP(CPointPropertiesDialog, CMyDialog)
 	ON_BN_CLICKED(IDC_CHECK1, &CPointPropertiesDialog::OnBnClickedCheck1)
 	ON_STN_CLICKED( IDC_COLOR, &CPointPropertiesDialog::OnStnClickedColor )
 END_MESSAGE_MAP()
-
 
 // CPointPropertiesDialog message handlers
 
 BOOL CPointPropertiesDialog::OnInitDialog()
 {
 	CMyDialog::OnInitDialog();
-	
+
 	return TRUE;
 }
 
@@ -141,6 +139,6 @@ void CPointPropertiesDialog::OnStnClickedColor()
 	if( dlg.DoModal() == IDOK )
 	{
 		m_Color = dlg.GetColor();
-		m_ColorControl.SetColor( m_Color ); 
+		m_ColorControl.SetColor( m_Color );
 	}
 }

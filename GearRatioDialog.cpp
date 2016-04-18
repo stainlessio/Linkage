@@ -6,7 +6,6 @@
 #include "GearRatioDialog.h"
 #include "afxdialogex.h"
 
-
 // CGearRatioDialog dialog
 
 IMPLEMENT_DYNAMIC(CGearRatioDialog, CMyDialog)
@@ -20,7 +19,6 @@ CGearRatioDialog::CGearRatioDialog(CWnd* pParent /*=NULL*/)
 , m_GearChainSelection( 0 )
 , m_bUseRadiusValues( FALSE )
 {
-
 }
 
 CGearRatioDialog::~CGearRatioDialog()
@@ -42,15 +40,12 @@ void CGearRatioDialog::DoDataExchange(CDataExchange* pDX)
 	OnBnClickedRadio();
 }
 
-
 BEGIN_MESSAGE_MAP(CGearRatioDialog, CMyDialog)
 	ON_BN_CLICKED( IDC_RADIO1, &CGearRatioDialog::OnBnClickedRadio )
 	ON_BN_CLICKED( IDC_RADIO2, &CGearRatioDialog::OnBnClickedRadio )
 END_MESSAGE_MAP()
 
-
 // CGearRatioDialog message handlers
-
 
 void CGearRatioDialog::OnBnClickedRadio()
 {

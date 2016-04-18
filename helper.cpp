@@ -18,7 +18,7 @@ int GetxAty( int y, int x1, int y1, int x2, int y2, bool* pbValid )
 		}
 	return x2 + (int)( (double)( x1 - x2 ) * ( (double)( y - y2 ) / (double)( y1 - y2 ) ) );
 	}
-	
+
 int GetyAtx( int x, int x1, int y1, int x2, int y2, bool* pbValid )
 	{
 	if( pbValid != NULL )

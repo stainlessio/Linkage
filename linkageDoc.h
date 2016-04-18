@@ -223,7 +223,6 @@ public:
 	static CString GetUnitsString( CLinkageDoc::_Units Units );
 	static CLinkageDoc::_Units GetUnitsValue( const char *pUnits );
 
-	int GetUnfinishedSimulationSteps( void ) { return m_DesiredSimulationStep - m_SimulationStep; }
 	void RemoveGearRatio( CConnector *pGearConnector, CLink *pGearLink );
 
 private:
@@ -239,8 +238,8 @@ private:
 	enum _Units m_Units;
 	double m_ScaleFactor;
 
-	int m_SimulationStep;
-	int m_DesiredSimulationStep;
+//	int m_SimulationStep;
+//	int m_DesiredSimulationStep;
 
 	CUndoRecord *m_pUndoList;
 	CUndoRecord *m_pUndoListEnd;

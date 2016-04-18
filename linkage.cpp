@@ -25,20 +25,20 @@ static char THIS_FILE[] = __FILE__;
 class CMyDocTemplate : public CSingleDocTemplate
 {
        DECLARE_DYNAMIC(CMyDocTemplate)
- 
+
 // Constructors
 public:
     CMyDocTemplate(UINT nIDResource,  CRuntimeClass* pDocClass,
-              CRuntimeClass* pFrameClass, CRuntimeClass* pViewClass) 
+              CRuntimeClass* pFrameClass, CRuntimeClass* pViewClass)
 			  : CSingleDocTemplate(nIDResource, pDocClass, pFrameClass, pViewClass) {}
     virtual ~CMyDocTemplate() {}
- 
+
 // Overrides
 public:
     CDocTemplate::Confidence MatchDocType(LPCTSTR _lpszPathName, CDocument*& _rpDocMatch)
 	{
 		Confidence con ;
- 
+
 		con = CDocTemplate::MatchDocType( _lpszPathName, _rpDocMatch) ;
 		if( con == CDocTemplate::yesAlreadyOpen )
 		{
@@ -55,7 +55,7 @@ public:
 };
 
 IMPLEMENT_DYNAMIC(CMyDocTemplate, CSingleDocTemplate)
- 
+
 /////////////////////////////////////////////////////////////////////////////
 // CLinkageApp
 
@@ -116,11 +116,11 @@ BOOL CLinkageApp::InitInstance()
 	// such as the name of your company or organization
 	SetRegistryKey(_T("rectorsquid"));
 	LoadStdProfileSettings( 8 );  // Load standard INI file options
-	
+
 	// Stop stupid MFC action to overwrite my accelerators with those in
 	// a registery setting.
 	WriteProfileString( "Workspace\\Keyboard-0" , "Accelerators", NULL );
-	
+
 	InitContextMenuManager();
 	InitShellManager();
 
@@ -141,7 +141,6 @@ BOOL CLinkageApp::InitInstance()
 		RUNTIME_CLASS(CMainFrame),       // main SDI frame window
 		RUNTIME_CLASS(CLinkageView));
 	AddDocTemplate(pDocTemplate);
-
 
 	// Enable DDE Execute open
 	EnableShellOpen();
@@ -195,7 +194,7 @@ void CLinkageApp::SetPrinterOrientation( int OrientationMode )
 		if( pDevMode )
 		{
 			pDevMode->dmOrientation = OrientationMode;
-		
+
 			// Unlock memory handle.
 			lpDevNames = (LPDEVNAMES)GlobalLock(pd.hDevNames);
 			lpszDriverName = (LPTSTR )lpDevNames + lpDevNames->wDriverOffset;

@@ -188,7 +188,7 @@ void CDXFFile::DXF_Dimension(double x1, double y1, double x2, double y2, double 
 	temp << "|1001|ACAD|1000|DSTYLE|1002|{|1070|   287|1070|     3|1070|    40|1040|" << DimScale << "|1070|   271|1070|     3|1070|   272|1070|     3|1070|   279|1070|     0|1002|}|";
 
 	DXF_BodyText += temp.str();
-	
+
 	//All dimensions need to be referenced in the header information
 	DXF_BuildBlockBody();
 }
@@ -241,7 +241,7 @@ void CDXFFile::DXF_ShowText(double x, double y, double eAng, double eRad, const 
 
 #endif
 
-#if 0 
+#if 0
 
 // The caller draws their own arrow heads.
 
@@ -271,7 +271,6 @@ void CDXFFile::DXF_ArrowHead(double iRadians, double sngX, double sngY)
 }
 
 #endif
-
 
 void CDXFFile::DXF_Polyline( int Count, double *coordinate, bool bClosed )
 {

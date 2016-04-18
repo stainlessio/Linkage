@@ -6,7 +6,6 @@
 #include "AngleDialog.h"
 #include "afxdialogex.h"
 
-
 // CAngleDialog dialog
 
 IMPLEMENT_DYNAMIC(CAngleDialog, CMyDialog)
@@ -15,7 +14,6 @@ CAngleDialog::CAngleDialog(CWnd* pParent /*=NULL*/)
 	: CMyDialog( pParent, CAngleDialog::IDD )
 	, m_Angle(0)
 {
-
 }
 
 CAngleDialog::~CAngleDialog()
@@ -37,9 +35,7 @@ void CAngleDialog::DoDataExchange(CDataExchange* pDX)
 	}
 }
 
-
 BEGIN_MESSAGE_MAP(CAngleDialog, CMyDialog)
 END_MESSAGE_MAP()
-
 
 // CAngleDialog message handlers

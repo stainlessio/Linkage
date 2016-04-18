@@ -17,17 +17,15 @@ static char THIS_FILE[]=__FILE__;
 //////////////////////////////////////////////////////////////////////
 CColorCursor::CColorCursor()
 {
-
 }
 
 CColorCursor::~CColorCursor()
 {
-
 }
 
 //////////////////////////////////////////////////////////////////////
-//  CreateCursorFromBitmap 
-//  Function to create a cursor from HBITMAP. 
+//  CreateCursorFromBitmap
+//  Function to create a cursor from HBITMAP.
 //  Pass bitmaps having standard cursor sizes like 16*16, 32*32...
 //////////////////////////////////////////////////////////////////////
 HCURSOR CColorCursor::CreateCursorFromBitmap(HBITMAP hSourceBitmap,
@@ -61,31 +59,28 @@ HCURSOR CColorCursor::CreateCursorFromBitmap(HBITMAP hSourceBitmap,
 		iconinfo.hbmColor	= hXorMask;
 
 		hRetCursor = ::CreateIconIndirect(&iconinfo);
-
 	}
 	while(0);
 
 	return hRetCursor;
 }
 
-
 //////////////////////////////////////////////////////////////////////
 //  GetMaskBitmaps
-//  Function to AND and XOR masks for a cursor from a HBITMAP. 
+//  Function to AND and XOR masks for a cursor from a HBITMAP.
 //////////////////////////////////////////////////////////////////////
-void CColorCursor::GetMaskBitmaps(HBITMAP hSourceBitmap, COLORREF clrTransparent, 
+void CColorCursor::GetMaskBitmaps(HBITMAP hSourceBitmap, COLORREF clrTransparent,
 								  HBITMAP &hAndMaskBitmap, HBITMAP &hXorMaskBitmap)
 {
 	HDC hDC					= ::GetDC(NULL);
-	HDC hMainDC				= ::CreateCompatibleDC(hDC); 
-	HDC hAndMaskDC			= ::CreateCompatibleDC(hDC); 
-	HDC hXorMaskDC			= ::CreateCompatibleDC(hDC); 
+	HDC hMainDC				= ::CreateCompatibleDC(hDC);
+	HDC hAndMaskDC			= ::CreateCompatibleDC(hDC);
+	HDC hXorMaskDC			= ::CreateCompatibleDC(hDC);
 
 	//Get the dimensions of the source bitmap
 	BITMAP bm;
 	::GetObject(hSourceBitmap,sizeof(BITMAP),&bm);
 
-	
 	hAndMaskBitmap	= ::CreateCompatibleBitmap(hDC,bm.bmWidth,bm.bmHeight);
 	hXorMaskBitmap	= ::CreateCompatibleBitmap(hDC,bm.bmWidth,bm.bmHeight);
 
@@ -113,7 +108,7 @@ void CColorCursor::GetMaskBitmaps(HBITMAP hSourceBitmap, COLORREF clrTransparent
 			}
 		}
 	}
-	
+
 	::SelectObject(hMainDC,hOldMainBitmap);
 	::SelectObject(hAndMaskDC,hOldAndMaskBitmap);
 	::SelectObject(hXorMaskDC,hOldXorMaskBitmap);

@@ -10,30 +10,30 @@ static int ExpandPolygonCornerx( CFPoint &Point, CFPoint &PreviousPoint, CFPoint
 	// Returns two points that are the proper distance from the original and
 	// are the start and end points for an arc to round the corner. The order
 	// of the two points is correct for the Windows CDC Arc function.
-	
+
 	double Angle = GetAngle( Point, PreviousPoint, NextPoint );
-	
+
 	bool bChangeDirection = ( Angle > 180 );
 	// FORCE TO FALSE. THE HULL SHOULD ALWAYS BE SORTED SO THERE SHOULD BE NO DIRECTION CHANGE!
 	bChangeDirection = false;
-	
+
 	CFLine Line1( PreviousPoint, Point );
 	CFLine Perp1;
 	Line1.PerpendicularLine( Perp1, bChangeDirection ? 1 : -1 );
-	
+
 	CFLine Line2( NextPoint, Point );
 	CFLine Perp2;
 	Line2.PerpendicularLine( Perp2, bChangeDirection ? -1 : 1 );
 
 	Perp1.SetDistance( Distance );
 	Perp2.SetDistance( Distance );
-	
+
 	NewPoint1 = Perp1.GetEnd();
 	NewPoint2 = Perp2.GetEnd();
-	
+
 //	if( fabs( NewPoint1.x - NewPoint2.x ) < 2 && fabs( NewPoint1.y - NewPoint2.y ) < 2 )
 //		return 0;
-		
+
 	return bChangeDirection ? 1 : -1;
 }
 
@@ -46,12 +46,12 @@ class CRendererImplementation
 
 	CRendererImplementation()
 	{
-		m_ScrollPosition.SetPoint( 0, 0 ); 
-		m_Scale = 1.0; 
+		m_ScrollPosition.SetPoint( 0, 0 );
+		m_Scale = 1.0;
 	}
 
 	virtual ~CRendererImplementation() {}
-	
+
 	double Scale( double &length )
 	{
 		length *= m_Scale;
@@ -65,7 +65,7 @@ class CRendererImplementation
 		if( m_Scale > 1 )
 		{
 			/*
-			 * This adjustment lines up the pixels from drawing operations in 
+			 * This adjustment lines up the pixels from drawing operations in
 			 * a way that looks better when shrunk down. This give the anti-aliased
 			 * images, videos, etc., a slightly better look to them.
 			 */
@@ -125,7 +125,7 @@ class CRendererImplementation
 	virtual void SetAttribDC( HDC hDeviceContext ) = 0;
 	virtual int SetBkMode( int nBkMode ) = 0;
 	virtual COLORREF SetBkColor( COLORREF crColor ) = 0;
-	virtual CGdiObject* SelectStockObject( int nIndex ) = 0;	
+	virtual CGdiObject* SelectStockObject( int nIndex ) = 0;
 	virtual COLORREF SetTextColor( COLORREF crColor ) = 0;
 	virtual COLORREF GetTextColor( void ) = 0;
 	virtual void FillRect( LPCRECT lpRect, CBrush* pBrush ) = 0;
@@ -157,30 +157,30 @@ class CRendererImplementation
 		// Returns two points that are the proper distance from the original and
 		// are the start and end points for an arc to round the corner. The order
 		// of the two points is correct for the Windows CDC Arc function.
-	
+
 		double Angle = GetAngle( Point, PreviousPoint, NextPoint );
-	
+
 		bool bChangeDirection = ( Angle > 180 );
 		// FORCE TO FALSE. THE HULL SHOULD ALWAYS BE SORTED SO THERE SHOULD BE NO DIRECTION CHANGE!
 		bChangeDirection = false;
-	
+
 		CFLine Line1( PreviousPoint, Point );
 		CFLine Perp1;
 		Line1.PerpendicularLine( Perp1, bChangeDirection ? 1 : -1 );
-	
+
 		CFLine Line2( NextPoint, Point );
 		CFLine Perp2;
 		Line2.PerpendicularLine( Perp2, bChangeDirection ? -1 : 1 );
 
 		Perp1.SetDistance( Distance );
 		Perp2.SetDistance( Distance );
-	
+
 		NewPoint1 = Perp1.GetEnd();
 		NewPoint2 = Perp2.GetEnd();
-	
+
 		if( fabs( NewPoint1.x - NewPoint2.x ) < 2 && fabs( NewPoint1.y - NewPoint2.y ) < 2 )
 			return 0;
-		
+
 		return bChangeDirection ? 1 : -1;
 	}
 
@@ -188,10 +188,10 @@ class CRendererImplementation
 	{
 		// WARNING, THIS CODE ASSUMES A 100% CONVEX POLYGON. IT WILL NOT
 		// WORK PROPERLY ON A POLYGON WITH ANY CONCAVE-NESS.
-	
+
 		if( PointCount <= 1 )
 			return;
-		
+
 		CPoint *pIntegerPoints = 0;
 		COLORREF NewColor;
 		CFPoint FirstPoint1;
@@ -207,12 +207,12 @@ class CRendererImplementation
 			Green += ( 1.0 - Green ) * .965;
 		if( Blue < 1.0 )
 			Blue += ( 1.0 - Blue ) * .965;
-	
+
 		NewColor = RGB( (int)( Red * 255 ), (int)( Green * 255 ), (int)( Blue * 255 ) );
 		CBrush Brush;
 		Brush.CreateSolidBrush( NewColor );
 		CPen Pen( PS_SOLID, (int)min( 1.0 * m_Scale, 1.0 ), NewColor );
-	
+
 		int ArcDirection = 0;
 
 		if( ExpansionDistance == 0 )
@@ -227,15 +227,15 @@ class CRendererImplementation
 			SetArcDirection( ArcDirection == 1 ? AD_COUNTERCLOCKWISE : AD_CLOCKWISE );
 		}
 		int FirstDirection = ArcDirection;
-	
+
 		CPen *pOldPen = 0;
 		CBrush *pOldBrush = 0;
-	
+
 		if( bFill )
-		{	
+		{
 			pOldPen = SelectObject( &Pen );
 			pOldBrush = SelectObject( &Brush );
-		
+
 			pIntegerPoints = new CPoint [PointCount*2];
 			if( pIntegerPoints == 0 )
 				return;
@@ -253,7 +253,7 @@ class CRendererImplementation
 			// The first arc is drawn invisible so that the MoveTo doesn't
 			// cause a glitch in the drawing. Windows is calculating the first
 			// point in the arc and we don't know where that is for setting the
-			// current drawing point beforehand. This arc is drawn properly 
+			// current drawing point beforehand. This arc is drawn properly
 			// after the loop.
 			if( ArcDirection == 0 )
 				MoveTo( FirstPoint1 );
@@ -266,7 +266,7 @@ class CRendererImplementation
 				SelectObject( pOldPen );
 			}
 		}
-	
+
 		for( int Counter = 1; Counter < PointCount; ++Counter )
 		{
 			CFPoint *pNextPoint = 0;
@@ -287,7 +287,7 @@ class CRendererImplementation
 				ArcDirection = ExpandPolygonCorner( pPoints[Counter], pPoints[Counter-1], *pNextPoint, ExpansionDistance, TempPoint1, TempPoint2 );
 				SetArcDirection( ArcDirection == 1 ? AD_COUNTERCLOCKWISE : AD_CLOCKWISE );
 			}
-		
+
 			if( bFill )
 			{
 				if( ArcDirection != 0 )
@@ -322,7 +322,7 @@ class CRendererImplementation
 				CRgn Region;
 				Region.CreatePolygonRgn( pIntegerPoints, FillPoint, ALTERNATE );
 				delete [] pIntegerPoints;
-		
+
 				FillRgn( &Region, &Brush );
 			//}
 			SelectObject( pOldPen );
@@ -352,7 +352,7 @@ class CRendererImplementation
 	virtual int SelectObject( CRgn* pRgn ) = 0;
 	virtual CBrush* SelectObject( CBrush *pBrush ) = 0;
 	virtual CFPoint GetTextExtent( const char *pString, int Count ) = 0;
-	
+
 	int GetPenSize( int UnscaledSize )
 	{
 		return (int)max( UnscaledSize * m_Scale, 1.0 );
@@ -378,8 +378,8 @@ class CGDIRenderer : public CRendererImplementation
 	CGDIRenderer( bool bIsPrinting )
 	{
 		m_bIsPrinting = bIsPrinting;
-		m_ScrollPosition.SetPoint( 0, 0 ); 
-		m_Scale = 1.0; 
+		m_ScrollPosition.SetPoint( 0, 0 );
+		m_Scale = 1.0;
 		m_bCreatedFont = false;
 		m_pDC = 0;
 		memset( &m_ScaledLogFont, 0, sizeof( m_ScaledLogFont ) );
@@ -563,7 +563,7 @@ class CGDIRenderer : public CRendererImplementation
 //			DrawLine( Line );
 //			MoveTo( (int)x, (int)y );
 //		}
-		
+
 		CFPoint Result = m_pDC->LineTo( (int)x, (int)y );
 		CPen* pPen = m_pDC->GetCurrentPen();
 		if( pPen != 0 )
@@ -592,7 +592,7 @@ class CGDIRenderer : public CRendererImplementation
 //				return CFPoint();
 //
 //			COLORREF PenColor = LogPen.lopnColor;
-//		 
+//
 //			Gdiplus::Color TheColor( 255, GetRValue( PenColor ), GetGValue( PenColor ), GetBValue( PenColor ) );
 //			Gdiplus::REAL PenWidth = (Gdiplus::REAL)LogPen.lopnWidth.x;
 //			PenWidth *= (Gdiplus::REAL)0.2;
@@ -642,7 +642,7 @@ class CGDIRenderer : public CRendererImplementation
 		Scale( x2, y2 );
 		Scale( x3, y3 );
 		Scale( x4, y4 );
-	
+
 		if( bDrawTo )
 			return m_pDC->ArcTo( (int)x1, (int)y1, (int)x2+1, (int)y2+1, (int)x3, (int)y3, (int)x4, (int)y4 ) != 0;
 		else
@@ -681,29 +681,29 @@ class CGDIRenderer : public CRendererImplementation
 		if( fabs( Deviation ) < .1 )
 	//	if( RotationAngle == 0 || RotationAngle == 90 || RotationAngle == 180 || RotationAngle == 270 )
 			return DrawRect( x1, y1, x2, y2 );
-		
+
 		CFPoint Center( ( x1 + x2 ) / 2.0, ( y1 + y2 ) / 2.0 );
 
-		// The addition of .1 causes the display to look better when rounding to 
+		// The addition of .1 causes the display to look better when rounding to
 		// individual pixels. Without this, the rectange appears to rotate sooner
 		// than expected in comparison to other things.
-	
+
 		CFPoint Point1( x1 + .1, y1 + .1 );
 		CFPoint Point2( x2 + .1, y1 + .1 );
 		CFPoint Point3( x2 + .1, y2 + .1 );
 		CFPoint Point4( x1 + .1, y2 + .1 );
-	
+
 		Point1.RotateAround( Center, RotationAngle );
 		Point2.RotateAround( Center, RotationAngle );
 		Point3.RotateAround( Center, RotationAngle );
 		Point4.RotateAround( Center, RotationAngle );
-	
+
 		MoveTo( Point1 );
 		LineTo( Point2 );
 		LineTo( Point3 );
 		LineTo( Point4 );
 		LineTo( Point1 );
-	
+
 		return TRUE;
 	}
 
@@ -747,7 +747,7 @@ class CGDIRenderer : public CRendererImplementation
 	{
 		if( m_Scale <= 1 )
 			return m_pDC->SelectObject( pPen );
-		
+
 		EXTLOGPEN LogPen;
 		if( pPen == 0 || pPen->GetExtLogPen( &LogPen ) == 0 )
 			return m_pDC->SelectObject( pPen );
@@ -774,7 +774,7 @@ class CGDIRenderer : public CRendererImplementation
 				double Window = m_pDC->GetWindowExt().cx;
 				double ExtraScale = Window / Viewport;
 
-				LOGBRUSH LogBrush; 
+				LOGBRUSH LogBrush;
 				LogBrush.lbColor = LogPen.elpColor;
 				LogBrush.lbStyle = PS_SOLID;
 
@@ -827,7 +827,7 @@ class CGDIRenderer : public CRendererImplementation
 
 	CBitmap* SelectObject( CBitmap* pBitmap )
 		{ return m_pDC->SelectObject( pBitmap ); }
-	
+
 	int SelectObject( CRgn* pRgn )
 		{ return m_pDC->SelectObject( pRgn ); }
 
@@ -869,7 +869,7 @@ class CGDIRenderer : public CRendererImplementation
 			Red *= 0.3;
 			Green *= 0.3;
 			Blue *= 0.3;
-	
+
 			COLORREF NewColor = RGB( (int)( Red * 255 ), (int)( Green * 255 ), (int)( Blue * 255 ) );
 			CPen Pen( LogPen.lopnStyle, LogPen.lopnWidth.x, NewColor );
 
@@ -894,7 +894,7 @@ class CGDIRenderer : public CRendererImplementation
 			CrossLine.ReverseDirection();
 			CrossLine.SetDistance( Width );
 			CPen *pOldPen = (CPen*)m_pDC->SelectStockObject( NULL_PEN );
-		
+
 			POINT Points[3];
 			Points[0].x = (int)Scale( CrossLine.GetStart() ).x;
 			Points[0].y = (int)Scale( CrossLine.GetStart() ).y;
@@ -1117,7 +1117,7 @@ class CNullRenderer : public CRendererImplementation
 
 	CBitmap* SelectObject( CBitmap* pBitmap )
 		{ return 0; }
-	
+
 	int SelectObject( CRgn* pRgn )
 		{ return 0; }
 
@@ -1162,8 +1162,8 @@ class CDXFRenderer : public CRendererImplementation
 		m_pDC = new CDC;
 		m_pDC->Attach( ::GetDC( 0 ) );
 
-		m_ScrollPosition.SetPoint( 0, 0 ); 
-		m_Scale = 1.0; 
+		m_ScrollPosition.SetPoint( 0, 0 );
+		m_Scale = 1.0;
 		m_bCreatedFont = false;
 		memset( &m_ScaledLogFont, 0, sizeof( m_ScaledLogFont ) );
 		m_CurrentPosition = CFPoint( 0, 0 );
@@ -1443,18 +1443,18 @@ class CDXFRenderer : public CRendererImplementation
 			Deviation -= 90;
 		if( fabs( Deviation ) < .1 )
 			return DrawRect( x1, y1, x2, y2 );
-		
+
 		CFPoint Center( ( x1 + x2 ) / 2.0, ( y1 + y2 ) / 2.0 );
 
-		// The addition of .1 causes the display to look better when rounding to 
+		// The addition of .1 causes the display to look better when rounding to
 		// individual pixels. Without this, the rectange appears to rotate sooner
 		// than expected in comparison to other things.
-	
+
 		CFPoint Point1( x1, y1 );
 		CFPoint Point2( x2, y1 );
 		CFPoint Point3( x2, y2 );
 		CFPoint Point4( x1, y2 );
-	
+
 		Point1.RotateAround( Center, -RotationAngle );
 		Point2.RotateAround( Center, -RotationAngle );
 		Point3.RotateAround( Center, -RotationAngle );
@@ -1492,7 +1492,7 @@ class CDXFRenderer : public CRendererImplementation
 		CoordinateArray[7] = y2;
 
 		m_DXFFile.DXF_Polyline( 4, CoordinateArray, true );
-		
+
 		return true;
 	}
 
@@ -1514,23 +1514,23 @@ class CDXFRenderer : public CRendererImplementation
 	virtual int ExpandPolygonCorner( CFPoint &Point, CFPoint &PreviousPoint, CFPoint &NextPoint, double Distance, CFPoint &NewPoint1, CFPoint &NewPoint2 )
 	{
 		double Angle = GetAngle( Point, PreviousPoint, NextPoint );
-	
+
 		bool bChangeDirection = false;
-	
+
 		CFLine Line1( PreviousPoint, Point );
 		CFLine Perp1;
 		Line1.PerpendicularLine( Perp1, bChangeDirection ? -1 : 1 );
-	
+
 		CFLine Line2( NextPoint, Point );
 		CFLine Perp2;
 		Line2.PerpendicularLine( Perp2, bChangeDirection ? 1 : -1 );
 
 		Perp1.SetDistance( Distance );
 		Perp2.SetDistance( Distance );
-	
+
 		NewPoint1 = Perp1.GetEnd();
 		NewPoint2 = Perp2.GetEnd();
-	
+
 		return bChangeDirection ? 1 : -1;
 	}
 
@@ -1538,7 +1538,7 @@ class CDXFRenderer : public CRendererImplementation
 	{
 		if( m_Scale <= 1 )
 			return m_pDC->SelectObject( pPen );
-		
+
 		EXTLOGPEN LogPen;
 		if( pPen == 0 || pPen->GetExtLogPen( &LogPen ) == 0 )
 			return m_pDC->SelectObject( pPen );
@@ -1565,7 +1565,7 @@ class CDXFRenderer : public CRendererImplementation
 				double Window = m_pDC->GetWindowExt().cx;
 				double ExtraScale = Window / Viewport;
 
-				LOGBRUSH LogBrush; 
+				LOGBRUSH LogBrush;
 				LogBrush.lbColor = LogPen.elpColor;
 				LogBrush.lbStyle = PS_SOLID;
 
@@ -1600,7 +1600,7 @@ class CDXFRenderer : public CRendererImplementation
 
 	CBitmap* SelectObject( CBitmap* pBitmap )
 		{ return m_pDC->SelectObject( pBitmap ); }
-	
+
 	int SelectObject( CRgn* pRgn )
 		{ return m_pDC->SelectObject( pRgn ); }
 
@@ -1651,7 +1651,7 @@ class CDXFRenderer : public CRendererImplementation
 		CrossLine.ReverseDirection();
 		CrossLine.SetDistance( Width );
 		CPen *pOldPen = (CPen*)m_pDC->SelectStockObject( NULL_PEN );
-		
+
 		DrawLine( CrossLine.GetStart(), CrossLine.GetEnd() );
 		DrawLine( CrossLine.GetEnd(), ToPoint );
 		DrawLine( ToPoint, CrossLine.GetStart() );
@@ -1664,7 +1664,6 @@ class CDXFRenderer : public CRendererImplementation
 		return TRUE;
 	}
 };
-
 
 class CGDIPlusRenderer : public CRendererImplementation
 {
@@ -1681,8 +1680,8 @@ class CGDIPlusRenderer : public CRendererImplementation
 	CGDIPlusRenderer( bool bIsPrinting )
 	{
 		m_bIsPrinting = bIsPrinting;
-		m_ScrollPosition.SetPoint( 0, 0 ); 
-		m_Scale = 1.0; 
+		m_ScrollPosition.SetPoint( 0, 0 );
+		m_Scale = 1.0;
 		m_bCreatedFont = false;
 		m_pDC = 0;
 		memset( &m_ScaledLogFont, 0, sizeof( m_ScaledLogFont ) );
@@ -1866,7 +1865,7 @@ class CGDIPlusRenderer : public CRendererImplementation
 //			DrawLine( Line );
 //			MoveTo( (int)x, (int)y );
 //		}
-		
+
 		CFPoint Result = m_pDC->LineTo( (int)x, (int)y );
 		CPen* pPen = m_pDC->GetCurrentPen();
 		if( pPen != 0 )
@@ -1895,7 +1894,7 @@ class CGDIPlusRenderer : public CRendererImplementation
 //				return CFPoint();
 //
 //			COLORREF PenColor = LogPen.lopnColor;
-//		 
+//
 //			Gdiplus::Color TheColor( 255, GetRValue( PenColor ), GetGValue( PenColor ), GetBValue( PenColor ) );
 //			Gdiplus::REAL PenWidth = (Gdiplus::REAL)LogPen.lopnWidth.x;
 //			PenWidth *= (Gdiplus::REAL)0.2;
@@ -1945,7 +1944,7 @@ class CGDIPlusRenderer : public CRendererImplementation
 		Scale( x2, y2 );
 		Scale( x3, y3 );
 		Scale( x4, y4 );
-	
+
 		if( bDrawTo )
 			return m_pDC->ArcTo( (int)x1, (int)y1, (int)x2+1, (int)y2+1, (int)x3, (int)y3, (int)x4, (int)y4 ) != 0;
 		else
@@ -1984,29 +1983,29 @@ class CGDIPlusRenderer : public CRendererImplementation
 		if( fabs( Deviation ) < .1 )
 	//	if( RotationAngle == 0 || RotationAngle == 90 || RotationAngle == 180 || RotationAngle == 270 )
 			return DrawRect( x1, y1, x2, y2 );
-		
+
 		CFPoint Center( ( x1 + x2 ) / 2.0, ( y1 + y2 ) / 2.0 );
 
-		// The addition of .1 causes the display to look better when rounding to 
+		// The addition of .1 causes the display to look better when rounding to
 		// individual pixels. Without this, the rectange appears to rotate sooner
 		// than expected in comparison to other things.
-	
+
 		CFPoint Point1( x1 + .1, y1 + .1 );
 		CFPoint Point2( x2 + .1, y1 + .1 );
 		CFPoint Point3( x2 + .1, y2 + .1 );
 		CFPoint Point4( x1 + .1, y2 + .1 );
-	
+
 		Point1.RotateAround( Center, RotationAngle );
 		Point2.RotateAround( Center, RotationAngle );
 		Point3.RotateAround( Center, RotationAngle );
 		Point4.RotateAround( Center, RotationAngle );
-	
+
 		MoveTo( Point1 );
 		LineTo( Point2 );
 		LineTo( Point3 );
 		LineTo( Point4 );
 		LineTo( Point1 );
-	
+
 		return TRUE;
 	}
 
@@ -2050,7 +2049,7 @@ class CGDIPlusRenderer : public CRendererImplementation
 	{
 		if( m_Scale <= 1 )
 			return m_pDC->SelectObject( pPen );
-		
+
 		EXTLOGPEN LogPen;
 		if( pPen == 0 || pPen->GetExtLogPen( &LogPen ) == 0 )
 			return m_pDC->SelectObject( pPen );
@@ -2077,7 +2076,7 @@ class CGDIPlusRenderer : public CRendererImplementation
 				double Window = m_pDC->GetWindowExt().cx;
 				double ExtraScale = Window / Viewport;
 
-				LOGBRUSH LogBrush; 
+				LOGBRUSH LogBrush;
 				LogBrush.lbColor = LogPen.elpColor;
 				LogBrush.lbStyle = PS_SOLID;
 
@@ -2130,7 +2129,7 @@ class CGDIPlusRenderer : public CRendererImplementation
 
 	CBitmap* SelectObject( CBitmap* pBitmap )
 		{ return m_pDC->SelectObject( pBitmap ); }
-	
+
 	int SelectObject( CRgn* pRgn )
 		{ return m_pDC->SelectObject( pRgn ); }
 
@@ -2172,7 +2171,7 @@ class CGDIPlusRenderer : public CRendererImplementation
 			Red *= 0.3;
 			Green *= 0.3;
 			Blue *= 0.3;
-	
+
 			COLORREF NewColor = RGB( (int)( Red * 255 ), (int)( Green * 255 ), (int)( Blue * 255 ) );
 			CPen Pen( LogPen.lopnStyle, LogPen.lopnWidth.x, NewColor );
 
@@ -2197,7 +2196,7 @@ class CGDIPlusRenderer : public CRendererImplementation
 			CrossLine.ReverseDirection();
 			CrossLine.SetDistance( Width );
 			CPen *pOldPen = (CPen*)m_pDC->SelectStockObject( NULL_PEN );
-		
+
 			POINT Points[3];
 			Points[0].x = (int)Scale( CrossLine.GetStart() ).x;
 			Points[0].y = (int)Scale( CrossLine.GetStart() ).y;
@@ -2234,8 +2233,8 @@ class CD2DRenderer : public CRendererImplementation
 	CD2DRenderer( bool bIsPrinting )
 	{
 		m_bIsPrinting = bIsPrinting;
-		m_ScrollPosition.SetPoint( 0, 0 ); 
-		m_Scale = 1.0; 
+		m_ScrollPosition.SetPoint( 0, 0 );
+		m_Scale = 1.0;
 		m_bCreatedFont = false;
 		m_pDC = 0;
 		memset( &m_ScaledLogFont, 0, sizeof( m_ScaledLogFont ) );
@@ -2396,8 +2395,7 @@ class CD2DRenderer : public CRendererImplementation
 			return false;
 
 /*		D2D1CreateFactory( D2D1_FACTORY_TYPE_SINGLE_THREADED, &pFactory);
-				
-				
+
 		D2D1_RENDER_TARGET_PROPERTIES props = D2D1::RenderTargetProperties(
 			D2D1_RENDER_TARGET_TYPE_DEFAULT,
 			D2D1::PixelFormat(
@@ -2475,9 +2473,8 @@ class CD2DRenderer : public CRendererImplementation
 
 		pRenderTarget->EndDraw();
 
-
 		return CFPoint( 0, 0 );*/
-		
+
 		CFPoint Result = m_pDC->LineTo( (int)x, (int)y );
 		CPen* pPen = m_pDC->GetCurrentPen();
 		if( pPen != 0 )
@@ -2506,7 +2503,7 @@ class CD2DRenderer : public CRendererImplementation
 //				return CFPoint();
 //
 //			COLORREF PenColor = LogPen.lopnColor;
-//		 
+//
 //			Gdiplus::Color TheColor( 255, GetRValue( PenColor ), GetGValue( PenColor ), GetBValue( PenColor ) );
 //			Gdiplus::REAL PenWidth = (Gdiplus::REAL)LogPen.lopnWidth.x;
 //			PenWidth *= (Gdiplus::REAL)0.2;
@@ -2556,7 +2553,7 @@ class CD2DRenderer : public CRendererImplementation
 		Scale( x2, y2 );
 		Scale( x3, y3 );
 		Scale( x4, y4 );
-	
+
 		if( bDrawTo )
 			return m_pDC->ArcTo( (int)x1, (int)y1, (int)x2+1, (int)y2+1, (int)x3, (int)y3, (int)x4, (int)y4 ) != 0;
 		else
@@ -2595,29 +2592,29 @@ class CD2DRenderer : public CRendererImplementation
 		if( fabs( Deviation ) < .1 )
 	//	if( RotationAngle == 0 || RotationAngle == 90 || RotationAngle == 180 || RotationAngle == 270 )
 			return DrawRect( x1, y1, x2, y2 );
-		
+
 		CFPoint Center( ( x1 + x2 ) / 2.0, ( y1 + y2 ) / 2.0 );
 
-		// The addition of .1 causes the display to look better when rounding to 
+		// The addition of .1 causes the display to look better when rounding to
 		// individual pixels. Without this, the rectange appears to rotate sooner
 		// than expected in comparison to other things.
-	
+
 		CFPoint Point1( x1 + .1, y1 + .1 );
 		CFPoint Point2( x2 + .1, y1 + .1 );
 		CFPoint Point3( x2 + .1, y2 + .1 );
 		CFPoint Point4( x1 + .1, y2 + .1 );
-	
+
 		Point1.RotateAround( Center, RotationAngle );
 		Point2.RotateAround( Center, RotationAngle );
 		Point3.RotateAround( Center, RotationAngle );
 		Point4.RotateAround( Center, RotationAngle );
-	
+
 		MoveTo( Point1 );
 		LineTo( Point2 );
 		LineTo( Point3 );
 		LineTo( Point4 );
 		LineTo( Point1 );
-	
+
 		return TRUE;
 	}
 
@@ -2661,7 +2658,7 @@ class CD2DRenderer : public CRendererImplementation
 	{
 		if( m_Scale <= 1 )
 			return m_pDC->SelectObject( pPen );
-		
+
 		EXTLOGPEN LogPen;
 		if( pPen == 0 || pPen->GetExtLogPen( &LogPen ) == 0 )
 			return m_pDC->SelectObject( pPen );
@@ -2688,7 +2685,7 @@ class CD2DRenderer : public CRendererImplementation
 				double Window = m_pDC->GetWindowExt().cx;
 				double ExtraScale = Window / Viewport;
 
-				LOGBRUSH LogBrush; 
+				LOGBRUSH LogBrush;
 				LogBrush.lbColor = LogPen.elpColor;
 				LogBrush.lbStyle = PS_SOLID;
 
@@ -2741,7 +2738,7 @@ class CD2DRenderer : public CRendererImplementation
 
 	CBitmap* SelectObject( CBitmap* pBitmap )
 		{ return m_pDC->SelectObject( pBitmap ); }
-	
+
 	int SelectObject( CRgn* pRgn )
 		{ return m_pDC->SelectObject( pRgn ); }
 
@@ -2783,7 +2780,7 @@ class CD2DRenderer : public CRendererImplementation
 			Red *= 0.3;
 			Green *= 0.3;
 			Blue *= 0.3;
-	
+
 			COLORREF NewColor = RGB( (int)( Red * 255 ), (int)( Green * 255 ), (int)( Blue * 255 ) );
 			CPen Pen( LogPen.lopnStyle, LogPen.lopnWidth.x, NewColor );
 
@@ -2808,7 +2805,7 @@ class CD2DRenderer : public CRendererImplementation
 			CrossLine.ReverseDirection();
 			CrossLine.SetDistance( Width );
 			CPen *pOldPen = (CPen*)m_pDC->SelectStockObject( NULL_PEN );
-		
+
 			POINT Points[3];
 			Points[0].x = (int)Scale( CrossLine.GetStart() ).x;
 			Points[0].y = (int)Scale( CrossLine.GetStart() ).y;
@@ -2989,7 +2986,7 @@ CBitmap* CRenderer::SelectObject( CBitmap* pBitmap )
 
 	return m_pImplementation->SelectObject( pBitmap );
 }
-	
+
 int CRenderer::SelectObject( CRgn* pRgn )
 {
 	if( m_pImplementation == 0 )
@@ -3026,7 +3023,7 @@ bool CRenderer::DrawArrow( CFPoint FromPoint, CFPoint ToPoint, double Width, dou
 {
 	if( m_pImplementation == 0 )
 		return false;
-	
+
 	return m_pImplementation->DrawArrow( FromPoint, ToPoint, Width, Length );
 }
 
@@ -3059,7 +3056,7 @@ void CRenderer::SetOffset( CFPoint &Offset )
 	if( m_pImplementation == 0 )
 		return;
 
-	m_pImplementation->m_ScrollPosition = Offset; 
+	m_pImplementation->m_ScrollPosition = Offset;
 }
 
 void CRenderer::SetOffset( double dx, double dy )
@@ -3068,7 +3065,7 @@ void CRenderer::SetOffset( double dx, double dy )
 		return;
 
 	m_pImplementation->m_ScrollPosition.x = dx;
-	m_pImplementation->m_ScrollPosition.y = dy; 
+	m_pImplementation->m_ScrollPosition.y = dy;
 }
 
 void CRenderer::SetScale( double Scale )
@@ -3076,7 +3073,7 @@ void CRenderer::SetScale( double Scale )
 	if( m_pImplementation == 0 )
 		return;
 
-	m_pImplementation->m_Scale = Scale; 
+	m_pImplementation->m_Scale = Scale;
 }
 
 double CRenderer::GetScale( void )
@@ -3084,7 +3081,7 @@ double CRenderer::GetScale( void )
 	if( m_pImplementation == 0 )
 		return 1;
 
-	return m_pImplementation->m_Scale; 
+	return m_pImplementation->m_Scale;
 }
 
 CFPoint CRenderer::GetOffset( void )
@@ -3092,7 +3089,7 @@ CFPoint CRenderer::GetOffset( void )
 	if( m_pImplementation == 0 )
 		return CPoint( 0, 0 );
 
-	return m_pImplementation->m_ScrollPosition; 
+	return m_pImplementation->m_ScrollPosition;
 }
 
 CDC * CRenderer::GetDC( void )
@@ -3222,27 +3219,6 @@ int CRenderer::GetYOrientation( void )
 
 	return m_pImplementation->GetYOrientation();
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 	#if 0
 
@@ -3405,6 +3381,5 @@ CRenderer::CRenderer( enum _RenderDestination RendererDestination )
 		case NULL_RENDERER:
 		default:
 			m_pImplementation = new CNullRenderer( false );
-		
 	}
 }

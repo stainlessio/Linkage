@@ -56,16 +56,12 @@ void CLinePropertiesDialog::DoDataExchange(CDataExchange* pDX)
 		m_ColorControl.SetColor( m_Color );
 }
 
-
 BEGIN_MESSAGE_MAP(CLinePropertiesDialog, CMyDialog)
 	ON_BN_CLICKED(IDC_CHECK1, &CLinePropertiesDialog::OnBnClickedCheck1)
 	ON_STN_CLICKED( IDC_COLOR, &CLinePropertiesDialog::OnStnClickedColor )
 END_MESSAGE_MAP()
 
-
 // CLinePropertiesDialog message handlers
-
-
 
 void CLinePropertiesDialog::OnBnClickedCheck1()
 {
@@ -75,13 +71,12 @@ void CLinePropertiesDialog::OnBnClickedCheck1()
 	m_SpinControl.EnableWindow( bUnchecked );
 }
 
-
 void CLinePropertiesDialog::OnStnClickedColor()
 {
 	CColorDialog dlg;
 	if( dlg.DoModal() == IDOK )
 	{
 		m_Color = dlg.GetColor();
-		m_ColorControl.SetColor( m_Color ); 
+		m_ColorControl.SetColor( m_Color );
 	}
 }

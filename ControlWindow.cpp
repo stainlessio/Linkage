@@ -28,7 +28,6 @@ class CControlWindowControl
 	bool m_bCentered; // true if the zero point is at the center of the control.
 };
 
-
 class CControlWindowImplementation
 {
 	public:
@@ -42,11 +41,10 @@ class CControlWindowImplementation
 		m_HandleSize = HANDLESIZE;
 		m_MaxTextWidth = 0;
 		m_CaptureControl = -1;
-		m_Font.CreateFont( -11, 0, 0, 0, FW_NORMAL, 0, 0, 0, 
-							DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, 
+		m_Font.CreateFont( -11, 0, 0, 0, FW_NORMAL, 0, 0, 0,
+							DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS,
 							ANTIALIASED_QUALITY | CLEARTYPE_QUALITY, VARIABLE_PITCH | FF_SWISS,
 							"arial" );
-
 	}
 	~CControlWindowImplementation() {}
 
@@ -54,7 +52,7 @@ class CControlWindowImplementation
 	int m_ControlCount;
 
 	CControlWindowControl m_Controls[m_MAXCONTROLS];
-	
+
 	CControlWindowControl *m_pCaptureControl;
 
 	int m_ControlWidth;
@@ -141,7 +139,6 @@ CControlWindow::~CControlWindow()
 	m_pImplementation = 0;
 }
 
-
 BEGIN_MESSAGE_MAP(CControlWindow, CWnd)
 	ON_WM_LBUTTONDOWN()
 	ON_WM_LBUTTONUP()
@@ -151,10 +148,7 @@ BEGIN_MESSAGE_MAP(CControlWindow, CWnd)
 	ON_WM_ERASEBKGND()
 END_MESSAGE_MAP()
 
-
-
 // CControlWindow message handlers
-
 
 void CControlWindow::OnLButtonDown(UINT nFlags, CPoint point)
 {
@@ -193,7 +187,6 @@ void CControlWindow::OnLButtonUp(UINT nFlags, CPoint point)
 	m_pImplementation->m_CaptureControl = -1;
 	ReleaseCapture();
 }
-
 
 void CControlWindow::OnMouseMove(UINT nFlags, CPoint point)
 {
@@ -313,7 +306,7 @@ int CControlWindow::GetControlId( int Index )
 {
 	if( m_pImplementation == 0 )
 		return 0;
-	
+
 	return m_pImplementation->m_Controls[Index].m_ControlID;
 }
 
@@ -339,7 +332,7 @@ int CControlWindow::GetDesiredHeight( void )
 {
 	if( m_pImplementation == 0 )
 		return 0;
-	
+
 	return m_pImplementation->GetDesiredHeight();
 }
 
@@ -353,7 +346,7 @@ double CControlWindow::GetPosition( int ControlID )
 		if( m_pImplementation->m_Controls[Counter].m_ControlID == ControlID )
 			return m_pImplementation->m_Controls[Counter].m_Position;
 	}
-	
+
 	return 0.0;
 }
 
@@ -389,7 +382,6 @@ void CControlWindow::AddControl( int ControlID, const char *pDescription, int Co
 
 	m_pImplementation->m_ControlCount++;
 }
-
 
 BOOL CControlWindow::OnEraseBkgnd( CDC* pDC )
 {

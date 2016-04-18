@@ -29,7 +29,7 @@ class CPopupGalleryImplementation
 	bool m_bTrackingMouseLeave;
 	int m_SelectedItem;
 	int m_Count;
-	static const int ITEMBORDER = 4; 
+	static const int ITEMBORDER = 4;
 	static const int BORDER = 2;
 	static const int TEXT_BORDER = 10;
 	CMFCToolTipCtrl m_ToolTip;
@@ -52,7 +52,7 @@ class CPopupGalleryImplementation
 };
 
 CPopupGallery::CPopupGallery( int CommandID, int ImageStripResourceID, int ImageWidth )
-{	
+{
 	m_pImplementation = new CPopupGalleryImplementation;
 	if( m_pImplementation == 0 )
 		return;
@@ -147,7 +147,7 @@ void CPopupGallery::SetTooltip( int Index, const char *pString )
 		Description.Truncate( pNewline - pString );
 		Title = pNewline + 1;
 	}
-	
+
 	if( Index < m_pImplementation->m_Count )
 	{
 		m_pImplementation->m_pToolTitles[Index] = Title;
@@ -280,7 +280,7 @@ BEGIN_MESSAGE_MAP(CPopupGallery, CWnd)
 END_MESSAGE_MAP()
 
 bool CPopupGalleryImplementation::GetItemRect( int Index, CRect &Rect )
-{	
+{
 	if( Index >= m_Count )
 		return false;
 
@@ -299,9 +299,8 @@ bool CPopupGalleryImplementation::GetItemRect( int Index, CRect &Rect )
 
 	Rect.SetRect( x, y, x + cx, y + cy );
 
-	return true;		
+	return true;
 }
-
 
 _inline void COLORREF_TO_COLOR16( COLORREF r, TRIVERTEX &v ) { v.Red = ( (int)GetRValue( r ) ) << 8; v.Green = ( (int)GetGValue( r ) ) << 8; v.Blue = ( (int)GetBValue( r ) ) << 8; v.Alpha = 0; }
 
@@ -528,11 +527,11 @@ void CPopupGallery::OnMouseMove(UINT nFlags, CPoint point)
 		CWnd::OnMouseMove( nFlags, point );
 		return;
 	}
-	
+
 	if( !m_pImplementation->m_bTrackingMouseLeave )
 	{
 		m_pImplementation->m_bTrackingMouseLeave = true;
-		
+
 		TRACKMOUSEEVENT tme;
 		tme.cbSize = sizeof(TRACKMOUSEEVENT);
 		tme.dwFlags = TME_LEAVE;
@@ -563,7 +562,6 @@ void CPopupGallery::OnMouseMove(UINT nFlags, CPoint point)
 	CWnd::OnMouseMove( nFlags, point );
 }
 
-
 void CPopupGallery::OnMouseLeave()
 {
 	if( m_pImplementation == 0 )
@@ -580,7 +578,6 @@ void CPopupGallery::OnMouseLeave()
 	m_pImplementation->m_SelectedItem = -1;
 }
 
-
 void CPopupGallery::OnLButtonDown(UINT nFlags, CPoint point)
 {
 	if( m_pImplementation == 0 )
@@ -588,7 +585,6 @@ void CPopupGallery::OnLButtonDown(UINT nFlags, CPoint point)
 
 	m_pImplementation->AnyButtonDown(nFlags, point);
 }
-
 
 void CPopupGallery::OnLButtonUp(UINT nFlags, CPoint point)
 {
@@ -598,7 +594,6 @@ void CPopupGallery::OnLButtonUp(UINT nFlags, CPoint point)
 	m_pImplementation->AnyButtonUp( this, nFlags, point );
 }
 
-
 void CPopupGallery::OnRButtonDown(UINT nFlags, CPoint point)
 {
 	if( m_pImplementation == 0 )
@@ -606,7 +601,6 @@ void CPopupGallery::OnRButtonDown(UINT nFlags, CPoint point)
 
 	m_pImplementation->AnyButtonDown(nFlags, point);
 }
-
 
 void CPopupGallery::OnRButtonUp(UINT nFlags, CPoint point)
 {
@@ -616,19 +610,16 @@ void CPopupGallery::OnRButtonUp(UINT nFlags, CPoint point)
 	m_pImplementation->AnyButtonUp( this, nFlags, point );
 }
 
-
 void CPopupGallery::OnChar(UINT nChar, UINT nRepCnt, UINT nFlags)
 {
 	if( nChar == VK_ESCAPE )
 		HideGallery();
 }
 
-
 void CPopupGallery::OnNcCalcSize(BOOL bCalcValidRects, NCCALCSIZE_PARAMS* lpncsp)
 {
 	InflateRect( &lpncsp->rgrc[0], -2, -2 );
 }
-
 
 void CPopupGallery::OnNcPaint()
 {
@@ -637,7 +628,7 @@ void CPopupGallery::OnNcPaint()
 	CRect Rect;
 	GetWindowRect( &Rect );
 	Rect.OffsetRect( -Rect.left, -Rect.top );
-	
+
 	CBrush Medium( RGB( 180, 180, 180 ) );
 	CPen Dark( PS_SOLID, 1, RGB( 100, 100, 100 ) );
 	CPen Light( PS_SOLID, 1, RGB( 244, 247, 252 ) );

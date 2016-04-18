@@ -1,7 +1,6 @@
 #include "stdafx.h"
 #include "Element.h"
 
-
 CElement::CElement(void)
 {
 	m_bSelected = false;
@@ -54,11 +53,11 @@ void CElement::RemoveFastenElement( class CElement *pElement )
 	}
 }
 
-void CElement::UnfastenTo( void ) 
+void CElement::UnfastenTo( void )
 {
 	CElementItem *pItem = GetFastenedTo();
 	if( pItem != 0 && pItem->GetElement() != 0 )
 		pItem->GetElement()->RemoveFastenElement( this );
-	m_pFastenedTo = CElementItem(); 
+	m_pFastenedTo = CElementItem();
 }
 

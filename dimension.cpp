@@ -1,7 +1,6 @@
 #include "stdafx.h"
 #include "dimension.h"
 
-
 CDimension::CDimension(void)
 {
 	m_Offset = 0;

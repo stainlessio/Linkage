@@ -71,7 +71,6 @@ static const int CONNECTORRADIUS = 5;
 static const int CONNECTORTRIANGLE = 6;
 static const int ANCHORBASE = 4;
 
-
 #ifdef _DEBUG
 //#define new DEBUG_NEW
 #undef THIS_FILE
@@ -122,7 +121,7 @@ BEGIN_MESSAGE_MAP(CLinkageView, CView)
 	ON_UPDATE_COMMAND_UI(ID_MECHANISM_SIMULATE, &CLinkageView::OnUpdateButtonRun)
 	ON_COMMAND(ID_SIMULATION_SIMULATE, &CLinkageView::OnMechanismQuicksim)
 	ON_UPDATE_COMMAND_UI(ID_SIMULATION_SIMULATE, &CLinkageView::OnUpdateButtonRun)
-	
+
 	ON_COMMAND(ID_SIMULATE_INTERACTIVE, &CLinkageView::OnSimulateInteractive)
 	ON_UPDATE_COMMAND_UI(ID_SIMULATE_INTERACTIVE, &CLinkageView::OnUpdateButtonRun)
 
@@ -137,8 +136,6 @@ BEGIN_MESSAGE_MAP(CLinkageView, CView)
 	ON_UPDATE_COMMAND_UI(ID_SIMULATE_FORWARD_BIG, &CLinkageView::OnUpdateSimulateForwardBackward)
 	ON_COMMAND(ID_SIMULATE_BACKWARD_BIG, &CLinkageView::OnSimulateBackwardBig)
 	ON_UPDATE_COMMAND_UI(ID_SIMULATE_BACKWARD_BIG, &CLinkageView::OnUpdateSimulateForwardBackward)
-
-
 
 	ON_COMMAND(ID_SIMULATE_MANUAL, &CLinkageView::OnSimulateManual)
 	ON_UPDATE_COMMAND_UI(ID_SIMULATE_MANUAL, &CLinkageView::OnUpdateButtonRun)
@@ -176,7 +173,7 @@ BEGIN_MESSAGE_MAP(CLinkageView, CView)
 
 	ON_COMMAND( ID_FILE_PRINTFULL, OnPrintFull )
 	ON_UPDATE_COMMAND_UI( ID_FILE_PRINTFULL, OnUpdatePrintFull )
-	
+
 	ON_COMMAND( ID_FILE_PRINT_SETUP, OnFilePrintSetup )
 	ON_COMMAND(ID_INSERT_CONNECTOR, (AFX_PMSG)&CLinkageView::OnInsertConnector)
 	ON_COMMAND(ID_INSERT_POINT,(AFX_PMSG)&CLinkageView::OnInsertPoint)
@@ -239,7 +236,6 @@ BEGIN_MESSAGE_MAP(CLinkageView, CView)
 	ON_COMMAND(ID_ALIGN_FLIPV, &CLinkageView::OnFlipVertical)
 	ON_UPDATE_COMMAND_UI(ID_ALIGN_FLIPV, &CLinkageView::OnUpdateFlipVertical)
 
-
 	ON_COMMAND(ID_VIEW_LABELS, &CLinkageView::OnViewLabels)
 	ON_UPDATE_COMMAND_UI(ID_VIEW_LABELS, &CLinkageView::OnUpdateViewLabels)
 	ON_COMMAND(ID_VIEW_ANGLES, &CLinkageView::OnViewAngles)
@@ -290,10 +286,10 @@ BEGIN_MESSAGE_MAP(CLinkageView, CView)
 	ON_UPDATE_COMMAND_UI(ID_EDIT_COPY, &CLinkageView::OnUpdateEditSelected)
 	ON_COMMAND(ID_EDIT_PASTE, &CLinkageView::OnEditPaste)
 	ON_UPDATE_COMMAND_UI(ID_EDIT_PASTE, &CLinkageView::OnUpdateEditPaste)
-	
+
 	ON_COMMAND(ID_VIEW_BOLD, &CLinkageView::OnViewBold)
 	ON_UPDATE_COMMAND_UI(ID_VIEW_BOLD, &CLinkageView::OnUpdateViewBold)
-	
+
 	ON_COMMAND( ID_VIEW_UNITS, &CLinkageView::OnViewUnits )
 	ON_COMMAND( ID_VIEW_COORDINATES, &CLinkageView::OnViewCoordinates )
 
@@ -408,14 +404,14 @@ CLinkageView::CLinkageView()
 		m_pPopupGallery->SetTooltip( 10, ID_INSERT_MEASUREMENT );
 		m_pPopupGallery->SetTooltip( 11, ID_INSERT_GEAR );
 	}
-	
-	m_SmallFont.CreateFont( -SMALL_FONT_SIZE, 0, 0, 0, FW_LIGHT, 0, 0, 0, 
-							DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, 
+
+	m_SmallFont.CreateFont( -SMALL_FONT_SIZE, 0, 0, 0, FW_LIGHT, 0, 0, 0,
+							DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS,
 							ANTIALIASED_QUALITY | CLEARTYPE_QUALITY, VARIABLE_PITCH | FF_SWISS,
 							"arial" );
 
-	m_MediumFont.CreateFont( -MEDIUM_FONT_SIZE, 0, 0, 0, FW_NORMAL, 0, 0, 0, 
-							DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, 
+	m_MediumFont.CreateFont( -MEDIUM_FONT_SIZE, 0, 0, 0, FW_NORMAL, 0, 0, 0,
+							DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS,
 							ANTIALIASED_QUALITY | CLEARTYPE_QUALITY, VARIABLE_PITCH | FF_SWISS,
 							"arial" );
 
@@ -442,7 +438,7 @@ CLinkageView::CLinkageView()
 
 		m_bShowDimensions = pApp->GetProfileInt( "Settings", "Showdimensions", 0 ) != 0;
 		m_bShowGroundDimensions = pApp->GetProfileInt( "Settings", "Showgrounddimensions", 1 ) != 0;
-								
+
 		m_Rotate0 = pApp->LoadIcon( IDI_ICON5 );
 		m_Rotate1 = pApp->LoadIcon( IDI_ICON1 );
 		m_Rotate2 = pApp->LoadIcon( IDI_ICON2 );
@@ -454,7 +450,7 @@ CLinkageView::CLinkageView()
 
 	GdiplusStartupInput gdiplusStartupInput;
 	GdiplusStartup( &m_gdiplusToken, &gdiplusStartupInput, 0 );
-							
+
 	timeBeginPeriod( 1 );
 	m_TimerID = 0;
 }
@@ -472,7 +468,6 @@ void CLinkageView::GetSetGroundDimensionVisbility( bool bSave )
 	// Just use the one set of settings for now - and think about this for a while.
 	ShowDimensionsName = "Showdimensions";
 	ShowGroundDimensionsName = "Showgrounddimensions";
-
 
 	if( bSave )
 	{
@@ -581,7 +576,6 @@ CLinkageDoc* CLinkageView::GetDocument() // non-debug version is inline
 /////////////////////////////////////////////////////////////////////////////
 // CLinkageView drawing
 
-	
 void CLinkageView::GetAdjustmentControlRect( AdjustmentControl Control, CRect &Rect )
 {
 	CFRect FRect;
@@ -593,7 +587,7 @@ void CLinkageView::GetAdjustmentControlRect( AdjustmentControl Control, CFRect &
 {
 	CFRect PixelRect = Scale( m_SelectionContainerRect );
 	PixelRect.InflateRect( 4, 4 );
-	
+
 	if( m_VisibleAdjustment == ADJUSTMENT_ROTATE )
 	{
 		switch( Control )
@@ -605,7 +599,7 @@ void CLinkageView::GetAdjustmentControlRect( AdjustmentControl Control, CFRect &
 				Rect.SetRect( PixelPoint.x - 7, PixelPoint.y - 7, PixelPoint.x + 7, PixelPoint.y + 7 );
 				break;
 			}
-			case AC_TOP_LEFT: 
+			case AC_TOP_LEFT:
 				Rect.SetRect( PixelRect.left - 11, PixelRect.top - 11, PixelRect.left, PixelRect.top );
 				break;
 			case AC_TOP_RIGHT:
@@ -624,7 +618,7 @@ void CLinkageView::GetAdjustmentControlRect( AdjustmentControl Control, CFRect &
 	{
 		switch( Control )
 		{
-			case AC_TOP_LEFT: 
+			case AC_TOP_LEFT:
 				Rect.SetRect( PixelRect.left - 6, PixelRect.top - 6, PixelRect.left, PixelRect.top );
 				break;
 			case AC_TOP_RIGHT:
@@ -637,26 +631,26 @@ void CLinkageView::GetAdjustmentControlRect( AdjustmentControl Control, CFRect &
 				Rect.SetRect( PixelRect.left - 6, PixelRect.bottom, PixelRect.left, PixelRect.bottom + 6 );
 				break;
 			case AC_TOP:
-				Rect.SetRect( ( ( PixelRect.left + PixelRect.right ) / 2 ) - 3, 
+				Rect.SetRect( ( ( PixelRect.left + PixelRect.right ) / 2 ) - 3,
 							  PixelRect.top - 6,
 							  ( ( PixelRect.left + PixelRect.right ) / 2 ) + 3,
 							  PixelRect.top );
 				break;
 			case AC_RIGHT:
 				Rect.SetRect( PixelRect.right,
-							  ( ( PixelRect.top + PixelRect.bottom ) / 2 ) - 3, 
+							  ( ( PixelRect.top + PixelRect.bottom ) / 2 ) - 3,
 							  PixelRect.right + 6,
 							  ( ( PixelRect.top + PixelRect.bottom ) / 2 ) + 3 );
 				break;
 			case AC_BOTTOM:
-				Rect.SetRect( ( ( PixelRect.left + PixelRect.right ) / 2 ) - 3, 
+				Rect.SetRect( ( ( PixelRect.left + PixelRect.right ) / 2 ) - 3,
 							  PixelRect.bottom,
 							  ( ( PixelRect.left + PixelRect.right ) / 2 ) + 3,
 							  PixelRect.bottom + 6 );
 				break;
 			case AC_LEFT:
 				Rect.SetRect( PixelRect.left - 6,
-							  ( ( PixelRect.top + PixelRect.bottom ) / 2 ) - 3, 
+							  ( ( PixelRect.top + PixelRect.bottom ) / 2 ) - 3,
 							  PixelRect.left,
 							  ( ( PixelRect.top + PixelRect.bottom ) / 2 ) + 3 );
 				break;
@@ -671,7 +665,7 @@ void CLinkageView::DrawAdjustmentControls( CRenderer *pRenderer )
 		return;
 
 	CDC *pDC = pRenderer->GetDC();
-	
+
 	if( m_VisibleAdjustment == ADJUSTMENT_ROTATE )
 	{
 		if( m_MouseAction != ACTION_NONE && m_MouseAction != ACTION_RECENTER /*&& m_MouseAction != ACTION_ROTATE*/ )
@@ -684,7 +678,7 @@ void CLinkageView::DrawAdjustmentControls( CRenderer *pRenderer )
 
 		if( m_MouseAction != ACTION_NONE )
 			return;
-			
+
 		GetAdjustmentControlRect( AC_TOP_LEFT, Rect );
 		::DrawIconEx(pDC->GetSafeHdc(), (int)Rect.left, (int)Rect.top, m_Rotate1, 32, 32, 0, 0, DI_NORMAL);
 		//pDC->DrawIcon( (int)Rect.left, (int)Rect.top, m_Rotate1 );
@@ -748,7 +742,7 @@ int CLinkageView::GetPrintPageCount( CDC *pDC, CPrintInfo *pPrintInfo, bool bPri
 	CLinkageDoc* pDoc = GetDocument();
 	ASSERT_VALID(pDoc);
 
-	static const double MyLogicalPixels = CLinkageDoc::GetBaseUnitsPerInch(); 
+	static const double MyLogicalPixels = CLinkageDoc::GetBaseUnitsPerInch();
 
 	int PixelsPerInch = pDC->GetDeviceCaps( LOGPIXELSX );
 	double ScaleFactor = MyLogicalPixels / PixelsPerInch;
@@ -765,10 +759,9 @@ int CLinkageView::GetPrintPageCount( CDC *pDC, CPrintInfo *pPrintInfo, bool bPri
 	int WidthInPages = (int)( ( ( PixelRect.Width() / ScaleFactor ) / cx ) + 0.999999999999999999 );
 	int HeightInPages = (int)( ( ( PixelRect.Height() / ScaleFactor ) / cy ) + 0.999999999999999999 );
 
-	return WidthInPages * HeightInPages; 
-
+	return WidthInPages * HeightInPages;
 }
-		
+
 CRect CLinkageView::PrepareRenderer( CRenderer &Renderer, CRect *pDrawRect, CBitmap *pBitmap, CDC *pDC, double ScalingValue, bool bScaleToFit, double MarginScale, double UnscaledUnitSize, bool bForScreen, bool bAntiAlias, bool bActualSize, int PageNumber )
 {
 	CLinkageDoc* pDoc = GetDocument();
@@ -806,11 +799,11 @@ CRect CLinkageView::PrepareRenderer( CRenderer &Renderer, CRect *pDrawRect, CBit
 
 		/*
 		 * There is a bug in the CRenderer code that make pen handling fail
-		 * at unexpected times. The CRenderer code would try to adjust the 
+		 * at unexpected times. The CRenderer code would try to adjust the
 		 * pen width for a specified pen to account for the scaling but
 		 * the arrow head drawing code makes this fail intermittently.
 		 * Because of all of that, the only way to get proper printing
-		 * is to use the window and viewport feature and not use the scaling 
+		 * is to use the window and viewport feature and not use the scaling
 		 * feature of CRenderer.
 		 */
 
@@ -913,10 +906,10 @@ CRect CLinkageView::PrepareRenderer( CRenderer &Renderer, CRect *pDrawRect, CBit
 
 			double xScaleChange = cx / Area.Width();
 			double yScaleChange = cy / Area.Height();
-			
+
 			double ScaleValue = min( xScaleChange, yScaleChange );
-			
-			// But screen zoom needs to one of the "standard" zoom 
+
+			// But screen zoom needs to one of the "standard" zoom
 			// levels that a user would see if they just scrolled in and out.
 // 			m_Zoom = pow( ZOOM_AMOUNT, floor( log( ScaleValue ) / log( ZOOM_AMOUNT ) ) );
 
@@ -989,12 +982,12 @@ class CConnectorTextData : public ConnectorListOperation
 	{
 		CString TempString;
 		if( m_bShowDebug )
-			TempString.Format( "      Connector %s [%d]: %.4lf, %.4lf\n", 
-							   (const char*)pConnector->GetIdentifierString( m_bShowDebug ), pConnector->GetIdentifier(), 
+			TempString.Format( "      Connector %s [%d]: %.4lf, %.4lf\n",
+							   (const char*)pConnector->GetIdentifierString( m_bShowDebug ), pConnector->GetIdentifier(),
 							   pConnector->GetPoint().x, pConnector->GetPoint().y );
 		else
-			TempString.Format( "      Connector %s: %.4lf, %.4lf\n", 
-							   (const char*)pConnector->GetIdentifierString( m_bShowDebug ), 
+			TempString.Format( "      Connector %s: %.4lf, %.4lf\n",
+							   (const char*)pConnector->GetIdentifierString( m_bShowDebug ),
 							   pConnector->GetPoint().x, pConnector->GetPoint().y );
 		m_Text += TempString;
 		return true;
@@ -1013,7 +1006,7 @@ class CConnectorDistanceData : public ConnectorListOperation
 		{
 			double Dist = Distance( m_pLastConnector->GetPoint(), pConnector->GetPoint() );
 			CString TempString;
-			TempString.Format( "      Distance %s%s %.4lf\n", 
+			TempString.Format( "      Distance %s%s %.4lf\n",
 							   (const char*)m_pLastConnector->GetIdentifierString( false ), (const char*)pConnector->GetIdentifierString( false ), Dist );
 			m_Text += TempString;
 		}
@@ -1033,14 +1026,14 @@ void CLinkageView::DrawData( CRenderer *pRenderer )
 	CFont *pOriginalFont = pRenderer->SelectObject( m_pUsingFont, UnscaledUnits( m_UsingFontHeight ) );
 
 	pRenderer->SetTextAlign( TA_TOP | TA_LEFT );
-	
+
 	static const int x = 10;
 	static const int x2 = 30;
 	double y = 10;
 	double dy = pRenderer->GetTextExtent( "X", 1 ).y - 1;
-	
+
 	CString Text;
-	
+
 	LinkList* pLinkList = pDoc->GetLinkList();
 	POSITION Position = pLinkList->GetHeadPosition();
 	while( Position != NULL )
@@ -1048,22 +1041,21 @@ void CLinkageView::DrawData( CRenderer *pRenderer )
 		CLink* pLink = pLinkList->GetNext( Position );
 		if( pLink == NULL )
 			continue;
-		
+
 		CString TempString;
 		if( m_bShowDebug )
 			TempString.Format( "Link %s [%d]\n", (const char*)pLink->GetIdentifierString( m_bShowDebug ), pLink->GetIdentifier() );
 		else
 			TempString.Format( "Link %s\n", (const char*)pLink->GetIdentifierString( m_bShowDebug ) );
 		Text += TempString;
-		
+
 		CConnectorTextData FormatText( Text, m_bShowDebug );
 		pLink->GetConnectorList()->Iterate( FormatText );
-		
+
 		CConnectorDistanceData FormatDistance( Text, pLink->GetConnectorList()->GetCount() <= 2 ? 0 : pLink->GetConnectorList()->GetTail() );
 		pLink->GetConnectorList()->Iterate( FormatDistance );
-
 	}
-	
+
 	char *pStart = Text.GetBuffer();
 	for(;;)
 	{
@@ -1074,9 +1066,9 @@ void CLinkageView::DrawData( CRenderer *pRenderer )
 		y += dy;
 		if( pEnd == 0 )
 			break;
-		pStart = pEnd + 1;				
+		pStart = pEnd + 1;
 	}
-	Text.ReleaseBuffer( 0 );		
+	Text.ReleaseBuffer( 0 );
 
 	y += dy;
 
@@ -1191,7 +1183,7 @@ void CLinkageView::DrawSnapLines( CRenderer *pRenderer )
 		return;
 
 	COLORREF Color = COLOR_SNAPHINT;
-	
+
 	CPen DotPen( PS_DOT, 1, Color );
 
 	CPen * pOldPen = pRenderer->SelectObject( &DotPen );
@@ -1255,10 +1247,10 @@ CFRect CLinkageView::GetDocumentArea( bool bWithDimensions, bool bSelectedOnly )
 	 * The following code is almost useful. It does not work for exporting images because
 	 * the scale of the image is determined after the document area is obtained, but the
 	 * code below uses the scale to figure out a new document area. In other words, the
-	 * code cannot use the document area to pick a scale if the scale is needed to get the 
+	 * code cannot use the document area to pick a scale if the scale is needed to get the
 	 * document area!
 	 *
-	 * An alternative might be to use the document area without the dimension lines and then 
+	 * An alternative might be to use the document area without the dimension lines and then
 	 * increase the image size to allow room for the dimensions to fit. Then the image export
 	 * might be able to use this, as would the printing process.
 	 */
@@ -1277,7 +1269,7 @@ CFRect CLinkageView::GetDocumentArea( bool bWithDimensions, bool bSelectedOnly )
 	{
 		if( !bSelectedOnly )
 		{
-			double SolidLinkCornerRadius = Unscale( CONNECTORRADIUS + 3 ); 
+			double SolidLinkCornerRadius = Unscale( CONNECTORRADIUS + 3 );
 			DocumentArea.InflateRect( SolidLinkCornerRadius, SolidLinkCornerRadius );
 
 			LinkList* pLinkList = pDoc->GetLinkList();
@@ -1323,7 +1315,7 @@ CFArea CLinkageView::DoDraw( CRenderer* pRenderer )
 		CPen *pOldPen = pRenderer->SelectObject( &aPen );
 		pRenderer->DrawRect( Scale( Derfus ) );
 		pRenderer->SelectObject( pOldPen );
-		
+
 		// Original document
 		pDoc->GetDocumentArea( Derfus );
 		CPen xxxPen( PS_SOLID, 1, RGB( 0, 180, 0 ) );
@@ -1340,9 +1332,9 @@ CFArea CLinkageView::DoDraw( CRenderer* pRenderer )
 	return Area;
 }
 
-double roundUp( double number, double fixedBase ) 
+double roundUp( double number, double fixedBase )
 {
-    if (fixedBase != 0 && number != 0) 
+    if (fixedBase != 0 && number != 0)
 	{
         double sign = number > 0 ? 1 : -1;
         number *= sign;
@@ -1354,9 +1346,9 @@ double roundUp( double number, double fixedBase )
     return number;
 }
 
-double roundDown( double number, double fixedBase ) 
+double roundDown( double number, double fixedBase )
 {
-    if (fixedBase != 0 && number != 0) 
+    if (fixedBase != 0 && number != 0)
 	{
         double sign = number > 0 ? 1 : -1;
         number *= sign;
@@ -1381,7 +1373,7 @@ void CLinkageView::DrawGrid( CRenderer* pRenderer )
 #if 0
 	double GapDistance = Unscale( 20 ) * pDoc->GetUnitScale();
 
-	// Get the next 1, 5, 10, 50, 100 type of number that is above the 
+	// Get the next 1, 5, 10, 50, 100 type of number that is above the
 	// distance we got using a base pixel length. This will be the value
 	// to use for the snap.
 	int Test = (int)( GapDistance * 1000 );
@@ -1516,7 +1508,7 @@ CFArea CLinkageView::DrawMechanism( CRenderer* pRenderer )
 		CFRect RealRect = Scale( SelectRect );
 		RealRect.InflateRect( 3, 3 );
 
-		bool bMoreHighlight = RealRect.Width() < 30 || RealRect.Height() < 30; 
+		bool bMoreHighlight = RealRect.Width() < 30 || RealRect.Height() < 30;
 		RealRect.InflateRect( 2, 2 );
 		double Inflate = max( 10 - RealRect.Width(), 10 - RealRect.Height() );
 		if( Inflate > 0 )
@@ -1528,7 +1520,7 @@ CFArea CLinkageView::DrawMechanism( CRenderer* pRenderer )
 
 	pRenderer->SelectObject( m_pUsingFont, UnscaledUnits( SMALL_FONT_SIZE ) );
 	pRenderer->SetTextColor( COLOR_TEXT );
-	
+
 	POSITION Position = 0;
 
 	LinkList* pLinkList = pDoc->GetLinkList();
@@ -1590,7 +1582,7 @@ CFArea CLinkageView::DrawMechanism( CRenderer* pRenderer )
 			/*
 			 * Draw a box just for stretching that shows the stretch extents.
 			 */
-		 
+
 			CLinkageDoc* pDoc = GetDocument();
 			ASSERT_VALID(pDoc);
 			CFRect Rect = GetDocumentAdjustArea( true );
@@ -1698,7 +1690,7 @@ CFArea CLinkageView::DrawMechanism( CRenderer* pRenderer )
 
 	if( m_bShowData && m_bShowSelection )
 		DrawData( pRenderer );
-	
+
 	if( m_bShowSelection && m_MouseAction == ACTION_SELECT )
 	{
 		CPen Pen( PS_SOLID, 1, RGB( 128, 128, 255 ) );
@@ -1934,7 +1926,7 @@ CFArea CLinkageView::DrawPartsList( CRenderer* pRenderer )
 
 		DrawLink( pRenderer, pGearConnections, pDoc->GetViewLayers(), pPartsLink, false, false, true );
 		DrawLink( pRenderer, pGearConnections, pDoc->GetViewLayers(), pPartsLink, m_bShowLabels, true, false );
-		
+
 		//POSITION Position2 = pConnectors->GetHeadPosition();
 		//while( Position2 != NULL )
 		//{
@@ -1982,8 +1974,6 @@ CFArea CLinkageView::DrawPartsList( CRenderer* pRenderer )
 	 * Create a ground link if no other single link holds all of the ground connectors.
 	 */
 
-
-
 	return DocumentArea;
 }
 
@@ -2001,7 +1991,7 @@ void CLinkageView::DrawMotionPath( CRenderer *pRenderer, CConnector *pConnector 
 		COLORREF Color = COLOR_MOTIONPATH;
 		CPen Pen( PS_SOLID, 1, Color );
 		CPen *pOldPen = pRenderer->SelectObject( &Pen );
-			
+
 		pRenderer->MoveTo( Scale( CFPoint( pPoints[DrawPoint].x, pPoints[DrawPoint].y ) ) );
 		++DrawPoint;
 		for( int Counter = 1; Counter < PointCount; ++Counter )
@@ -2015,7 +2005,6 @@ void CLinkageView::DrawMotionPath( CRenderer *pRenderer, CConnector *pConnector 
 			pRenderer->LineTo( Scale( pConnector->GetPoint() ) );
 	}
 }
-
 
 BOOL StretchBltPlus(
   HDC hdcDest,
@@ -2037,7 +2026,7 @@ BOOL StretchBltPlus(
 	  Image *imx = Bitmap::FromHBITMAP(hBmp,NULL);
 	  RectF r( (Gdiplus::REAL)nXOriginDest, (Gdiplus::REAL)nYOriginDest, (Gdiplus::REAL)nWidthDest, (Gdiplus::REAL)nHeightDest );
 	  dest.SetInterpolationMode( InterpolationModeHighQuality );
-	  dest.DrawImage( imx, r, (Gdiplus::REAL)nXOriginSrc, (Gdiplus::REAL)nYOriginSrc, (Gdiplus::REAL)nWidthSrc, (Gdiplus::REAL)nHeightSrc, UnitPixel ); 
+	  dest.DrawImage( imx, r, (Gdiplus::REAL)nXOriginSrc, (Gdiplus::REAL)nYOriginSrc, (Gdiplus::REAL)nWidthSrc, (Gdiplus::REAL)nHeightSrc, UnitPixel );
 	  delete imx;
 	  return TRUE;
 }
@@ -2068,7 +2057,6 @@ MemDC.SelectObject( &bitmap );
 
 pDC->BitBlt( 0, 0, 300, 300, &MemDC, 0, 0, SRCCOPY );
 */
-
 }
 
 void CLinkageView::OnDraw( CDC* pDC, CPrintInfo *pPrintInfo )
@@ -2125,13 +2113,11 @@ void CLinkageView::OnDraw( CDC* pDC, CPrintInfo *pPrintInfo )
 	if( Renderer.GetScale() == 1.0 )
 		pDC->BitBlt( 0, 0, m_DrawingRect.Width(), m_DrawingRect.Height(), Renderer.GetDC(), 0, 0, SRCCOPY );
 	else
-		StretchBltPlus( pDC->GetSafeHdc(), 
+		StretchBltPlus( pDC->GetSafeHdc(),
 		                0, 0, m_DrawingRect.Width(), m_DrawingRect.Height(),
-		                Renderer.GetSafeHdc(), 
-						0, 0, (int)( m_DrawingRect.Width() * Renderer.GetScale() ), (int)( m_DrawingRect.Height() * Renderer.GetScale() ), 
+		                Renderer.GetSafeHdc(),
+						0, 0, (int)( m_DrawingRect.Width() * Renderer.GetScale() ), (int)( m_DrawingRect.Height() * Renderer.GetScale() ),
 						SRCCOPY );
-
-
 
 	if( m_bRecordingVideo && m_RecordQuality > 0 )
 	{
@@ -2211,7 +2197,7 @@ void CLinkageView::DrawRuler( CRenderer *pRenderer )
 
 	double GapDistance = Unscale( SCALE_LINE_GAPLENGTH ) * DocScale;
 
-	// Get the next 1, 5, 10, 50, 100 type of number that is above the 
+	// Get the next 1, 5, 10, 50, 100 type of number that is above the
 	// distance we got using a base pixel length. This will be the value
 	// to use for the measurement line tick marks.
 	int Test = (int)( GapDistance * 1000 );
@@ -2266,7 +2252,7 @@ bool CLinkageView::SelectVideoBox( UINT nFlags, CPoint Point )
 {
 	if( m_VisibleAdjustment == ADJUSTMENT_NONE || m_MouseAction != ACTION_NONE )
 		return false;
-		
+
 	CFRect Rect( 0, 0, 0, 0 );
 	m_MouseAction = ACTION_NONE;
 
@@ -2281,9 +2267,9 @@ bool CLinkageView::SelectVideoBox( UINT nFlags, CPoint Point )
 	Rect.InflateRect( 2, 2 );
 	if( Rect.PointInRect( FPoint ) )
 		m_MouseAction = ACTION_RECENTER;
-	
+
 	CFRect AdjustmentRect = Scale( m_SelectionContainerRect );
-		
+
 	MouseAction DoMouseAction = ACTION_NONE;
 	if( m_VisibleAdjustment == ADJUSTMENT_ROTATE )
 		DoMouseAction = ACTION_ROTATE;
@@ -2326,7 +2312,7 @@ bool CLinkageView::SelectVideoBox( UINT nFlags, CPoint Point )
 		m_DragOffset = FPoint - CFPoint( AdjustmentRect.left, AdjustmentRect.bottom );
 		m_MouseAction = DoMouseAction;
 	}
-	
+
 	if( m_VisibleAdjustment == ADJUSTMENT_STRETCH )
 	{
 		GetAdjustmentControlRect( AC_TOP, Rect );
@@ -2362,7 +2348,7 @@ bool CLinkageView::SelectVideoBox( UINT nFlags, CPoint Point )
 			m_MouseAction = ACTION_STRETCH;
 		}
 	}
-		
+
 	if( m_MouseAction == ACTION_NONE )
 		return false;
 	else
@@ -2376,7 +2362,7 @@ bool CLinkageView::SelectAdjustmentControl( UINT nFlags, CPoint Point )
 {
 	if( m_VisibleAdjustment == ADJUSTMENT_NONE || m_MouseAction != ACTION_NONE )
 		return false;
-		
+
 	CFRect Rect( 0, 0, 0, 0 );
 	m_MouseAction = ACTION_NONE;
 
@@ -2391,9 +2377,9 @@ bool CLinkageView::SelectAdjustmentControl( UINT nFlags, CPoint Point )
 	Rect.InflateRect( 2, 2 );
 	if( Rect.PointInRect( FPoint ) )
 		m_MouseAction = ACTION_RECENTER;
-	
+
 	CFRect AdjustmentRect = Scale( m_SelectionContainerRect );
-		
+
 	MouseAction DoMouseAction = ACTION_NONE;
 	if( m_VisibleAdjustment == ADJUSTMENT_ROTATE )
 		DoMouseAction = ACTION_ROTATE;
@@ -2436,7 +2422,7 @@ bool CLinkageView::SelectAdjustmentControl( UINT nFlags, CPoint Point )
 		m_DragOffset = FPoint - CFPoint( AdjustmentRect.left, AdjustmentRect.bottom );
 		m_MouseAction = DoMouseAction;
 	}
-	
+
 	if( m_VisibleAdjustment == ADJUSTMENT_STRETCH )
 	{
 		GetAdjustmentControlRect( AC_TOP, Rect );
@@ -2472,7 +2458,7 @@ bool CLinkageView::SelectAdjustmentControl( UINT nFlags, CPoint Point )
 			m_MouseAction = ACTION_STRETCH;
 		}
 	}
-		
+
 	if( m_MouseAction == ACTION_NONE )
 		return false;
 	else
@@ -2510,7 +2496,7 @@ bool CLinkageView::FindDocumentItem( CPoint Point, CLink *&pFoundLink, CConnecto
 	ASSERT_VALID(pDoc);
 
 	CFPoint AdjustedPoint = Unscale( Point );
-	
+
 	double GrabDistance = Unscale( GRAB_DISTANCE );
 
 	return pDoc->FindElement( AdjustedPoint, GrabDistance, pFoundLink, pFoundConnector );
@@ -2520,14 +2506,14 @@ bool CLinkageView::SelectDocumentItem( UINT nFlags, CPoint point )
 {
 	if( m_MouseAction != ACTION_NONE )
 		return false;
-		
+
 	CLinkageDoc* pDoc = GetDocument();
 	ASSERT_VALID(pDoc);
-	
+
 	bool bMultiSelect = ( nFlags & ( MK_CONTROL | MK_SHIFT ) ) != 0;
 
 	CFPoint AdjustedPoint = Unscale( point );
-	
+
 	double GrabDistance = Unscale( GRAB_DISTANCE );
 
 	bool bSelectionChanged = false;
@@ -2535,7 +2521,7 @@ bool CLinkageView::SelectDocumentItem( UINT nFlags, CPoint point )
 
 	MarkSelection( bSelectionChanged );
 	ShowSelectedElementCoordinates();
-	
+
 	if( m_MouseAction == ACTION_NONE )
 		return false;
 	else
@@ -2549,41 +2535,40 @@ bool CLinkageView::DragSelectionBox( UINT nFlags, CPoint point )
 {
 	if( m_MouseAction != ACTION_NONE )
 		return false;
-	
+
 	/*
 	 * Assume nothing else is under the mouse cursor at this point
 	 * in the processing. There would be some mouse action set if
 	 * something else has been selected before noe.
 	 */
-	
+
 	m_MouseAction = ACTION_SELECT;
 	m_SelectRect.SetRect( point, point );
 	InvalidateRect( 0 );
-	
+
 	return true;
 }
 
-
-void CLinkageView::OnLButtonDown(UINT nFlags, CPoint point) 
+void CLinkageView::OnLButtonDown(UINT nFlags, CPoint point)
 {
 	SetCapture();
-	
+
 	if( m_bSimulating || !m_bAllowEdit )
 		return;
-		
+
 	m_PreviousDragPoint = point;
 	m_DragStartPoint = point;
 	m_DragOffset.SetPoint( 0, 0 );
 	m_bMouseMovedEnough	= false;
 	m_MouseAction = ACTION_NONE;
 	m_bSuperHighlight = 0;
-	
+
 	CFPoint DocumentPoint = Unscale( point );
 	SetLocationAsStatus( DocumentPoint );
 
 	if( m_bAllowEdit && SelectAdjustmentControl( nFlags, point ) )
 		return;
-		
+
 	if( SelectDocumentItem( nFlags, point ) )
 		return;
 
@@ -2591,13 +2576,13 @@ void CLinkageView::OnLButtonDown(UINT nFlags, CPoint point)
 		return;
 }
 
-void CLinkageView::OnButtonUp(UINT nFlags, CPoint point) 
+void CLinkageView::OnButtonUp(UINT nFlags, CPoint point)
 {
 	ReleaseCapture();
-	
+
     if( m_bChangeAdjusters )
 		OnMouseEndChangeAdjusters( nFlags, point );
-	
+
 	switch( m_MouseAction )
 	{
 		case ACTION_SELECT: OnMouseEndSelect( nFlags, point ); break;
@@ -2616,7 +2601,7 @@ void CLinkageView::OnButtonUp(UINT nFlags, CPoint point)
 	SetScrollExtents();
 }
 
-void CLinkageView::OnLButtonUp(UINT nFlags, CPoint point) 
+void CLinkageView::OnLButtonUp(UINT nFlags, CPoint point)
 {
 	OnButtonUp( nFlags, point );
 }
@@ -2636,7 +2621,7 @@ double CLinkageView::CalculateDefaultGrid( void )
 
 	double GapDistance = Unscale( 20 ) * pDoc->GetUnitScale();
 
-	// Get the next 1, 5, 10, 50, 100 type of number that is above the 
+	// Get the next 1, 5, 10, 50, 100 type of number that is above the
 	// distance we got using a base pixel length. This will be the value
 	// to use for the snap.
 	int Test = (int)( GapDistance * 1000 );
@@ -2658,7 +2643,7 @@ double CLinkageView::CalculateDefaultGrid( void )
 		GapDistance = 0.01;
 
 	return GapDistance;
-} 
+}
 
 void CLinkageView::OnMouseMoveDrag(UINT nFlags, CPoint point)
 {
@@ -2677,7 +2662,7 @@ void CLinkageView::OnMouseMoveDrag(UINT nFlags, CPoint point)
 
 	double GapDistance = Unscale( 20 ) * pDoc->GetUnitScale();
 
-	// Get the next 1, 5, 10, 50, 100 type of number that is above the 
+	// Get the next 1, 5, 10, 50, 100 type of number that is above the
 	// distance we got using a base pixel length. This will be the value
 	// to use for the snap.
 	int Test = (int)( GapDistance * 1000 );
@@ -2755,20 +2740,20 @@ void CLinkageView::OnMouseMoveRecenter(UINT nFlags, CPoint point)
 	// Snap to connectors
 
 	CFPoint AdjustedPoint = Unscale( point );
-	
+
 	CLinkageDoc* pDoc = GetDocument();
 	ASSERT_VALID(pDoc);
 
 	CSnapConnector Snap( AdjustedPoint, Unscale( PIXEL_SNAP_DISTANCE ) );
 	pDoc->GetConnectorList()->Iterate( Snap );
-	
+
 	CConnector* pSnapConnector = Snap.GetConnector();
-	
+
 	if( pSnapConnector != 0 )
 		m_SelectionRotatePoint = pSnapConnector->GetPoint();
 	else
 		m_SelectionRotatePoint = AdjustedPoint;
-		
+
 	InvalidateRect( 0 );
 }
 
@@ -2778,7 +2763,7 @@ void CLinkageView::OnMouseMoveStretch(UINT nFlags, CPoint point, bool bEndStretc
 	ASSERT_VALID(pDoc);
 	CFPoint AdjustedPoint = Unscale( point );
 	CLinkageDoc::_Direction Direction = CLinkageDoc::DIAGONAL;
-	
+
 	CFRect NewRect = m_SelectionAdjustmentRect;
 	switch( m_StretchingControl )
 	{
@@ -2786,7 +2771,7 @@ void CLinkageView::OnMouseMoveStretch(UINT nFlags, CPoint point, bool bEndStretc
 		case AC_RIGHT: NewRect.right = AdjustedPoint.x; Direction = CLinkageDoc::HORIZONTAL; break;
 		case AC_BOTTOM: NewRect.bottom = AdjustedPoint.y; Direction = CLinkageDoc::VERTICAL; break;
 		case AC_LEFT: NewRect.left = AdjustedPoint.x; Direction = CLinkageDoc::HORIZONTAL; break;
-		
+
 		case AC_TOP_LEFT:
 		case AC_TOP_RIGHT:
 		case AC_BOTTOM_LEFT:
@@ -2797,20 +2782,20 @@ void CLinkageView::OnMouseMoveStretch(UINT nFlags, CPoint point, bool bEndStretc
 			double NewWidth;
 			switch( m_StretchingControl )
 			{
-				case AC_TOP_LEFT:	
-					NewRect.left = AdjustedPoint.x; 
-					NewRect.top = AdjustedPoint.y; 
+				case AC_TOP_LEFT:
+					NewRect.left = AdjustedPoint.x;
+					NewRect.top = AdjustedPoint.y;
 					NewHeight = m_SelectionAdjustmentRect.Width() == 0 ? 0 : m_SelectionAdjustmentRect.Height() * NewRect.Width() / m_SelectionAdjustmentRect.Width();
 					NewWidth = m_SelectionAdjustmentRect.Height() == 0 ? 0 : m_SelectionAdjustmentRect.Width() * NewRect.Height() / m_SelectionAdjustmentRect.Height();
-					
+
 					if( NewWidth > NewRect.Width() )
 						NewRect.left = NewRect.right - NewWidth;
 					else
 						NewRect.top = NewRect.bottom - NewHeight;
 					break;
-				case AC_TOP_RIGHT: 
-					NewRect.right = AdjustedPoint.x; 
-					NewRect.top = AdjustedPoint.y; 
+				case AC_TOP_RIGHT:
+					NewRect.right = AdjustedPoint.x;
+					NewRect.top = AdjustedPoint.y;
 					NewHeight = m_SelectionAdjustmentRect.Width() == 0 ? 0 : m_SelectionAdjustmentRect.Height() * NewRect.Width() / m_SelectionAdjustmentRect.Width();
 					NewWidth = m_SelectionAdjustmentRect.Height() == 0 ? 0 : m_SelectionAdjustmentRect.Width() * NewRect.Height() / m_SelectionAdjustmentRect.Height();
 
@@ -2819,9 +2804,9 @@ void CLinkageView::OnMouseMoveStretch(UINT nFlags, CPoint point, bool bEndStretc
 					else
 						NewRect.top = NewRect.bottom - NewHeight;
 					break;
-				case AC_BOTTOM_LEFT: 
-					NewRect.left = AdjustedPoint.x; 
-					NewRect.bottom = AdjustedPoint.y; 
+				case AC_BOTTOM_LEFT:
+					NewRect.left = AdjustedPoint.x;
+					NewRect.bottom = AdjustedPoint.y;
 					NewHeight = m_SelectionAdjustmentRect.Width() == 0 ? 0 : m_SelectionAdjustmentRect.Height() * NewRect.Width() / m_SelectionAdjustmentRect.Width();
 					NewWidth = m_SelectionAdjustmentRect.Height() == 0 ? 0 : m_SelectionAdjustmentRect.Width() * NewRect.Height() / m_SelectionAdjustmentRect.Height();
 
@@ -2830,9 +2815,9 @@ void CLinkageView::OnMouseMoveStretch(UINT nFlags, CPoint point, bool bEndStretc
 					else
 						NewRect.bottom = NewRect.top + NewHeight;
 					break;
-				case AC_BOTTOM_RIGHT: 
-					NewRect.right = AdjustedPoint.x; 
-					NewRect.bottom = AdjustedPoint.y; 
+				case AC_BOTTOM_RIGHT:
+					NewRect.right = AdjustedPoint.x;
+					NewRect.bottom = AdjustedPoint.y;
 					NewHeight = m_SelectionAdjustmentRect.Width() == 0 ? 0 : m_SelectionAdjustmentRect.Height() * NewRect.Width() / m_SelectionAdjustmentRect.Width();
 					NewWidth = m_SelectionAdjustmentRect.Height() == 0 ? 0 : m_SelectionAdjustmentRect.Width() * NewRect.Height() / m_SelectionAdjustmentRect.Height();
 
@@ -2845,19 +2830,19 @@ void CLinkageView::OnMouseMoveStretch(UINT nFlags, CPoint point, bool bEndStretc
 			break;
 		}
 	}
-	
+
 	if( !pDoc->StretchSelected( m_SelectionAdjustmentRect, NewRect, Direction ) )
 		return;
-		
+
 	if( bEndStretch )
 	{
 		CFPoint Scale( NewRect.Width() / m_SelectionAdjustmentRect.Width(), NewRect.Height() / m_SelectionAdjustmentRect.Height() );
-		
+
 		CFPoint OldPoint = m_SelectionRotatePoint;
 		CFPoint NewPoint;
 		m_SelectionRotatePoint.x = NewRect.left + ( ( OldPoint.x - m_SelectionAdjustmentRect.left ) * Scale.x );
 		m_SelectionRotatePoint.y = NewRect.top + ( ( OldPoint.y - m_SelectionAdjustmentRect.top ) * Scale.y );
-	}	
+	}
 	InvalidateRect( 0 );
 }
 
@@ -2877,7 +2862,7 @@ void CLinkageView::OnMouseEndDrag(UINT nFlags, CPoint point)
 {
 	CLinkageDoc* pDoc = GetDocument();
 	ASSERT_VALID(pDoc);
-	
+
 	pDoc->FinishChangeSelected();
 
 	int TotalSelected = pDoc->GetSelectedLinkCount( false ) + pDoc->GetSelectedConnectorCount();
@@ -2892,7 +2877,7 @@ void CLinkageView::OnMouseEndDrag(UINT nFlags, CPoint point)
 		ShowSelectedElementStatus();
 	}
 
-	if( m_bSnapOn && m_bAutoJoin && 
+	if( m_bSnapOn && m_bAutoJoin &&
 	    pDoc->GetSelectedLinkCount( true ) == 0 && pDoc->GetSelectedConnectorCount() == 1 )
 	{
 		pDoc->AutoJoinSelected();
@@ -2931,7 +2916,7 @@ void CLinkageView::ShowSelectedElementStatus( void )
 		String = "Link ";
 	else if( pElement->IsConnector() )
 		String = "Connector ";
-	
+
 	String += pElement->GetIdentifierString( m_bShowDebug );
 
 	SetStatusText( String );
@@ -2941,12 +2926,12 @@ void CLinkageView::OnMouseEndSelect(UINT nFlags, CPoint point)
 {
 	CLinkageDoc* pDoc = GetDocument();
 	ASSERT_VALID(pDoc);
-	
+
 	/*
 	 * Normalize the rectangle for selection. Other code might not handle
 	 * it otherwise.
 	 */
-	 
+
 	if( m_SelectRect.left > m_SelectRect.right )
 	{
 		int Temp = m_SelectRect.left;
@@ -2961,13 +2946,13 @@ void CLinkageView::OnMouseEndSelect(UINT nFlags, CPoint point)
 	}
 
 	CFRect Rect = Unscale( m_SelectRect );
-	
+
 	m_bChangeAdjusters = false;
 	bool bMultiSelect = ( nFlags & ( MK_CONTROL | MK_SHIFT ) ) != 0;
-	
+
 	bool bSelectionChanged = false;
 	m_MouseAction = pDoc->SelectElement( Rect, bMultiSelect, bSelectionChanged ) ? ACTION_DRAG : ACTION_NONE;
-	
+
     if( pDoc->IsSelectionAdjustable() )
     {
 		if( bSelectionChanged )
@@ -3030,7 +3015,7 @@ void CLinkageView::SetLocationAsStatus( CFPoint &Point )
 	SetStatusText( Location );
 }
 
-void CLinkageView::OnMouseMove(UINT nFlags, CPoint point) 
+void CLinkageView::OnMouseMove(UINT nFlags, CPoint point)
 {
 	if( m_PreviousDragPoint == point )
 		return;
@@ -3046,7 +3031,7 @@ void CLinkageView::OnMouseMove(UINT nFlags, CPoint point)
 
 		m_bMouseMovedEnough = true;
 
-		if( m_MouseAction == ACTION_DRAG 
+		if( m_MouseAction == ACTION_DRAG
 			|| m_MouseAction == ACTION_ROTATE
 			|| m_MouseAction == ACTION_STRETCH )
 		{
@@ -3075,17 +3060,17 @@ void CLinkageView::OnMouseMove(UINT nFlags, CPoint point)
 		case ACTION_STRETCH: OnMouseMoveStretch( nFlags, point, false ); break;
 		default: break;
 	}
-	
-	m_bChangeAdjusters = false;	
-	
+
+	m_bChangeAdjusters = false;
+
 	m_PreviousDragPoint = point;
 }
 
-void CLinkageView::OnMechanismReset() 
+void CLinkageView::OnMechanismReset()
 {
 	CLinkageDoc* pDoc = GetDocument();
 	ASSERT_VALID(pDoc);
-	
+
 	pDoc->Reset( false );
 	m_Simulator.Reset();
 	UpdateForDocumentChange();
@@ -3144,11 +3129,11 @@ void CLinkageView::SaveVideoFrame( CRenderer *pRenderer, CRect &CaptureRect )
 		pVideoBitmap->m_DC.BitBlt( 0, 0, Width, Height, pRenderer->GetDC(), x, y, SRCCOPY );
 	else
 	{
-		StretchBltPlus( pVideoBitmap->m_DC.GetSafeHdc(), 
+		StretchBltPlus( pVideoBitmap->m_DC.GetSafeHdc(),
 		                0, 0, Width, Height,
-		                pRenderer->GetSafeHdc(), 
-						(int)( x * ScaleFactor ), (int)( y * ScaleFactor ), 
-						(int)( ANIMATIONWIDTH * ScaleFactor ), (int)( ANIMATIONHEIGHT * ScaleFactor ), 
+		                pRenderer->GetSafeHdc(),
+						(int)( x * ScaleFactor ), (int)( y * ScaleFactor ),
+						(int)( ANIMATIONWIDTH * ScaleFactor ), (int)( ANIMATIONHEIGHT * ScaleFactor ),
 						SRCCOPY );
 	}
 
@@ -3236,7 +3221,7 @@ void CLinkageView::CloseVideoFile( void )
 bool CLinkageView::AnyAlwaysManual( void )
 {
 	CLinkageDoc* pDoc = GetDocument();
-	ASSERT_VALID(pDoc);	
+	ASSERT_VALID(pDoc);
 	ConnectorList* pConnectors = pDoc->GetConnectorList();
 	POSITION Position = pConnectors->GetHeadPosition();
 	while( Position != NULL )
@@ -3258,7 +3243,6 @@ bool CLinkageView::AnyAlwaysManual( void )
 	return false;
 }
 
-
 void CLinkageView::StartMechanismSimulate( enum _SimulationControl SimulationControl )
 {
 	SetFocus();
@@ -3268,9 +3252,9 @@ void CLinkageView::StartMechanismSimulate( enum _SimulationControl SimulationCon
 
 	if( m_TimerID != 0 )
 		timeKillEvent( m_TimerID );
-		
+
 	CLinkageDoc* pDoc = GetDocument();
-	ASSERT_VALID(pDoc);	
+	ASSERT_VALID(pDoc);
 
 	pDoc->SelectElement();
 	InvalidateRect( 0 );
@@ -3304,9 +3288,9 @@ void CLinkageView::StopMechanismSimulate( bool KeepCurrentPositions )
 
 	if( m_TimerID != 0 )
 		timeKillEvent( m_TimerID );
-		
+
 	CLinkageDoc* pDoc = GetDocument();
-	ASSERT_VALID(pDoc);	
+	ASSERT_VALID(pDoc);
 
 	pDoc->SelectElement();
 	InvalidateRect( 0 );
@@ -3337,7 +3321,7 @@ void CLinkageView::ConfigureControlWindow( enum _SimulationControl SimulationCon
 		m_ControlWindow.AddControl( -1, "Mechanism", -1 );
 
 	CLinkageDoc* pDoc = GetDocument();
-	ASSERT_VALID(pDoc);	
+	ASSERT_VALID(pDoc);
 	ConnectorList* pConnectors = pDoc->GetConnectorList();
 	POSITION Position = pConnectors->GetHeadPosition();
 	while( Position != NULL )
@@ -3422,7 +3406,7 @@ void CLinkageView::StepSimulation( enum _SimulationControl SimulationControl )
 
 	DWORD SimulationTimeLimit = 100;
 	DWORD SimulationStartTicks = GetTickCount();
-	
+
 	bool bSetToAbsoluteStep = false;
 
 	if( SimulationControl == AUTO )
@@ -3437,8 +3421,8 @@ void CLinkageView::StepSimulation( enum _SimulationControl SimulationControl )
 	}
 	else if( SimulationControl == INDIVIDUAL )
 	{
-		if( ControlCount > 0 )
-			m_SimulationSteps = pDoc->GetUnfinishedSimulationSteps();
+//		if( ControlCount > 0 )
+//			m_SimulationSteps = m_Simulator.GetUnfinishedSimulationSteps();
 	}
 
 	//if( SimulationControl != INDIVIDUAL )
@@ -3447,7 +3431,7 @@ void CLinkageView::StepSimulation( enum _SimulationControl SimulationControl )
 	if( m_SimulationSteps != 0 || SimulationControl == INDIVIDUAL || bSetToAbsoluteStep )
 	{
 		ClearDebugItems();
-		m_Simulator.SimulateStep( pDoc, m_SimulationSteps, bSetToAbsoluteStep, pControlIDs, pPositions, ControlCount, AnyAlwaysManual() );
+		m_Simulator.SimulateStep( pDoc, m_SimulationSteps, bSetToAbsoluteStep, pControlIDs, pPositions, ControlCount, AnyAlwaysManual() && SimulationControl != INDIVIDUAL );
 	}
 
 	m_SimulationSteps = 0;
@@ -3462,9 +3446,9 @@ void CLinkageView::OnTimer(UINT_PTR nIDEvent)
 {
 	if( !m_bSimulating )
 		return;
-		
+
 	CLinkageDoc* pDoc = GetDocument();
-	ASSERT_VALID(pDoc);	
+	ASSERT_VALID(pDoc);
 
 	// Step the simuation as long as the video is not getting extra pause frames before or after.
 	if( !m_bRecordingVideo || !m_bUseVideoCounters || ( m_VideoStartFrames == 0 && m_VideoRecordFrames != 0 ) )
@@ -3483,13 +3467,13 @@ void CLinkageView::OnTimer(UINT_PTR nIDEvent)
 		AfxMessageBox( AviError, MB_ICONEXCLAMATION | MB_OK );
 		return;
 	}
-	
+
 	if( !m_Simulator.IsSimulationValid() && m_bWasValid )
 	{
 		SetStatusText( "Invalid mechanism. Simulation paused." );
 		m_bWasValid = false;
 	}
-	
+
 	TickCount = GetTickCount() - TickCount;
 	if( TickCount > 15 )
 		TickCount = 15;
@@ -3690,7 +3674,6 @@ void CLinkageView::OnEditSetRatio()
 		dlg.m_bUseRadiusValues = pConnection->m_bUseSizeAsRadius;
 	}
 
-
 	dlg.m_Link1Name = pLink1->GetIdentifierString( m_bShowDebug );
 	dlg.m_Link2Name = pLink2->GetIdentifierString( m_bShowDebug );
 
@@ -3706,7 +3689,7 @@ void CLinkageView::OnEditDeleteselected()
 {
 	CLinkageDoc* pDoc = GetDocument();
 	ASSERT_VALID(pDoc);
-	pDoc->DeleteSelected();	
+	pDoc->DeleteSelected();
 	UpdateForDocumentChange();
 }
 
@@ -3718,7 +3701,7 @@ BOOL CLinkageView::OnEraseBkgnd(CDC* pDC)
 void CLinkageView::OnSize(UINT nType, int cx, int cy)
 {
 	CView::OnSize(nType, cx, cy);
-	
+
 	SetScrollExtents();
 
 	int Height = m_ControlWindow.GetDesiredHeight();
@@ -3786,7 +3769,7 @@ void CLinkageView::InsertPoint( CFPoint *pPoint )
 {
 	CLinkageDoc* pDoc = GetDocument();
 	ASSERT_VALID(pDoc);
-	pDoc->InsertConnector( CLinkageDoc::DRAWINGLAYER, Unscale( LINK_INSERT_PIXELS ), pPoint == 0 ? GetDocumentViewCenter() : *pPoint, pPoint != 0 );	
+	pDoc->InsertConnector( CLinkageDoc::DRAWINGLAYER, Unscale( LINK_INSERT_PIXELS ), pPoint == 0 ? GetDocumentViewCenter() : *pPoint, pPoint != 0 );
 	m_bSuperHighlight = true;
 
 	UpdateForDocumentChange();
@@ -3796,7 +3779,7 @@ void CLinkageView::InsertLine( CFPoint *pPoint )
 {
 	CLinkageDoc* pDoc = GetDocument();
 	ASSERT_VALID(pDoc);
-	pDoc->InsertLink( CLinkageDoc::DRAWINGLAYER, Unscale( LINK_INSERT_PIXELS ), pPoint == 0 ? GetDocumentViewCenter() : *pPoint, pPoint != 0, 2, false );	
+	pDoc->InsertLink( CLinkageDoc::DRAWINGLAYER, Unscale( LINK_INSERT_PIXELS ), pPoint == 0 ? GetDocumentViewCenter() : *pPoint, pPoint != 0, 2, false );
 	m_bSuperHighlight = true;
 
 	UpdateForDocumentChange();
@@ -3806,7 +3789,7 @@ void CLinkageView::InsertMeasurement( CFPoint *pPoint )
 {
 	CLinkageDoc* pDoc = GetDocument();
 	ASSERT_VALID(pDoc);
-	pDoc->InsertMeasurement( CLinkageDoc::DRAWINGLAYER, Unscale( LINK_INSERT_PIXELS ), pPoint == 0 ? GetDocumentViewCenter() : *pPoint, pPoint != 0 );	
+	pDoc->InsertMeasurement( CLinkageDoc::DRAWINGLAYER, Unscale( LINK_INSERT_PIXELS ), pPoint == 0 ? GetDocumentViewCenter() : *pPoint, pPoint != 0 );
 	m_bSuperHighlight = true;
 
 	UpdateForDocumentChange();
@@ -3816,7 +3799,7 @@ void CLinkageView::InsertGear( CFPoint *pPoint )
 {
 	CLinkageDoc* pDoc = GetDocument();
 	ASSERT_VALID(pDoc);
-	pDoc->InsertGear( CLinkageDoc::MECHANISMLAYER, Unscale( LINK_INSERT_PIXELS ), pPoint == 0 ? GetDocumentViewCenter() : *pPoint, pPoint != 0 );	
+	pDoc->InsertGear( CLinkageDoc::MECHANISMLAYER, Unscale( LINK_INSERT_PIXELS ), pPoint == 0 ? GetDocumentViewCenter() : *pPoint, pPoint != 0 );
 	m_bSuperHighlight = true;
 
 	UpdateForDocumentChange();
@@ -3826,7 +3809,7 @@ void CLinkageView::InsertConnector( CFPoint *pPoint )
 {
 	CLinkageDoc* pDoc = GetDocument();
 	ASSERT_VALID(pDoc);
-	pDoc->InsertConnector( CLinkageDoc::MECHANISMLAYER, Unscale( LINK_INSERT_PIXELS ), pPoint == 0 ? GetDocumentViewCenter() : *pPoint, pPoint != 0 );	
+	pDoc->InsertConnector( CLinkageDoc::MECHANISMLAYER, Unscale( LINK_INSERT_PIXELS ), pPoint == 0 ? GetDocumentViewCenter() : *pPoint, pPoint != 0 );
 	m_bSuperHighlight = true;
 
 	UpdateForDocumentChange();
@@ -3836,7 +3819,7 @@ void CLinkageView::InsertAnchor( CFPoint *pPoint )
 {
 	CLinkageDoc* pDoc = GetDocument();
 	ASSERT_VALID(pDoc);
-	pDoc->InsertAnchor( CLinkageDoc::MECHANISMLAYER, Unscale( LINK_INSERT_PIXELS ), pPoint == 0 ? GetDocumentViewCenter() : *pPoint, pPoint != 0, m_bNewLinksSolid );	
+	pDoc->InsertAnchor( CLinkageDoc::MECHANISMLAYER, Unscale( LINK_INSERT_PIXELS ), pPoint == 0 ? GetDocumentViewCenter() : *pPoint, pPoint != 0, m_bNewLinksSolid );
 	m_bSuperHighlight = true;
 
 	UpdateForDocumentChange();
@@ -3846,7 +3829,7 @@ void CLinkageView::InsertAnchorLink( CFPoint *pPoint )
 {
 	CLinkageDoc* pDoc = GetDocument();
 	ASSERT_VALID(pDoc);
-	pDoc->InsertAnchorLink(  CLinkageDoc::MECHANISMLAYER, Unscale( LINK_INSERT_PIXELS ), pPoint == 0 ? GetDocumentViewCenter() : *pPoint, pPoint != 0, m_bNewLinksSolid );	
+	pDoc->InsertAnchorLink(  CLinkageDoc::MECHANISMLAYER, Unscale( LINK_INSERT_PIXELS ), pPoint == 0 ? GetDocumentViewCenter() : *pPoint, pPoint != 0, m_bNewLinksSolid );
 	m_bSuperHighlight = true;
 
 	UpdateForDocumentChange();
@@ -3856,7 +3839,7 @@ void CLinkageView::InsertRotatinganchor( CFPoint *pPoint )
 {
 	CLinkageDoc* pDoc = GetDocument();
 	ASSERT_VALID(pDoc);
-	pDoc->InsertRotateAnchor(  CLinkageDoc::MECHANISMLAYER, Unscale( LINK_INSERT_PIXELS ), pPoint == 0 ? GetDocumentViewCenter() : *pPoint, pPoint != 0, m_bNewLinksSolid );	
+	pDoc->InsertRotateAnchor(  CLinkageDoc::MECHANISMLAYER, Unscale( LINK_INSERT_PIXELS ), pPoint == 0 ? GetDocumentViewCenter() : *pPoint, pPoint != 0, m_bNewLinksSolid );
 	m_bSuperHighlight = true;
 
 	UpdateForDocumentChange();
@@ -3866,7 +3849,7 @@ void CLinkageView::InsertLink( CFPoint *pPoint )
 {
 	CLinkageDoc* pDoc = GetDocument();
 	ASSERT_VALID(pDoc);
-	pDoc->InsertLink( CLinkageDoc::MECHANISMLAYER, Unscale( LINK_INSERT_PIXELS ), pPoint == 0 ? GetDocumentViewCenter() : *pPoint, pPoint != 0, 2, m_bNewLinksSolid );	
+	pDoc->InsertLink( CLinkageDoc::MECHANISMLAYER, Unscale( LINK_INSERT_PIXELS ), pPoint == 0 ? GetDocumentViewCenter() : *pPoint, pPoint != 0, 2, m_bNewLinksSolid );
 	m_bSuperHighlight = true;
 
 	UpdateForDocumentChange();
@@ -3877,7 +3860,6 @@ void CLinkageView::OnUpdateEditSplit(CCmdUI *pCmdUI)
 	CLinkageDoc* pDoc = GetDocument();
 	ASSERT_VALID(pDoc);
 	pCmdUI->Enable( !m_bSimulating && pDoc->IsSelectionSplittable() && m_bAllowEdit );
-	
 }
 
 void CLinkageView::OnUpdateEditProperties(CCmdUI *pCmdUI)
@@ -3958,7 +3940,7 @@ void CLinkageView::EditProperties( CConnector *pConnector, CLink *pLink, bool bS
 			return;
 		}
 	}
-		
+
 	if( pConnector != 0 )
 	{
 		bool bResult = false;
@@ -3975,7 +3957,6 @@ void CLinkageView::EditProperties( CConnector *pConnector, CLink *pLink, bool bS
 		return;
 	}
 }
-
 
 void CLinkageView::OnEditProperties()
 {
@@ -4009,7 +3990,7 @@ void CLinkageView::OnEditJoin()
 {
 	CLinkageDoc* pDoc = GetDocument();
 	ASSERT_VALID(pDoc);
-	pDoc->JoinSelected( true );	
+	pDoc->JoinSelected( true );
 	InvalidateRect( 0 );
 }
 
@@ -4017,7 +3998,7 @@ void CLinkageView::OnEditLock()
 {
 	CLinkageDoc* pDoc = GetDocument();
 	ASSERT_VALID(pDoc);
-	pDoc->LockSelected();	
+	pDoc->LockSelected();
 	InvalidateRect( 0 );
 }
 
@@ -4025,7 +4006,7 @@ void CLinkageView::OnEditSelectall()
 {
 	CLinkageDoc* pDoc = GetDocument();
 	ASSERT_VALID(pDoc);
-	pDoc->SelectAll();	
+	pDoc->SelectAll();
 	int TotalSelected = pDoc->GetSelectedLinkCount( false ) + pDoc->GetSelectedConnectorCount();
 	if( TotalSelected > 0 )
 	{
@@ -4225,7 +4206,6 @@ void CLinkageView::OnUpdateAlignRectangle( CCmdUI *pCmdUI )
 	pCmdUI->Enable( !m_bSimulating && pDoc->IsSelectionRectangle() && m_bAllowEdit );
 }
 
-
 void CLinkageView::OnAlignParallelogram()
 {
 	CLinkageDoc* pDoc = GetDocument();
@@ -4245,7 +4225,7 @@ void CLinkageView::OnEditSplit()
 {
 	CLinkageDoc* pDoc = GetDocument();
 	ASSERT_VALID(pDoc);
-	pDoc->SplitSelected();	
+	pDoc->SplitSelected();
 	UpdateForDocumentChange();
 }
 
@@ -4254,7 +4234,7 @@ void CLinkageView::InsertDouble( CFPoint *pPoint )
 	CLinkageDoc* pDoc = GetDocument();
 	ASSERT_VALID(pDoc);
 
-	pDoc->InsertLink(  CLinkageDoc::MECHANISMLAYER, Unscale( LINK_INSERT_PIXELS ), pPoint == 0 ? GetDocumentViewCenter() : *pPoint, pPoint != 0, 2, m_bNewLinksSolid );	
+	pDoc->InsertLink(  CLinkageDoc::MECHANISMLAYER, Unscale( LINK_INSERT_PIXELS ), pPoint == 0 ? GetDocumentViewCenter() : *pPoint, pPoint != 0, 2, m_bNewLinksSolid );
 	m_bSuperHighlight = true;
 	UpdateForDocumentChange();
 }
@@ -4263,7 +4243,7 @@ void CLinkageView::InsertTriple( CFPoint *pPoint )
 {
 	CLinkageDoc* pDoc = GetDocument();
 	ASSERT_VALID(pDoc);
-	pDoc->InsertLink(  CLinkageDoc::MECHANISMLAYER, Unscale( LINK_INSERT_PIXELS ), pPoint == 0 ? GetDocumentViewCenter() : *pPoint, pPoint != 0, 3, m_bNewLinksSolid );	
+	pDoc->InsertLink(  CLinkageDoc::MECHANISMLAYER, Unscale( LINK_INSERT_PIXELS ), pPoint == 0 ? GetDocumentViewCenter() : *pPoint, pPoint != 0, 3, m_bNewLinksSolid );
 	m_bSuperHighlight = true;
 	UpdateForDocumentChange();
 }
@@ -4272,7 +4252,7 @@ void CLinkageView::InsertQuad( CFPoint *pPoint )
 {
 	CLinkageDoc* pDoc = GetDocument();
 	ASSERT_VALID(pDoc);
-	pDoc->InsertLink(  CLinkageDoc::MECHANISMLAYER, Unscale( LINK_INSERT_PIXELS ), pPoint == 0 ? GetDocumentViewCenter() : *pPoint, pPoint != 0, 4, m_bNewLinksSolid );	
+	pDoc->InsertLink(  CLinkageDoc::MECHANISMLAYER, Unscale( LINK_INSERT_PIXELS ), pPoint == 0 ? GetDocumentViewCenter() : *pPoint, pPoint != 0, 4, m_bNewLinksSolid );
 	m_bSuperHighlight = true;
 	UpdateForDocumentChange();
 }
@@ -4686,16 +4666,16 @@ BOOL CLinkageView::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt)
 {
 	if( m_bSimulating )
 		return TRUE;
-		
+
 	if( zDelta == 0 )
 		return TRUE;
 	if( zDelta > 0 && m_ScreenZoom >= 256 )
 		return TRUE;
 	else if( zDelta < 0 && m_ScreenZoom <= .0005 )
 		return TRUE;
-		
+
 	ScreenToClient( &pt );
-	
+
 	m_Zoom = m_ScreenZoom;
 	CFPoint AdjustedPoint = Unscale( pt );
 
@@ -4703,13 +4683,13 @@ BOOL CLinkageView::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt)
 		m_ScreenZoom *= ZOOM_AMOUNT;
 	else if( zDelta < 0 )
 		m_ScreenZoom /= ZOOM_AMOUNT;
-	
+
 	m_Zoom = m_ScreenZoom;
 	CFPoint AdjustedPoint2 = Unscale( pt );
 
 	double dx = ( AdjustedPoint2.x - AdjustedPoint.x ) * m_ScreenZoom;
 	double dy = ( AdjustedPoint2.y - AdjustedPoint.y ) * m_ScreenZoom;
-	
+
 	m_ScreenScrollPosition.x -= (int)dx;
 	m_ScreenScrollPosition.y += (int)dy;
 
@@ -4732,7 +4712,7 @@ void CLinkageView::OnViewZoomin()
 {
 	if( m_bSimulating )
 		return;
-		
+
 	CPoint Point = GetDefaultUnscalePoint();
 	ClientToScreen( &Point );
 	OnMouseWheel( 0, 120, Point );
@@ -4792,7 +4772,7 @@ void CLinkageView::OnMenuZoomfit()
 
 	double Scale = min( xScaleChange, yScaleChange );
 
-	// But screen zoom needs to one of the "standard" zoom 
+	// But screen zoom needs to one of the "standard" zoom
 	// levels that a user would see if they just srolled in and out.
 	m_ScreenZoom = pow( ZOOM_AMOUNT, floor( log( Scale ) / log( ZOOM_AMOUNT ) ) );
 
@@ -4814,7 +4794,7 @@ void CLinkageView::OnUpdate( CView* pSender, LPARAM lHint, CObject* pHint )
 	CMFCRibbonComboBox * pComboBox = DYNAMIC_DOWNCAST( CMFCRibbonComboBox, pRibbon->FindByID( ID_VIEW_UNITS ) );
 	if( pComboBox == 0 )
 		return;
-	
+
 	CLinkageDoc* pDoc = GetDocument();
 	ASSERT_VALID(pDoc);
 	CLinkageDoc::_Units Units = pDoc->GetUnits();
@@ -4918,9 +4898,9 @@ void CLinkageView::OnMechanismQuicksim()
 {
 	if( m_TimerID != 0 )
 		timeKillEvent( m_TimerID );
-		
+
 	CLinkageDoc* pDoc = GetDocument();
-	ASSERT_VALID(pDoc);	
+	ASSERT_VALID(pDoc);
 
 	pDoc->SelectElement();
 	InvalidateRect( 0 );
@@ -4932,21 +4912,19 @@ void CLinkageView::OnMechanismQuicksim()
 		m_TimerID = 0;
 		OnMechanismReset();
 	}
-	
+
 	// Always do the quick simulation even if it was already simulating.
-
-
 
 	pDoc->Reset( true );
 	m_Simulator.Reset();
-	
+
 	int Steps = m_Simulator.GetSimulationSteps( pDoc );
-	
+
 	if( Steps == 0 )
 		return;
-		
+
 	++Steps; // There is always a last step needed to get back to the start location.
-	
+
 	bool bGoodSimulation = true;
 	int Counter = 0;
 	for( ; Counter < Steps && bGoodSimulation; ++Counter )
@@ -4957,11 +4935,11 @@ void CLinkageView::OnMechanismQuicksim()
 		m_Simulator.SimulateStep( pDoc, 1, false, 0, 0, 0, false );
 
 	DebugItemList.Clear();
-	
+
 	//pDoc->Reset( !bGoodSimulation );
 	pDoc->Reset( false );
 	m_Simulator.Reset();
-	
+
 	InvalidateRect( 0 );
 }
 
@@ -4972,7 +4950,6 @@ void CLinkageView::DebugDrawConnector( CRenderer* pDC, unsigned int OnLayers, CC
 
 	if( ( pConnector->GetLayers() & OnLayers ) == 0 )
 		return;
-	
 }
 
 double CLinkageView::AdjustYCoordinate( double y )
@@ -5015,8 +4992,8 @@ void CLinkageView::DrawSliderTrack( CRenderer* pRenderer, unsigned int OnLayers,
 				if( Found1 >= 0 && Found2 >= 0 )
 					break;
 			}
-			if( Found1 == Found2 + 1 || Found1 == Found2 - 1 
-			    || ( Found1 == 0 && Found2 == PointCount - 1 ) 
+			if( Found1 == Found2 + 1 || Found1 == Found2 - 1
+			    || ( Found1 == 0 && Found2 == PointCount - 1 )
 			    || ( Found2 == 0 && Found1 == PointCount - 1 ) )
 			{
 				// The points are along the hull of a non-solid link so there is already a line being drawn betwen them.
@@ -5066,7 +5043,7 @@ void CLinkageView::DrawFailureMarks( CRenderer* pRenderer, unsigned int OnLayers
 	CPen *pOldPen = pRenderer->SelectObject( &RedPen );
 	double Distance1 = Radius + UnscaledUnits( 4 );
 	double Distance2 = Radius + UnscaledUnits( 9 );
-		
+
 	pRenderer->MoveTo( Point.x + Distance1, Point.y );
 	pRenderer->LineTo( Point.x + Distance2, Point.y );
 	pRenderer->MoveTo( Point.x - Distance1, Point.y );
@@ -5159,11 +5136,11 @@ void CLinkageView::DrawConnector( CRenderer* pRenderer, unsigned int OnLayers, C
 			Pen.CreatePen( PS_SOLID, 1, Color );
 			Brush.CreateStockObject( NULL_BRUSH );
 		}
-	
+
 		if( bShowlabels && !bControlKnob )
 		{
 			/*
-			 * Don't draw generic ID values for drawing elements. Only 
+			 * Don't draw generic ID values for drawing elements. Only
 			 * mechanism elements can show an ID string when no name is
 			 * assigned by the user.
 			 */
@@ -5210,7 +5187,7 @@ void CLinkageView::DrawConnector( CRenderer* pRenderer, unsigned int OnLayers, C
 				}
 			}
 		}
-	
+
 		pOldPen = pRenderer->SelectObject( &Pen );
 		pOldBrush = pRenderer->SelectObject( &Brush );
 
@@ -5255,7 +5232,7 @@ void CLinkageView::DrawConnector( CRenderer* pRenderer, unsigned int OnLayers, C
 
 			pRenderer->Arc( Point.x - Radius, Point.y + AdjustYCoordinate( Radius ), Point.x + Radius, Point.y - AdjustYCoordinate( Radius ), Point.x, Point.y + AdjustYCoordinate( Radius ), Point.x, Point.y + AdjustYCoordinate( Radius ) );
 		}
-	
+
 		if( pConnector->IsAnchor() )
 		{
 			pRenderer->MoveTo( Point.x, Point.y );
@@ -5263,7 +5240,7 @@ void CLinkageView::DrawConnector( CRenderer* pRenderer, unsigned int OnLayers, C
 			pRenderer->LineTo( Point.x + m_ConnectorTriangle, Point.y - AdjustYCoordinate( m_ConnectorTriangle * 2 ) );
 			pRenderer->MoveTo( Point.x, Point.y );
 			pRenderer->LineTo( Point.x + m_ConnectorTriangle, Point.y - AdjustYCoordinate( m_ConnectorTriangle * 2 ) );
-		
+
 			// Little line thingies.
 			for( double Counter = 0; Counter <= m_ConnectorTriangle * 2; Counter += UnscaledUnits( 3 ) )
 			{
@@ -5271,7 +5248,7 @@ void CLinkageView::DrawConnector( CRenderer* pRenderer, unsigned int OnLayers, C
 				pRenderer->LineTo( Point.x - m_ConnectorTriangle + Counter, Point.y - AdjustYCoordinate( m_ConnectorTriangle + m_ConnectorTriangle ) );
 			}
 		}
-	
+
 		if( pConnector->IsInput() )
 		{
 			double Radius = ( m_ConnectorRadius + UnscaledUnits( 2 ) );
@@ -5292,17 +5269,17 @@ void CLinkageView::DrawConnector( CRenderer* pRenderer, unsigned int OnLayers, C
 			CFPoint Pencil( Point );
 			Pencil.x += m_ConnectorRadius;
 			Pencil.y += AdjustYCoordinate( m_ConnectorRadius );
-		
+
 			if( pConnector->IsInput() )
 			{
 				/*
-				 * no one ever sets an input to draw but make the pencil look 
+				 * no one ever sets an input to draw but make the pencil look
 				 * good if they do it.
 				 */
 				Pencil.x += UnscaledUnits( 2 );
 				Pencil.y -= UnscaledUnits( 2 );
 			}
-		
+
 			pRenderer->MoveTo( Pencil.x, Pencil.y );
 			pRenderer->LineTo( Pencil.x, Pencil.y + AdjustYCoordinate( UnscaledUnits( 2 ) ) );
 			pRenderer->LineTo( Pencil.x + UnscaledUnits( 3 ), Pencil.y + AdjustYCoordinate( UnscaledUnits( 5 ) ) );
@@ -5315,7 +5292,7 @@ void CLinkageView::DrawConnector( CRenderer* pRenderer, unsigned int OnLayers, C
 		if( !pConnector->IsPositionValid() )
 			DrawFailureMarks( pRenderer, OnLayers, Point, m_ConnectorRadius );
 	}
-	
+
 	double Radius = pConnector->GetDrawCircleRadius();
 	if( Radius != 0 )
 	{
@@ -5337,12 +5314,12 @@ void CLinkageView::DrawConnector( CRenderer* pRenderer, unsigned int OnLayers, C
 		static const int BOX_SIZE = 5;
 		int Adjustment = ( BOX_SIZE - 1 ) / 2;
 		CFRect Rect( Point.x - Adjustment,  Point.y + AdjustYCoordinate( Adjustment ),  Point.x + Adjustment,  Point.y - AdjustYCoordinate( Adjustment ) );
-		
+
 		pRenderer->FillRect( &Rect, &Brush );
 
 		DrawFasteners( pRenderer, OnLayers, pConnector );
 	}
-	
+
 	if( pOldPen != 0 )
 		pRenderer->SelectObject( pOldPen );
 	if( pOldBrush != 0 )
@@ -5379,9 +5356,9 @@ void CLinkageView::DebugDrawLink( CRenderer* pRenderer, unsigned int OnLayers, C
 			String.Format( "%.4lf", pLink->GetRotationAngle() );
 
 			double Radius = m_ConnectorRadius * 5;
-			
+
 			pRenderer->TextOut( Point.x + Radius, Point.y - ( UnscaledUnits( m_UsingFontHeight + 1 ) / 2 ), String );
-		}	
+		}
 	}
 	pRenderer->SelectObject( pOldPen );
 }
@@ -5407,7 +5384,7 @@ void CLinkageView::DrawFasteners( CRenderer* pRenderer, unsigned int OnLayers, C
 			CElementItem *pItem = pList->GetNext( Position );
 			if( pItem != 0 )
 			{
-				if( ( pItem->GetConnector() != 0 && !pItem->GetConnector()->IsSelected() ) 
+				if( ( pItem->GetConnector() != 0 && !pItem->GetConnector()->IsSelected() )
 					|| ( pItem->GetLink() != 0 && !pItem->GetLink()->IsSelected() ) )
 					TempList.AddHead( pItem );
 			}
@@ -5438,13 +5415,13 @@ void CLinkageView::DrawFasteners( CRenderer* pRenderer, unsigned int OnLayers, C
 			pItem->GetConnector()->GetArea( AreaRect );
 		else
 			pItem->GetLink()->GetArea( *pDoc->GetGearConnections(), AreaRect );
-			
+
 //		if( pFastenedTo->GetConnectorList()->GetCount() > 1 || pFastenedTo->IsGear() )
 //		{
 			AreaRect = Scale( AreaRect );
 			AreaRect.InflateRect( 2 + m_ConnectorRadius, 2 + m_ConnectorRadius );
 			pRenderer->DrawRect( AreaRect );
-//		}		
+//		}
 	}
 
 	pRenderer->SelectObject( pOldPen );
@@ -5462,7 +5439,7 @@ void CLinkageView::DrawActuator( CRenderer* pRenderer, unsigned int OnLayers, CL
 		return;
 
 	COLORREF Color;
-	
+
 	if( pRenderer->GetColorCount() == 2 )
 		Color = RGB( 0, 0, 0 );
 	else
@@ -5477,7 +5454,7 @@ void CLinkageView::DrawActuator( CRenderer* pRenderer, unsigned int OnLayers, CL
 		Green += ( 1.0 - Green ) * .7;
 	if( Blue < 1.0 )
 		Blue += ( 1.0 - Blue ) * .7;
-	
+
 	COLORREF SecondColor = RGB( (int)( Red * 255 ), (int)( Green * 255 ), (int)( Blue * 255 ) );
 
 	int PointCount = 0;
@@ -5633,7 +5610,7 @@ CFArea CLinkageView::DrawGroundDimensions( CRenderer* pRenderer, CLinkageDoc *pD
 		pConnectors = pDoc->GetConnectorList();
 	else
 		pConnectors = pGroundLink->GetConnectorList();
-	
+
 	Position = pConnectors->GetHeadPosition();
 	while( Position != NULL )
 	{
@@ -5641,7 +5618,7 @@ CFArea CLinkageView::DrawGroundDimensions( CRenderer* pRenderer, CLinkageDoc *pD
 		if( pConnector == 0 )
 			continue;
 
-		// Keep track of the left-most and bottom-most connectors for 
+		// Keep track of the left-most and bottom-most connectors for
 		// positioning the measurement lines later.
 		if( m_bSimulating )
 		{
@@ -5659,7 +5636,7 @@ CFArea CLinkageView::DrawGroundDimensions( CRenderer* pRenderer, CLinkageDoc *pD
 			continue;
 
 		++ConnectorCount;
-		
+
 		if( pLeftMost == 0 || pConnector->GetPoint().x < pLeftMost->GetPoint().x )
 			pLeftMost = pConnector;
 		if( pBottomMost == 0 || pConnector->GetPoint().y < pBottomMost->GetPoint().y )
@@ -5688,7 +5665,7 @@ CFArea CLinkageView::DrawGroundDimensions( CRenderer* pRenderer, CLinkageDoc *pD
 	CFLine Temp = OrientationLine;
 	Temp.ReverseDirection();
 	Temp.PerpendicularLine( PerpOrientationLine );
-	
+
 	/*
 	 * Create lists of connectors that are sorted according to location along the
 	 * two different orientation lines. The sorting is not necessary if there are
@@ -5737,12 +5714,12 @@ CFArea CLinkageView::DrawGroundDimensions( CRenderer* pRenderer, CLinkageDoc *pD
 
 	if( ConnectorCount == 2 )
 	{
-		// Draw a possibly diagonal measurement between the anchors but only 
-		// if there are two of them. Any more than that and the diagonal 
+		// Draw a possibly diagonal measurement between the anchors but only
+		// if there are two of them. Any more than that and the diagonal
 		// measurement will not be useful in real life.
 		if( ConnectorReference[0].m_pConnector->GetSharingLink( ConnectorReference[1].m_pConnector ) == 0 || pGroundLink != 0 )
 		{
-			// Skip this is they are lined up horizontally or vertically 
+			// Skip this is they are lined up horizontally or vertically
 			// because there is already a measurement shown.
 			if( fabs( ConnectorReference[0].m_pConnector->GetPoint().x - ConnectorReference[1].m_pConnector->GetPoint().x ) > 0.001
 			    && fabs( ConnectorReference[0].m_pConnector->GetPoint().y - ConnectorReference[1].m_pConnector->GetPoint().y ) > 0.001 )
@@ -5751,9 +5728,9 @@ CFArea CLinkageView::DrawGroundDimensions( CRenderer* pRenderer, CLinkageDoc *pD
 
 				double UseOffset = pGroundLink == 0 ? 0 : -OFFSET_INCREMENT;
 				DimensionsArea += DrawMeasurementLine( pRenderer, MeasurementLine, MeasurementLine.GetEnd(), MeasurementLine.GetStart(), UseOffset, bDrawLines, bDrawText );
-				
-				double Angle = MeasurementLine.GetAngle(); 
-				
+
+				double Angle = MeasurementLine.GetAngle();
+
 				if( Angle < 45 )
 					Offset += OFFSET_INCREMENT;
 			}
@@ -5945,7 +5922,7 @@ CFArea CLinkageView::DrawCirclesRadius( CRenderer *pRenderer, CFPoint Center, st
 
 	return DimensionsArea;
 }
- 
+
 CFArea CLinkageView::DrawConnectorLinkDimensions( CRenderer* pRenderer, const GearConnectionList *pGearConnections, unsigned int OnLayers, CLink *pLink, bool bDrawLines, bool bDrawText )
 {
 	if( !m_bShowDimensions )
@@ -5993,7 +5970,7 @@ CFArea CLinkageView::DrawConnectorLinkDimensions( CRenderer* pRenderer, const Ge
 			}
 		}
 	}
-			
+
 	pRenderer->SelectObject( pOldPen );
 	pRenderer->SetTextColor( OldFontColor );
 
@@ -6134,7 +6111,7 @@ CFArea CLinkageView::DrawDimensions( CRenderer* pRenderer, const GearConnectionL
 
 		double Offset = OFFSET_INCREMENT * -2;
 		DimensionsArea += DrawMeasurementLine( pRenderer, LengthLine, LengthLine.GetEnd(), LengthLine.GetStart(), Offset, bDrawLines, bDrawText );
-		
+
 		Offset = -OFFSET_INCREMENT;
 		DimensionsArea += DrawMeasurementLine( pRenderer, ThrowLine, ThrowLine.GetEnd(), ThrowLine.GetStart(), Offset, bDrawLines, bDrawText );
 		DimensionsArea += DrawMeasurementLine( pRenderer, ExtensionLine, ExtensionLine.GetEnd(), ExtensionLine.GetStart(), Offset, bDrawLines, bDrawText );
@@ -6145,7 +6122,7 @@ CFArea CLinkageView::DrawDimensions( CRenderer* pRenderer, const GearConnectionL
 		CFLine Temp = OrientationLine;
 		Temp.ReverseDirection();
 		Temp.PerpendicularLine( PerpOrientationLine );
-	
+
 		/*
 		 * Create lists of connectors that are sorted according to location along the
 		 * two different orientation lines. The sorting is not necessary if there are
@@ -6342,7 +6319,7 @@ void CLinkageView::DrawLink( CRenderer* pRenderer, const GearConnectionList *pGe
 {
 	if( ( pLink->GetLayers() & OnLayers ) == 0 )
 		return;
-	
+
 	CPen* pOldPen = 0;
 
 	int Count = pLink->GetConnectorList()->GetCount();
@@ -6358,22 +6335,22 @@ void CLinkageView::DrawLink( CRenderer* pRenderer, const GearConnectionList *pGe
 			if( pLink->IsSelected( true ) )
 			{
 				CPen GrayPen;
-			
+
 				CLinkageDoc* pDoc = GetDocument();
 				ASSERT_VALID(pDoc);
-			
+
 				GrayPen.CreatePen( PS_SOLID, 1, pDoc->GetLastSelectedLink() == pLink ? RGB( 255, 200, 200 ) : RGB( 220, 220, 220 ) ) ;
 				pOldPen = pRenderer->SelectObject( &GrayPen );
 
 				CFRect AreaRect;
 				pLink->GetArea( *pGearConnections, AreaRect );
-			
+
 				if( pLink->GetConnectorList()->GetCount() > 1 || pLink->IsGear() )
 				{
 					AreaRect = Scale( AreaRect );
 					AreaRect.InflateRect( 2 + m_ConnectorRadius, 2 + m_ConnectorRadius );
 					pRenderer->DrawRect( AreaRect );
-				}		
+				}
 				pRenderer->SelectObject( pOldPen );
 
 				DrawFasteners( pRenderer, OnLayers, pLink );
@@ -6381,7 +6358,7 @@ void CLinkageView::DrawLink( CRenderer* pRenderer, const GearConnectionList *pGe
 			return;
 		}
 	}
-	
+
 	if( pLink->IsMeasurementElement() )
 	{
 		CPen Pen;
@@ -6403,7 +6380,7 @@ void CLinkageView::DrawLink( CRenderer* pRenderer, const GearConnectionList *pGe
 		}
 		pRenderer->SelectObject( pOldPen );
 	}
-	
+
 	CPen Pen;
 	COLORREF Color;
 
@@ -6417,7 +6394,7 @@ void CLinkageView::DrawLink( CRenderer* pRenderer, const GearConnectionList *pGe
 	if( bShowlabels && ( Count > 1 || pLink->IsGear() ) )
 	{
 		/*
-		 * Don't draw generic ID values for drawing elements. Only 
+		 * Don't draw generic ID values for drawing elements. Only
 		 * mechanism elements can show an ID string when no name is
 		 * assigned by the user.
 		 */
@@ -6583,7 +6560,7 @@ void CLinkageView::DrawLink( CRenderer* pRenderer, const GearConnectionList *pGe
 						Green += ( 1.0 - Green ) * .965;
 					if( Blue < 1.0 )
 						Blue += ( 1.0 - Blue ) * .965;
-	
+
 					COLORREF NewColor = RGB( (int)( Red * 255 ), (int)( Green * 255 ), (int)( Blue * 255 ) );
 					CBrush Brush;
 					Brush.CreateSolidBrush( NewColor );
@@ -6661,7 +6638,7 @@ void CLinkageView::OnEditMakerighttriangle()
 	ASSERT_VALID(pDoc);
 	if( pDoc->GetSelectedConnectorCount() != 3 || pDoc->GetLastSelectedConnector() == 0 )
 		return;
-		
+
 	CImageSelectDialog Dlg;
 	Dlg.DoModal();
 }
@@ -6696,15 +6673,15 @@ CRect CLinkageView::GetDocumentScrollingRect( void )
 {
 	CLinkageDoc* pDoc = GetDocument();
 	ASSERT_VALID(pDoc);
-	
+
 	CFRect DocumentArea = GetDocumentArea();
-	
+
 	CFRect DocumentRect = Scale( DocumentArea );
-	
+
 	static const int EDITBORDER = 50;
-	
+
 	DocumentRect.InflateRect( EDITBORDER, EDITBORDER );
-	
+
 	return CRect( (int)DocumentRect.left, (int)DocumentRect.top, (int)DocumentRect.right, (int)DocumentRect.bottom );
 }
 
@@ -6712,9 +6689,9 @@ void CLinkageView::SetScrollExtents( bool bEnableBars )
 {
 	CLinkageDoc* pDoc = GetDocument();
 	ASSERT_VALID(pDoc);
-	
+
 	m_ScrollOffsetAdjustment.SetPoint( 0, 0 );
-	
+
 	SCROLLINFO ScrollInfo;
 	memset( &ScrollInfo, 0, sizeof( ScrollInfo ) );
 	ScrollInfo.cbSize = sizeof( ScrollInfo );
@@ -6726,7 +6703,7 @@ void CLinkageView::SetScrollExtents( bool bEnableBars )
 		SetScrollInfo( SB_VERT, &ScrollInfo, TRUE );
 		return;
 	}
-	
+
 	CRect ClientRect = m_DrawingRect;
 
 	m_Zoom = m_ScreenZoom;
@@ -6750,14 +6727,13 @@ void CLinkageView::SetScrollExtents( bool bEnableBars )
 	ScrollInfo.nPage = ClientRect.Height() + 1;
 	ScrollInfo.nPos = ClientRect.top;
 	SetScrollInfo( SB_VERT, &ScrollInfo, TRUE );
-
 }
 
 void CLinkageView::OnScroll( int WhichBar, UINT nSBCode, UINT nPos )
 {
 	int Minimum;
 	int Maximum;
-	GetScrollRange( WhichBar, &Minimum, &Maximum ); 
+	GetScrollRange( WhichBar, &Minimum, &Maximum );
 	int Current = GetScrollPos( WhichBar );
 	int New = Current;
 	int Move = 0;
@@ -6767,7 +6743,7 @@ void CLinkageView::OnScroll( int WhichBar, UINT nSBCode, UINT nPos )
 		case SB_LEFT:
 			New = Minimum;
 			break;
-			
+
 		case SB_RIGHT:
 			New = Maximum;
 			break;
@@ -6789,7 +6765,7 @@ void CLinkageView::OnScroll( int WhichBar, UINT nSBCode, UINT nPos )
 
 		case SB_PAGELEFT:
 		{
-			// Get the page size. 
+			// Get the page size.
 			SCROLLINFO   info;
 			GetScrollInfo( WhichBar, &info, SIF_ALL );
 
@@ -6804,7 +6780,7 @@ void CLinkageView::OnScroll( int WhichBar, UINT nSBCode, UINT nPos )
 
 		case SB_PAGERIGHT:
 		{
-			// Get the page size. 
+			// Get the page size.
 			SCROLLINFO   info;
 			GetScrollInfo( WhichBar, &info, SIF_ALL );
 
@@ -6825,7 +6801,7 @@ void CLinkageView::OnScroll( int WhichBar, UINT nSBCode, UINT nPos )
 			New = nPos;
 			break;
 	}
-	
+
 	if( WhichBar == SB_VERT )
 		m_ScreenScrollPosition.y += New - Current;
 	else
@@ -6838,10 +6814,9 @@ void CLinkageView::OnScroll( int WhichBar, UINT nSBCode, UINT nPos )
 		SetScrollPos( WhichBar, New );
 	else
 		SetScrollExtents();
-	
+
 	InvalidateRect( 0 );
 }
-
 
 void CLinkageView::OnVScroll( UINT nSBCode, UINT nPos, CScrollBar* pScrollBar )
 {
@@ -6857,7 +6832,7 @@ void CLinkageView::OnEditSlide()
 {
 	CLinkageDoc* pDoc = GetDocument();
 	ASSERT_VALID(pDoc);
-	
+
 	pDoc->ConnectSliderLimits();
 
 	UpdateForDocumentChange();
@@ -6867,7 +6842,7 @@ void CLinkageView::OnUpdateEditSlide(CCmdUI *pCmdUI)
 {
 	CLinkageDoc* pDoc = GetDocument();
 	ASSERT_VALID(pDoc);
-	
+
 	pCmdUI->Enable( pDoc->IsSelectionSlideable() && !m_bSimulating && m_bAllowEdit );
 }
 
@@ -6875,7 +6850,7 @@ void CLinkageView::InsertlinkSlider( CFPoint *pPoint )
 {
 	CLinkageDoc* pDoc = GetDocument();
 	ASSERT_VALID(pDoc);
-	pDoc->InsertLink(  CLinkageDoc::MECHANISMLAYER, Unscale( LINK_INSERT_PIXELS ), pPoint == 0 ? GetDocumentViewCenter() : *pPoint, pPoint != 0, 1, false, false, true, false, false, false, false );	
+	pDoc->InsertLink(  CLinkageDoc::MECHANISMLAYER, Unscale( LINK_INSERT_PIXELS ), pPoint == 0 ? GetDocumentViewCenter() : *pPoint, pPoint != 0, 1, false, false, true, false, false, false, false );
 	m_bSuperHighlight = true;
 	UpdateForDocumentChange();
 }
@@ -6886,7 +6861,7 @@ void CLinkageView::InsertSliderCombo( CFPoint *pPoint )
 	CLinkageDoc* pDoc = GetDocument();
 	ASSERT_VALID(pDoc);
 
-	static const char *SLIDER_COMBO_XML = 
+	static const char *SLIDER_COMBO_XML =
 		"<Linkage>\
 		<connector anchor=\"true\" x=\"520\" y=\"160\" id=\"0\"/>\
 		<connector anchor=\"true\" x=\"647\" y=\"160\" id=\"1\"/>\
@@ -7387,7 +7362,6 @@ void CLinkageView::OnEndPrintPreview( CDC* pDC, CPrintInfo* pInfo, POINT point, 
 	ShowPrintPreviewCategory( false );
 }
 
-
 void CLinkageView::OnSimulateInteractive()
 {
 	ConfigureControlWindow( INDIVIDUAL );
@@ -7446,7 +7420,6 @@ void CLinkageView::OnSimulateManual()
 	ConfigureControlWindow( GLOBAL );
 	StartMechanismSimulate( GLOBAL );
 }
-
 
 void CLinkageView::OnUpdateSimulateManual(CCmdUI *pCmdUI)
 {
@@ -7556,11 +7529,10 @@ void CLinkageView::InsertActuator( CFPoint *pPoint )
 {
 	CLinkageDoc* pDoc = GetDocument();
 	ASSERT_VALID(pDoc);
-	pDoc->InsertLink( CLinkageDoc::MECHANISMLAYER, Unscale( LINK_INSERT_PIXELS ), pPoint == 0 ? GetDocumentViewCenter() : *pPoint, pPoint != 0, 2, false, false, false, true, false, m_bNewLinksSolid, false );	
+	pDoc->InsertLink( CLinkageDoc::MECHANISMLAYER, Unscale( LINK_INSERT_PIXELS ), pPoint == 0 ? GetDocumentViewCenter() : *pPoint, pPoint != 0, 2, false, false, false, true, false, m_bNewLinksSolid, false );
 	m_bSuperHighlight = true;
 	UpdateForDocumentChange();
 }
-
 
 int CLinkageView::OnCreate(LPCREATESTRUCT lpCreateStruct)
 {
@@ -7589,13 +7561,13 @@ void CLinkageView::OnDestroy()
 
 COleDropWndTarget::COleDropWndTarget() {}
 
-COleDropWndTarget::~COleDropWndTarget() {}     
+COleDropWndTarget::~COleDropWndTarget() {}
 
-DROPEFFECT COleDropWndTarget::OnDragEnter(CWnd* pWnd, COleDataObject* 
+DROPEFFECT COleDropWndTarget::OnDragEnter(CWnd* pWnd, COleDataObject*
            pDataObject, DWORD dwKeyState, CPoint point )
 {
 	// We always copy the dropped item.
-	return DROPEFFECT_COPY;    
+	return DROPEFFECT_COPY;
 }
 
 void COleDropWndTarget::OnDragLeave(CWnd* pWnd)
@@ -7603,18 +7575,18 @@ void COleDropWndTarget::OnDragLeave(CWnd* pWnd)
     COleDropTarget::OnDragLeave(pWnd);
 }
 
-DROPEFFECT COleDropWndTarget::OnDragOver(CWnd* pWnd, COleDataObject* 
+DROPEFFECT COleDropWndTarget::OnDragOver(CWnd* pWnd, COleDataObject*
            pDataObject, DWORD dwKeyState, CPoint point )
-{     
+{
 	// We always copy the dropped item and allow a drop anywhere in the view window.
-	return DROPEFFECT_COPY;    
+	return DROPEFFECT_COPY;
 }
 
-BOOL COleDropWndTarget::OnDrop(CWnd* pWnd, COleDataObject* pDataObject, 
+BOOL COleDropWndTarget::OnDrop(CWnd* pWnd, COleDataObject* pDataObject,
                  DROPEFFECT dropEffect, CPoint point )
-{           
+{
     HGLOBAL  hGlobal;
-    LPCSTR   pData;     
+    LPCSTR   pData;
 
     UINT CF_Linkage = RegisterClipboardFormat( "RECTORSQUID_Linkage_CLIPBOARD_XML_FORMAT" );
 
@@ -7625,16 +7597,15 @@ BOOL COleDropWndTarget::OnDrop(CWnd* pWnd, COleDataObject* pDataObject,
 		return FALSE;
 
     // Get pointer to data
-    pData=(LPCSTR)GlobalLock(hGlobal);    
+    pData=(LPCSTR)GlobalLock(hGlobal);
 
-    ASSERT(pData!=NULL); 
+    ASSERT(pData!=NULL);
 
     // Unlock memory - Send dropped text into the "bit-bucket"
     GlobalUnlock(hGlobal);
 
     return TRUE;
 }
-
 
 void CLinkageView::OnKeyUp(UINT nChar, UINT nRepCnt, UINT nFlags)
 {
@@ -7650,7 +7621,7 @@ void CLinkageView::OnChar(UINT nChar, UINT nRepCnt, UINT nFlags)
 	 */
 
 	switch( nChar )
-	{	
+	{
 		case '-':
 		case '_':
 			OnViewZoomin();
@@ -7703,7 +7674,6 @@ void CLinkageView::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 		CView::OnKeyDown( nChar, nRepCnt, nFlags );
 }
 
-
 BOOL CLinkageView::PreTranslateMessage(MSG* pMsg)
 {
 	if( pMsg->message == WM_KEYDOWN && pMsg->wParam==VK_TAB )
@@ -7718,12 +7688,12 @@ BOOL CLinkageView::PreTranslateMessage(MSG* pMsg)
 /*
  * Scale to get from document units to pixels. Document units are 96 DPI on a
  * typical screen. The document unit selection, inches or mm, are not used in
- * internal processes, just in showing measurement data to the user and 
+ * internal processes, just in showing measurement data to the user and
  * measurement input.
  *
  * Scale is also a document to pixel conversion function.
  *
- * Y document coordinates are negated to get from document to the screen 
+ * Y document coordinates are negated to get from document to the screen
  * coordinate system and back.
  */
 
@@ -7848,7 +7818,7 @@ void CLinkageView::OnViewUnits()
 	CMFCRibbonComboBox * pComboBox = DYNAMIC_DOWNCAST( CMFCRibbonComboBox, pRibbon->FindByID( ID_VIEW_UNITS ) );
 	if( pComboBox == 0 )
 		return;
-	
+
 	int nCurSel = pComboBox->GetCurSel();
 	if( nCurSel < 0 )
 		return;
@@ -7964,7 +7934,7 @@ void CLinkageView::ShowSelectedElementCoordinates( void )
 		pConnector1 = pDoc->GetSelectedConnector( 1 );
 		pConnector2 = pDoc->GetSelectedConnector( 2 );
 	}
-	
+
 	if( SelectedCount < 1 || SelectedCount > 3 )
 	{
 		pEditBox->SetEditText( "" );
@@ -8067,20 +8037,19 @@ void CLinkageView::OnUpdateViewCoordinates( CCmdUI *pCmdUI )
 {
 	CLinkageDoc* pDoc = GetDocument();
 	ASSERT_VALID(pDoc);
-	
+
 	int SelectedConnectors = pDoc->GetSelectedConnectorCount();
 	int SelectedLinks = pDoc->GetSelectedLinkCount( true );
-	
+
 	//pCmdUI->Enable( !m_bSimulating && ( ( SelectedConnectors == 1 || SelectedConnectors == 2 || SelectedConnectors == 3 || pDoc->IsSelectionMeshableGears() ) ? 1 : 0 ) && m_bAllowEdit );
 	pCmdUI->Enable( !m_bSimulating && m_bAllowEdit && ( SelectedConnectors + SelectedLinks > 0 || pDoc->IsSelectionMeshableGears() ) ? 1 : 0 );
 }
-
 
 static bool GetEncoderClsid(WCHAR *format, CLSID *pClsid)
 {
 	unsigned int num = 0,  size = 0;
 	GetImageEncodersSize(&num, &size);
-	if( size == 0 ) 
+	if( size == 0 )
 		return false;
 	ImageCodecInfo *pImageCodecInfo = (ImageCodecInfo *)(malloc(size));
 	if( pImageCodecInfo == NULL )
@@ -8093,7 +8062,7 @@ static bool GetEncoderClsid(WCHAR *format, CLSID *pClsid)
 			*pClsid = pImageCodecInfo[Index].Clsid;
 			free(pImageCodecInfo);
 			return true;
-		}    
+		}
 	}
 	free(pImageCodecInfo);
 	return false;
@@ -8126,13 +8095,11 @@ bool CLinkageView::DisplayAsImage( CDC *pOutputDC, int xOut, int yOut, int OutWi
 	ShrunkDC.SelectObject( &ShrunkBitmap );
 	ShrunkDC.PatBlt( 0, 0, RenderWidth, RenderHeight, WHITENESS );
 
-	StretchBltPlus( ShrunkDC.GetSafeHdc(), 
+	StretchBltPlus( ShrunkDC.GetSafeHdc(),
 		            0, 0, RenderWidth, RenderHeight,
-		            Renderer.GetSafeHdc(), 
+		            Renderer.GetSafeHdc(),
 					0, 0, (int)( Width * ScaleFactor ), (int)( Height * ScaleFactor ),
 					SRCCOPY );
-
-
 
 	double WidthScale = (double)OutWidth / (double)RenderWidth;
 	double HeightScale = (double)OutHeight / (double)RenderHeight;
@@ -8148,15 +8115,15 @@ bool CLinkageView::DisplayAsImage( CDC *pOutputDC, int xOut, int yOut, int OutWi
 	CRect AllRect( xOut, yOut, xOut + OutWidth, yOut + OutHeight );
 	pOutputDC->FillRect( &AllRect, &BackgroundBrush );
 
-	StretchBltPlus( pOutputDC->GetSafeHdc(), 
+	StretchBltPlus( pOutputDC->GetSafeHdc(),
 		            xOut + xOffset, yOut + yOffset, FinalWidth, FinalHeight,
-		            ShrunkDC.GetSafeHdc(), 
+		            ShrunkDC.GetSafeHdc(),
 					0, 0, RenderWidth, RenderHeight,
 					SRCCOPY );
 
 	if( bAddBorder )
 	{
-		CBrush Brush( RGB( 0, 0, 0 ) ); 
+		CBrush Brush( RGB( 0, 0, 0 ) );
 		CRect Rect( xOut + xOffset, yOut + yOffset, xOut + xOffset + FinalWidth, yOut + yOffset + FinalHeight );
 		pOutputDC->FrameRect( &Rect, &Brush );
 	}
@@ -8165,7 +8132,7 @@ bool CLinkageView::DisplayAsImage( CDC *pOutputDC, int xOut, int yOut, int OutWi
 }
 
 bool CLinkageView::SaveAsImage( const char *pFileName, int RenderWidth, int RenderHeight, double ResolutionAdjustmentFactor, double MarginScale )
-{	
+{
 	CString SearchableFileName = pFileName;
 	SearchableFileName.MakeUpper();
 	bool bJPEG = false;
@@ -8205,9 +8172,9 @@ bool CLinkageView::SaveAsImage( const char *pFileName, int RenderWidth, int Rend
 	ShrunkDC.SelectObject( &ShrunkBitmap );
 	ShrunkDC.PatBlt( 0, 0, FinalWidth, FinalHeight, WHITENESS );
 
-	StretchBltPlus( ShrunkDC.GetSafeHdc(), 
+	StretchBltPlus( ShrunkDC.GetSafeHdc(),
 		            0, 0, FinalWidth, FinalHeight,
-		            Renderer.GetSafeHdc(), 
+		            Renderer.GetSafeHdc(),
 					0, 0, (int)( Width * ScaleFactor ), (int)( Height * ScaleFactor ),
 					SRCCOPY );
 
@@ -8240,7 +8207,7 @@ bool CLinkageView::SaveAsImage( const char *pFileName, int RenderWidth, int Rend
 }
 
 bool CLinkageView::SaveAsDXF( const char *pFileName )
-{	
+{
 	CLinkageDoc* pDoc = GetDocument();
 	ASSERT_VALID(pDoc);
 
@@ -8307,10 +8274,10 @@ void CLinkageView::UpdateForDocumentChange( void )
 LRESULT CLinkageView::OnGesture(WPARAM wParam, LPARAM lParam)
 {
     // Create a structure to populate and retrieve the extra message info.
-    GESTUREINFO gi;  
-    
+    GESTUREINFO gi;
+
     ZeroMemory(&gi, sizeof(GESTUREINFO));
-    
+
     gi.cbSize = sizeof(GESTUREINFO);
 
     BOOL bResult  = GetGestureInfo((HGESTUREINFO)lParam, &gi);
@@ -8320,7 +8287,7 @@ LRESULT CLinkageView::OnGesture(WPARAM wParam, LPARAM lParam)
         // now interpret the gesture
         switch (gi.dwID){
            case GID_ZOOM:
-               // Code for zooming goes here     
+               // Code for zooming goes here
                bHandled = TRUE;
                break;
            case GID_PAN:

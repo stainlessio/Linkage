@@ -7,7 +7,6 @@
 #include "ExportImageSettingsDialog.h"
 #include "afxdialogex.h"
 
-
 // CExportImageSettingsDialog dialog
 
 IMPLEMENT_DYNAMIC(CExportImageSettingsDialog, CDialog)
@@ -52,7 +51,6 @@ void CExportImageSettingsDialog::DoDataExchange(CDataExchange* pDX)
 	m_MarginSpinControl.SetRange( 0, 50 );
 }
 
-
 BEGIN_MESSAGE_MAP(CExportImageSettingsDialog, CDialog)
 	ON_BN_CLICKED( IDC_RADIO1, &CExportImageSettingsDialog::OnBnClickedResolution )
 	ON_BN_CLICKED( IDC_RADIO3, &CExportImageSettingsDialog::OnBnClickedResolution )
@@ -65,15 +63,12 @@ BEGIN_MESSAGE_MAP(CExportImageSettingsDialog, CDialog)
 	ON_EN_CHANGE( IDC_EDIT7, &CExportImageSettingsDialog::OnEnChangeEdit7 )
 END_MESSAGE_MAP()
 
-
 // CExportImageSettingsDialog message handlers
-
 
 void CExportImageSettingsDialog::OnBnClickedResolution()
 {
 	UpdateImage();
 }
-
 
 void CExportImageSettingsDialog::OnEnChangeScaleFactor()
 {
@@ -119,9 +114,6 @@ BOOL CExportImageSettingsDialog::OnInitDialog()
 {
 	CDialog::OnInitDialog();
 
-
-
-
 	CRect Rect;
 	m_PreviewArea.GetWindowRect( &Rect );
 	ScreenToClient( &Rect );
@@ -135,7 +127,6 @@ BOOL CExportImageSettingsDialog::OnInitDialog()
 	return TRUE;  // return TRUE unless you set the focus to a control
 	// EXCEPTION: OCX Property Pages should return FALSE
 }
-
 
 void CExportImageSettingsDialog::OnPaint()
 {
@@ -215,7 +206,7 @@ void CExportImageSettingsDialog::OnCopy()
 	CClientDC dc( this );
 	CDC memDC;
 
-	memDC.CreateCompatibleDC( &dc ); 
+	memDC.CreateCompatibleDC( &dc );
 	bitmap.CreateCompatibleBitmap( &dc, RenderWidth, RenderHeight );
 	CBitmap* pOldBitmap = memDC.SelectObject( &bitmap );
 
@@ -229,7 +220,6 @@ void CExportImageSettingsDialog::OnCopy()
 
 	memDC.SelectObject( pOldBitmap );
 }
-
 
 void CExportImageSettingsDialog::OnEnChangeEdit7()
 {

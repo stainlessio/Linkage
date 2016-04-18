@@ -3,7 +3,7 @@
 #include <new>
 
 static const CString Dummy = "";
-	
+
 class QuickXMLNodeImplementation
 {
 	public:
@@ -49,7 +49,7 @@ QuickXMLNode::~QuickXMLNode()
 		m_pImplementation = 0;
 	}
 }
-	
+
 bool QuickXMLNode::Parse( const char *pText )
 {
 	if( m_pImplementation == 0 )
@@ -68,7 +68,7 @@ const char *QuickXMLNode::Parse( const char *pText, bool bExpectEndTag )
 
 	m_pImplementation->m_pFirstChild = 0;
 	QuickXMLNode *pLastChild = 0;
-	
+
 	while( pText != 0 && *pText != '\0' )
 	{
 		const char *pTag = pText + strcspn( pText, "<" );
@@ -77,7 +77,7 @@ const char *QuickXMLNode::Parse( const char *pText, bool bExpectEndTag )
 		const char *pTagData = pTag + 1;
 		if( *pTagData == '\0' )
 			return 0;
-			
+
 		const char *pLinkData = pText + strspn( pText, " \t\r\n" );
 		if( pLinkData != pTag )
 		{
@@ -90,7 +90,7 @@ const char *QuickXMLNode::Parse( const char *pText, bool bExpectEndTag )
 				pLastChild->m_pImplementation->m_pNext = pNewNode;
 			pLastChild = pNewNode;
 		}
-			
+
 		if( *pTagData == '/' )
 		{
 			// Is this the end tag we want? It had better be!
@@ -112,14 +112,14 @@ const char *QuickXMLNode::Parse( const char *pText, bool bExpectEndTag )
 			const char * pEnd = pTag + strcspn( pTag, "><" );
 			if( *pEnd == '\0' || *pEnd == '<' )
 				return 0;
-				
+
 			if( pEnd[-1] == '/' )
 				--pEnd;
-				
+
 			const char * pNameEnd = pTag + strcspn( pTag, " " );
 			if( pNameEnd > pEnd )
 				pNameEnd = pEnd;
-			
+
 			CString Tag;
 
 			// Done. Return pointer after this end tag.
@@ -147,7 +147,7 @@ const char *QuickXMLNode::Parse( const char *pText, bool bExpectEndTag )
 }
 
 class QuickXMLNode* QuickXMLNode::FindChildByName( const char *pName )
-{	
+{
 	if( m_pImplementation == 0 )
 		return 0;
 
@@ -203,7 +203,6 @@ const CString & QuickXMLNode::GetText( void )
 	return m_pImplementation->m_NameOrData;
 }
 
-
 class QuickXMLNode* QuickXMLNode::GetNextSibling( void )
 {
 	if( m_pImplementation == 0 )
@@ -215,24 +214,24 @@ class QuickXMLNode* QuickXMLNode::GetNextSibling( void )
 const CString & QuickXMLNode::GetAttribute( const char *pAttribute )
 {
 	static CString Value;
-	
+
 	if( m_pImplementation == 0 )
 		return Dummy;
-		
+
 	CString Search = pAttribute;
 	Search += "=\"";
 
 	int Found = m_pImplementation->m_Attributes.Find( Search );
 	if( Found < 0 )
 		return Dummy;
-		
+
 	Found += Search.GetLength();
-		
+
 	int End = m_pImplementation->m_Attributes.Find( "\"", Found );
 	if( End < 0 )
 		return Dummy;
-		
+
 	Value = m_pImplementation->m_Attributes.Mid( Found, End - Found );
-	
+
 	return Value;
 }

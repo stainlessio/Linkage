@@ -7,7 +7,6 @@
 #include "AviFile.h"
 #include "mmsystem.h"
 
-
 // CLinkPropertiesDialog dialog
 
 IMPLEMENT_DYNAMIC(CRecordDialog, CMyDialog)
@@ -23,7 +22,6 @@ CRecordDialog::CRecordDialog(CWnd* pParent /*=NULL*/)
 	, m_RecordTime(_T("0:0:0.0"))
 	, m_EndTime(_T("0:0:0.0"))
 {
-
 }
 
 CRecordDialog::~CRecordDialog()
@@ -121,11 +119,7 @@ BEGIN_MESSAGE_MAP(CRecordDialog, CMyDialog)
 	ON_BN_CLICKED( IDC_BUTTON1, &CRecordDialog::OnBnClickedButton1 )
 END_MESSAGE_MAP()
 
-
 // CLinkPropertiesDialog message handlers
-
-
-
 
 void CRecordDialog::OnBnClickedButton1()
 {

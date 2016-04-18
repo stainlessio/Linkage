@@ -1,7 +1,6 @@
 #include "stdafx.h"
 #include "ColorStatic.h"
 
-
 IMPLEMENT_DYNAMIC( CColorStatic, CStatic )
 
 BEGIN_MESSAGE_MAP(CColorStatic, CStatic)

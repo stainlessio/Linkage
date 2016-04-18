@@ -5,7 +5,6 @@
 #include "Linkage.h"
 #include "LinkPropertiesDialog.h"
 
-
 // CLinkPropertiesDialog dialog
 
 IMPLEMENT_DYNAMIC(CLinkPropertiesDialog, CMyDialog)
@@ -104,17 +103,12 @@ void CLinkPropertiesDialog::DoDataExchange(CDataExchange* pDX)
 	OnBnClickedCheck2();
 }
 
-
 BEGIN_MESSAGE_MAP(CLinkPropertiesDialog, CMyDialog)
 	ON_BN_CLICKED(IDC_CHECK2, &CLinkPropertiesDialog::OnBnClickedCheck2)
 	ON_STN_CLICKED( IDC_COLOR, &CLinkPropertiesDialog::OnStnClickedColor )
 END_MESSAGE_MAP()
 
-
 // CLinkPropertiesDialog message handlers
-
-
-
 
 void CLinkPropertiesDialog::OnBnClickedCheck2()
 {
@@ -124,13 +118,12 @@ void CLinkPropertiesDialog::OnBnClickedCheck2()
 	m_ThrowDistanceControl.EnableWindow( m_ActuatorControl.GetCheck() != 0 ? TRUE : FALSE );
 }
 
-
 void CLinkPropertiesDialog::OnStnClickedColor()
 {
 	CColorDialog dlg;
 	if( dlg.DoModal() == IDOK )
 	{
 		m_Color = dlg.GetColor();
-		m_ColorControl.SetColor( m_Color ); 
+		m_ColorControl.SetColor( m_Color );
 	}
 }

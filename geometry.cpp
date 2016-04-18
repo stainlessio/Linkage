@@ -20,7 +20,7 @@ void CFPoint::SnapToLine( CFLine &Line, bool bToSegment, bool bStartToInfinity )
 	x = Line.m_Start.x + ( AB.x * t );
 	y = Line.m_Start.y + ( AB.y * t );
 
-	// Old code that had more computations than needed. Left where in case 
+	// Old code that had more computations than needed. Left where in case
 	// there is a problem with the new code to set x and y above.
 
     //CFLine TempLine( CFPoint( 0, 0 ), AB );
@@ -50,7 +50,7 @@ bool CFCircle::CircleIntersection( CFCircle& OtherCircle, CFPoint* ReturnPoint0,
 	{
 		if( fabs( a ) - r > .00005 )
 			return false;
-			
+
 		// Fudge a bit to allow for mechanisms that are close to working but
 		// that might have had some rounding issues cause malfunction.
 		double sign = _copysign( 1, a );
@@ -74,7 +74,7 @@ bool CFCircle::CircleIntersection( CFCircle& OtherCircle, CFPoint* ReturnPoint0,
 
 	return true;
 	}
-	
+
 double DistanceToLine( CFPoint &End1, CFPoint &End2, CFPoint CheckPoint )
 {
 	double r_numerator = (CheckPoint.x-End1.x)*(End2.x-End1.x) + (CheckPoint.y-End1.y)*(End2.y-End1.y);
@@ -83,7 +83,7 @@ double DistanceToLine( CFPoint &End1, CFPoint &End2, CFPoint CheckPoint )
 
     double px = End1.x + r*(End2.x-End1.x);
     double py = End1.y + r*(End2.y-End1.y);
-     
+
     double s =  ((End1.y-CheckPoint.y)*(End2.x-End1.x)-(End1.x-CheckPoint.x)*(End2.y-End1.y) ) / r_denomenator;
 
 	double DistanceToLine = fabs(s)*sqrt(r_denomenator);
@@ -101,7 +101,6 @@ double DistanceToLine( CFPoint &End1, CFPoint &End2, CFPoint CheckPoint )
 	}
 	else
 	{
-
 		double dist1 = (CheckPoint.x-End1.x)*(CheckPoint.x-End1.x) + (CheckPoint.y-End1.y)*(CheckPoint.y-End1.y);
 		double dist2 = (CheckPoint.x-End2.x)*(CheckPoint.x-End2.x) + (CheckPoint.y-End2.y)*(CheckPoint.y-End2.y);
 		if (dist1 < dist2)
@@ -128,16 +127,15 @@ bool CFRect::IsOverlapped( CFRect &Rect )
 
 bool CFRect::IsInsideOf( CFRect &Rect )
 {
-	return ( top >= Rect.top && top <= Rect.bottom 
-		     && bottom >= Rect.top && bottom <= Rect.bottom 
+	return ( top >= Rect.top && top <= Rect.bottom
+		     && bottom >= Rect.top && bottom <= Rect.bottom
 		     && left >= Rect.left && left <= Rect.right
 		     && right >= Rect.left && right <= Rect.right );
 }
 
-
 bool CFPoint::IsInsideOf( class CFRect &Rect )
 {
-	return ( y >= Rect.top && y <= Rect.bottom 
+	return ( y >= Rect.top && y <= Rect.bottom
 		     && x >= Rect.left && x <= Rect.right );
 }
 
@@ -157,15 +155,15 @@ CFPoint CFLine::MidPoint( double ScaleDistance )
 
 void Intersects( const CFLine &Line, const CFCircle &Circle, CFPoint &HitPoint1, CFPoint &HitPoint2, bool &bHit1, bool &bHit2, bool bBeforeOkay, bool bAfterOkay )
 {
-	double drsq; 
+	double drsq;
 	double D;
-	
+
 	double dx = Line[1].x - Line[0].x;
 	double dy = Line[1].y - Line[0].y;
-	
+
 	bHit1 = true;
 	bHit2 = true;
-	
+
 	drsq = dx * dx + dy * dy;
 	D = ( Line[0].x - Circle.x ) * dy - ( Line[0].y - Circle.y ) * dx;
 
@@ -182,14 +180,12 @@ void Intersects( const CFLine &Line, const CFCircle &Circle, CFPoint &HitPoint1,
 		HitPoint1.y = Circle.y + ( (-D) * dx + dy * det) / drsq;
 		HitPoint2.x = Circle.x + ( D * dy - dx * det) / drsq;
 		HitPoint2.y = Circle.y + ( (-D) * dx - dy * det) / drsq;
-       
+
 		double d = Line[0].x+dx;
 		double d2 = Line[0].y+dy;
-		
+
 		double xsign = _copysign( 1, Line[1].x-Line[0].x );
 		double ysign = _copysign( 1, Line[1].y-Line[0].y );
-		
-
 
 		if( d - Line[1].x < -0.00005 || d - Line[1].x > 0.00005 )
 		{
@@ -213,11 +209,11 @@ void Intersects( const CFLine &Line, const CFCircle &Circle, CFPoint &HitPoint1,
 		}
 
 		// Detect being at the beginning or end of the line and adjust the hit point.
-		// This is to account for more of those pesky rounding issues that cause 
+		// This is to account for more of those pesky rounding issues that cause
 		// intersections that theoretically should be on the end of the line to be
 		// past the end by a small amount.
 		double Fudge = 10000.0;
-		
+
 		// Test if points are before or after the line segment.
 		if( !bBeforeOkay )
 		{
@@ -271,16 +267,16 @@ void Intersects( const CFLine &Line, const CFCircle &Circle, CFPoint &HitPoint1,
 void CFPoint::RotateAround( const CFPoint &OtherPoint, double Angle )
 {
 	Angle *= DEGREES_TO_RADIANS_BEST_FOR_THIS_CODE; // Convert to radians.
-	
+
 	double x1 = x - OtherPoint.x;
 	double y1 = y - OtherPoint.y;
-	
+
 	double Cosine = cos( Angle );
 	double Sine = sin( Angle );
-	
+
 	double x2 = x1 * Cosine - y1 * Sine;
 	double y2 = x1 * Sine + y1 * Cosine;
-	
+
 	x = x2 + OtherPoint.x;
 	y = y2 + OtherPoint.y;
 }
@@ -288,16 +284,16 @@ void CFPoint::RotateAround( const CFPoint &OtherPoint, double Angle )
 void CFPoint::SetPoint( CFPoint &OtherPoint, double Distance, double Angle )
 {
 	Angle *= DEGREES_TO_RADIANS_BEST_FOR_THIS_CODE; // Convert to radians.
-	
+
 	x = OtherPoint.x + ( Distance * cos( Angle ) );
 	y = OtherPoint.y + ( Distance * sin( Angle ) );
-	
+
 //	double Cosine = cos( Angle );
 //	double Sine = sin( Angle );
-//	
+//
 //	double x2 = x1 * Cosine - y1 * Sine;
 //	double y2 = x1 * Sine + y1 * Cosine;
-//	
+//
 //	x = x2 + OtherPoint.x;
 //	y = y2 + OtherPoint.y;
 }
@@ -321,7 +317,7 @@ bool Intersects( const CFPoint &line1Point1, const CFPoint &line1Point2, const C
 	double q =	( line1Point1.y - line2Point1.y ) * (line2Point2.x - line2Point1.x) -
 				(line1Point1.x - line2Point1.x) * (line2Point2.y - line2Point1.y);
 
-	double d =	(line1Point2.x - line1Point1.x) * (line2Point2.y - line2Point1.y) - 
+	double d =	(line1Point2.x - line1Point1.x) * (line2Point2.y - line2Point1.y) -
 				(line1Point2.y - line1Point1.y) * (line2Point2.x - line2Point1.x);
 
 	if( d == 0 ) // parallel lines so no intersection anywhere in space (in curved space, maybe, but not here in Euclidian space.)
@@ -416,7 +412,6 @@ void CFLine::PerpendicularPoint( CFPoint &Perp, const int Direction ) const
 	}
 }
 
-
 void CFLine::PerpendicularLine( CFLine &Perp, const int Direction ) const
 {
 	CFPoint Point = m_End;
@@ -507,14 +502,14 @@ bool IsPointInPoly( int PointCount, const CFPoint *pPoints, const CFPoint &TestP
 	{
 		if ((pPoints[i].y< TestPoint.y && pPoints[j].y>=TestPoint.y
 		||   pPoints[j].y< TestPoint.y && pPoints[i].y>=TestPoint.y)
-		&&  (pPoints[i].x<=TestPoint.x || pPoints[j].x<=TestPoint.x)) 
+		&&  (pPoints[i].x<=TestPoint.x || pPoints[j].x<=TestPoint.x))
 		{
-			oddNodes^=(pPoints[i].x+(TestPoint.y-pPoints[i].y)/(pPoints[j].y-pPoints[i].y)*(pPoints[j].x-pPoints[i].x)<TestPoint.x); 
+			oddNodes^=(pPoints[i].x+(TestPoint.y-pPoints[i].y)/(pPoints[j].y-pPoints[i].y)*(pPoints[j].x-pPoints[i].x)<TestPoint.x);
 		}
-		j=i; 
+		j=i;
 	}
 
-	return oddNodes != 0; 
+	return oddNodes != 0;
 }
 
 bool CFRect::PointInRect( CFPoint Point )
@@ -589,7 +584,7 @@ bool GetTangents( const CFCircle &Circle1, const CFCircle &Circle2, CFLine &Resu
 	Line.SetDistance( DistanceValue );
 	CFCircle Intersector( Line.GetEnd(), Line.GetDistance() );
 
-	CFPoint Point1; 
+	CFPoint Point1;
 	CFPoint Point2;
 	if( !Intersector.CircleIntersection( Temp, &Point1, &Point2 ) )
 		return false;
@@ -600,12 +595,12 @@ bool GetTangents( const CFCircle &Circle1, const CFCircle &Circle2, CFLine &Resu
 	Line.SetLine( Circle2.GetCenter(), Point1 );
 	Line.SetDistance( Circle2.r );
 
-	Result1 += Line.GetEnd() - Point1; 
+	Result1 += Line.GetEnd() - Point1;
 
 	Line.SetLine( Circle2.GetCenter(), Point2 );
 	Line.SetDistance( Circle2.r );
 
-	Result2 += Line.GetEnd() - Point2; 
+	Result2 += Line.GetEnd() - Point2;
 
 	return true;
 }
@@ -613,7 +608,7 @@ bool GetTangents( const CFCircle &Circle1, const CFCircle &Circle2, CFLine &Resu
 double GetClosestAngle( double OldAngle, double NewAngle )
 {
 	/*
-	 * NewAngle could be about 360 degrees off due to code doing normalization. Figure out how 
+	 * NewAngle could be about 360 degrees off due to code doing normalization. Figure out how
 	 * to get the angle as close to the old angle as possible by adding or subtracting 360.
 	 */
 
@@ -626,5 +621,4 @@ double GetClosestAngle( double OldAngle, double NewAngle )
 		return NewAngle - 360;
 	return NewAngle;
 }
-
 

@@ -34,9 +34,9 @@ END_MESSAGE_MAP()
 
 class CValidatedString : public CString
 {
-	public: bool LoadString( UINT nID ) 
+	public: bool LoadString( UINT nID )
 	{
-		BOOL bNameValid = CString::LoadString( nID ); 
+		BOOL bNameValid = CString::LoadString( nID );
 		ASSERT( bNameValid );
 		return bNameValid != 0;
 	}
@@ -45,7 +45,7 @@ class CValidatedString : public CString
 CMainFrame::CMainFrame()
 {
 	m_pSampleGallery = 0;
-	
+
 	// TODO: add member initialization code here
 	theApp.m_nAppLook = theApp.GetInt(_T("ApplicationLook"), ID_VIEW_APPLOOK_OFF_2007_SILVER);
 }
@@ -191,7 +191,6 @@ static void AddExportButton( CMFCRibbonPanel *pPanel )
 	//AddRibbonButton( pMainPanel, IDS_RIBBON_SAVEVIDEO, ID_FILE_SAVEVIDEO, 5, LARGE );
 	//AddRibbonButton( pMainPanel, IDS_RIBBON_SAVEIMAGE, ID_FILE_SAVEIMAGE, 37, LARGE );
 
-
 	strTemp.LoadString(IDS_RIBBON_EXPORT_LABEL);
 	pButtonExport->AddSubItem(new CMFCRibbonLabel(strTemp));
 
@@ -227,7 +226,7 @@ void CMainFrame::CreateViewPanel( CMFCRibbonCategory* pCategory )
 	AddRibbonButton( pPanelView, IDS_RIBBON_ZOOMFIT, ID_VIEW_ZOOMFIT, 20, SMALL );
 	AddRibbonButton( pPanelView, IDS_RIBBON_VIEW_ZOOMIN, ID_VIEW_ZOOMIN, 16, SMALL );
 	AddRibbonButton( pPanelView, IDS_RIBBON_VIEW_ZOOMOUT, ID_VIEW_ZOOMOUT, 17, SMALL );
-	
+
 	AddRibbonCheckbox( pPanelView, IDS_RIBBON_VIEWDRAWING, ID_VIEW_DRAWING );
 	AddRibbonCheckbox( pPanelView, IDS_RIBBON_VIEWMECHANISM, ID_VIEW_MECHANISM );
 
@@ -235,7 +234,6 @@ void CMainFrame::CreateViewPanel( CMFCRibbonCategory* pCategory )
 	//AddRibbonCheckbox( pPanelView, IDS_RIBBON_ANGLES, ID_VIEW_ANGLES );
 	//AddRibbonCheckbox( pPanelView, IDS_RIBBON_VIEW_ANICROP, ID_VIEW_ANICROP );
 	//AddRibbonCheckbox( pPanelView, IDS_RIBBON_DIMENSIONS, ID_VIEW_DIMENSIONS );
-
 
 	CMFCRibbonButton* pDetailsButton = new CMFCRibbonButton( ID_ALIGN_DETAILSBUTTON, "Details", 69 );
 
@@ -277,8 +275,6 @@ void CMainFrame::CreateDimensionsPanel( CMFCRibbonCategory* pCategory )
 	pPanelDimensions->Add( pEdit );
 
 	AddRibbonButton( pPanelDimensions, IDS_RIBBON_SET_RATIO, ID_EDIT_SET_RATIO, 79, SMALL );
-
-
 }
 
 void CMainFrame::CreatePrintPanel( CMFCRibbonCategory* pCategory )
@@ -307,8 +303,6 @@ void CMainFrame::CreatePrintOptionsPanel( CMFCRibbonCategory* pCategory )
 	AddRibbonButton( pPanePrintOptions, IDS_RIBBON_PRINT_SETUP, ID_FILE_PRINT_SETUP, 11, LARGE );
 	AddRibbonCheckbox( pPanePrintOptions, IDS_RIBBON_PRINTFULL, ID_FILE_PRINTFULL );
 }
-
-
 
 void CMainFrame::CreateInsertPanel( CMFCRibbonCategory* pCategory )
 {
@@ -379,13 +373,12 @@ class MyMenuCheck : public CMFCRibbonCheckBox
 {
 	public:
 	MyMenuCheck( UINT ID, const char *pText ) : CMFCRibbonCheckBox( ID, pText ) {}
-	
+
 	virtual void OnDraw( CDC* pDC )
 	{
 		m_szMargin;
 		CMFCRibbonCheckBox::OnDraw( pDC );
 	}
-
 };
 
 void CMainFrame::AppendMenuCheck( CMFCRibbonButton *pButton, UINT StringID, UINT ID )
@@ -403,7 +396,6 @@ void CMainFrame::CreateAlignPanel( CMFCRibbonCategory* pCategory )
 	CMFCRibbonPanel* pPaneAlign = AddPanel( pCategory, IDS_RIBBON_ALIGN, m_PanelImages.ExtractIcon(35) );
 
 	AddRibbonButton( pPaneAlign, IDS_RIBBON_UNDO, ID_EDIT_UNDO, 19, LARGE );
-
 
 	AddRibbonCheckbox( pPaneAlign, IDS_RIBBON_EDITDRAWING, ID_EDIT_DRAWING );
 	AddRibbonCheckbox( pPaneAlign, IDS_RIBBON_EDITMECHANISM, ID_EDIT_MECHANISM );
@@ -453,7 +445,7 @@ class MyCMFCRibbonButtonsGroup : public CMFCRibbonButtonsGroup
 {
 	public:
 
-	MyCMFCRibbonButtonsGroup( int yOffset = 0 ) : CMFCRibbonButtonsGroup() 
+	MyCMFCRibbonButtonsGroup( int yOffset = 0 ) : CMFCRibbonButtonsGroup()
 	{
 		m_SpecialOffsetForMe = yOffset;
 	}
@@ -503,7 +495,7 @@ void CMainFrame::CreateSimulationPanel( CMFCRibbonCategory* pCategory )
 	AddRibbonButton( pPanelMechanism, IDS_RIBBON_RUN, ID_SIMULATION_RUN, 23, LARGE );
 	AddRibbonButton( pPanelMechanism, IDS_RIBBON_STOP, ID_SIMULATION_STOP, 24, LARGE );
 	AddRibbonButton( pPanelMechanism, IDS_RIBBON_PIN, ID_SIMULATION_PIN, 63, LARGE );
-	
+
 	MyCMFCRibbonButtonsGroup *pGroup = new MyCMFCRibbonButtonsGroup( 6 );
 	pGroup->AddButton( new CMFCRibbonButton( ID_SIMULATION_SIMULATE, "", 25, -1 ) );
 	pGroup->AddButton( new CMFCRibbonButton( ID_SIMULATE_INTERACTIVE, "", 50, -1 ) );
@@ -555,13 +547,11 @@ void CMainFrame::CreateMainCategory( void )
 
 	AddRibbonButton( pMainPanel, IDS_RIBBON_SAVE, ID_FILE_SAVE, 2, LARGE );
 	AddRibbonButton( pMainPanel, IDS_RIBBON_SAVEAS, ID_FILE_SAVE_AS, 3, LARGE );
-	
+
 	AddExportButton( pMainPanel );
 
 	//AddRibbonButton( pMainPanel, IDS_RIBBON_SAVEVIDEO, ID_FILE_SAVEVIDEO, 5, LARGE );
 	//AddRibbonButton( pMainPanel, IDS_RIBBON_SAVEIMAGE, ID_FILE_SAVEIMAGE, 37, LARGE );
-
-
 
 	pMainPanel->Add(new CMFCRibbonSeparator(TRUE));
 	AddPrintButton( pMainPanel );
@@ -654,7 +644,6 @@ void CMainFrame::InitializeRibbon()
 	// CMFCRibbonCategory* pCategoryConfig = m_wndRibbonBar.AddCategory(strTemp, IDB_FILESMALL, IDB_FILELARGE, CSize( 16, 16 ), CSize( 32, 32 ));
 	// strTemp.LoadString(IDS_RIBBON_SETTINGS);
 	// CMFCRibbonCategory* pCategoryDetails = m_wndRibbonBar.AddCategory(strTemp, IDB_FILESMALL, IDB_FILELARGE, CSize( 16, 16 ), CSize( 32, 32 ));
-
 }
 
 // CMainFrame diagnostics
@@ -677,7 +666,6 @@ class CMFCVisualManagerWindows7Dave : public CMFCVisualManagerWindows7
 };
 
 IMPLEMENT_DYNAMIC( CMFCVisualManagerWindows7Dave, CMFCVisualManagerWindows7 )
-
 
 // CMainFrame message handlers
 
@@ -771,14 +759,13 @@ void CMainFrame::OnUpdateFilePrintPreview(CCmdUI* pCmdUI)
 /////////////////////////////////////////////////////////////////////////////
 // CMainFrame message handlers
 
-
 void CMainFrame::OnHelpUserguide()
 {
 	HINSTANCE hResult = 0;
 	static const char *DOC_FILE = ".\\Linkage.pdf";
 	if( _access( DOC_FILE, 0 ) == 0 )
 		hResult = ShellExecute( this->GetSafeHwnd(), "open", DOC_FILE, 0, 0, SW_SHOWNORMAL );
-		
+
 	if( hResult == 0 || hResult == INVALID_HANDLE_VALUE )
 		AfxMessageBox( "Unable to open the documentation file.", MB_ICONEXCLAMATION | MB_OK );
 }
@@ -793,9 +780,9 @@ void CMainFrame::ConfigureDocumentationMenu( CMenu *pMenu )
 {
 	if( pMenu == 0 || _access( ".\\Linkage.pdf", 0 ) == 0 )
 		return;
-		
+
 	// Remove the documentation menu item since there is no document.
-		
+
 	int Index;
 	for( Index = pMenu->GetMenuItemCount() - 1; Index >= 0; --Index )
 	{
@@ -843,7 +830,6 @@ void CMainFrame::OnSelectSample()
 
 	PostMessage( WM_COMMAND, GalleryData.GetCommandID( Selection ) );
 }
-
 
 void CMainFrame::OnDropFiles(HDROP hDropInfo)
 {
