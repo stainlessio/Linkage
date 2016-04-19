@@ -39,6 +39,7 @@ class CSimulatorImplementation
 		return true;
 	}
 
+	#pragma optimize( "agt" )
 	int CommonDivisor( int *Values, int Count )
 	{
 		for(;;)
@@ -101,6 +102,7 @@ class CSimulatorImplementation
 			 */
 		}
 	}
+	#pragma optimize( "" )
 
 	int GetSimulationSteps( CLinkageDoc *pDoc )
 	{
@@ -167,6 +169,9 @@ class CSimulatorImplementation
 		 * to reduce the necessary rotations to do a complete
 		 * cycle of the entire mechanism.
 		 */
+
+		if( InputCount == 1 )
+			return 1800 / Values[0];
 
 		int Divisor = CommonDivisor( Values, InputCount );
 

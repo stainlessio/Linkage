@@ -5534,11 +5534,18 @@ void CLinkageView::DrawStackedConnectors( CRenderer* pRenderer, unsigned int OnL
 		if( pConnector == 0 )
 			continue;
 
+		// Test for mechanism layers because all other layers don't need the stacking indicator.
+		if( ( pConnector->GetLayers() & CLinkageDoc::MECHANISMLAYERS  ) == 0 )
+			continue;
+
 		POSITION Position2 = pConnectors->GetHeadPosition();
 		while( Position2 != NULL )
 		{
 			CConnector* pConnector2 = pConnectors->GetNext( Position2 );
 			if( pConnector2 == 0 || pConnector2 == pConnector )
+				continue;
+
+			if( ( pConnector->GetLayers() & pConnector2->GetLayers() ) == 0 )
 				continue;
 
 			CFPoint Point1 = Scale( pConnector->GetPoint() );

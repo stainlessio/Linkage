@@ -262,6 +262,9 @@ bool CLinkageDoc::ReadIn( CArchive& ar, bool bSelectAll, bool bObeyUnscaleOffset
 	if( pRootNode == 0 || !pRootNode->IsLink() || pRootNode->GetText() != "linkage2" )
 		return false;
 
+	m_SelectedConnectors.RemoveAll();
+	m_SelectedLinks.RemoveAll();
+
 	CPoint Offset( 0, 0 );
 	double Unscale = 1;
 	double ScaleFactor = 1.0;
