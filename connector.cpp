@@ -184,7 +184,7 @@ void CConnector::RemoveLink( CLink *pLink )
 		if( pCheckLink != 0 && ( pLink == 0 || pCheckLink == pLink ) )
 		{
 			m_Links.RemoveAt( RemovePosition );
-			pCheckLink->SetActuator( false );
+			pCheckLink->SetActuator( pCheckLink->IsActuator() && pCheckLink->GetConnectorCount() == 2 );
 		}
 	}
 }

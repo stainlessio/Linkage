@@ -39,7 +39,7 @@ class CSimulatorImplementation
 		return true;
 	}
 
-	#pragma optimize( "agt" )
+	#pragma optimize( "agt", on )
 	int CommonDivisor( int *Values, int Count )
 	{
 		for(;;)
@@ -102,7 +102,7 @@ class CSimulatorImplementation
 			 */
 		}
 	}
-	#pragma optimize( "" )
+	#pragma optimize( "", on )
 
 	int GetSimulationSteps( CLinkageDoc *pDoc )
 	{

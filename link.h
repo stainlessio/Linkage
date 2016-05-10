@@ -83,6 +83,8 @@ class CLink : public CElement
 	bool IsTempFixed( void ) { return m_bTempFixed; }
 	bool IsFixed( void ) { return m_bTempFixed; }
 
+	double GetLength( void );
+
 	bool IsSelected( bool bIsSelectedConnector = true );
 	bool IsAllSelected( void );
 	bool IsAnySelected( void );

@@ -70,6 +70,12 @@ CFPoint* GetHull( ConnectorList* pConnectors, int &ReturnedPointCount, bool bUse
 
 	Count = Squash( PointArray, Count );
 
+	if( Count <= 1 )
+	{
+		ReturnedPointCount = Count;
+		return PointArray;
+	}
+
 	CFPoint* PointStack = new CFPoint[Count];
 	if( PointStack == NULL )
 	{

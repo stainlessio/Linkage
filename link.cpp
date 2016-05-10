@@ -74,6 +74,15 @@ CLink::~CLink()
 	m_HullCount = 0;
 }
 
+double CLink::GetLength( void )
+{
+	if( m_Connectors.GetCount() != 2 )
+		return 0;
+	CConnector *pConnector1 = GetConnector( 0 );
+	CConnector *pConnector2 = GetConnector( 1 );
+	return Distance( pConnector1->GetOriginalPoint(), pConnector2->GetOriginalPoint() );
+}
+
 void CLink::GetArea( const GearConnectionList &GearConnections, CFRect &Rect )
 {
 	CFRect AreaRect( DBL_MAX, -DBL_MAX, -DBL_MAX, DBL_MAX );

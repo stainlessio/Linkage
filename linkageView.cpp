@@ -66,6 +66,7 @@ static COLORREF COLOR_DRAWINGLIGHT = RGB( 200, 200, 200 );
 static COLORREF COLOR_DRAWINGDARK = RGB( 70, 70, 70 );
 static COLORREF COLOR_GRID = RGB( 200, 240, 240 );
 static COLORREF COLOR_GROUND = RGB( 100, 100, 100 );
+static COLORREF COLOR_MINORSELECTION = RGB( 170, 170, 170 );
 
 static const int CONNECTORRADIUS = 5;
 static const int CONNECTORTRIANGLE = 6;
@@ -5306,18 +5307,28 @@ void CLinkageView::DrawConnector( CRenderer* pRenderer, unsigned int OnLayers, C
 		pRenderer->SelectObject( pBrush );
 	}
 
-	if( m_bShowSelection && ( pConnector->IsSelected() || bHighlight ) )
+	if( m_bShowSelection )
 	{
-		CLinkageDoc* pDoc = GetDocument();
-		ASSERT_VALID(pDoc);
-		CBrush Brush( pDoc->GetLastSelectedConnector() == pConnector ? RGB( 196, 96, 96 ) : RGB( 0, 0, 0 ) );
-		static const int BOX_SIZE = 5;
-		int Adjustment = ( BOX_SIZE - 1 ) / 2;
-		CFRect Rect( Point.x - Adjustment,  Point.y + AdjustYCoordinate( Adjustment ),  Point.x + Adjustment,  Point.y - AdjustYCoordinate( Adjustment ) );
+		if( pConnector->IsSelected() || bHighlight )
+		{
+			CLinkageDoc* pDoc = GetDocument();
+			ASSERT_VALID(pDoc);
+			CBrush Brush( pDoc->GetLastSelectedConnector() == pConnector ? RGB( 196, 96, 96 ) : RGB( 0, 0, 0 ) );
+			static const int BOX_SIZE = 5;
+			int Adjustment = ( BOX_SIZE - 1 ) / 2;
+			CFRect Rect( Point.x - Adjustment,  Point.y + AdjustYCoordinate( Adjustment ),  Point.x + Adjustment,  Point.y - AdjustYCoordinate( Adjustment ) );
 
-		pRenderer->FillRect( &Rect, &Brush );
+			pRenderer->FillRect( &Rect, &Brush );
 
-		DrawFasteners( pRenderer, OnLayers, pConnector );
+			DrawFasteners( pRenderer, OnLayers, pConnector );
+		}
+		if( pConnector->IsLinkSelected() )
+		{
+			CPen GrayPen;
+			GrayPen.CreatePen( PS_SOLID, 1, COLOR_MINORSELECTION ) ;
+			pRenderer->SelectObject( &GrayPen );
+			pRenderer->Arc( CFArc( Point, m_ConnectorRadius * 2, Point, Point ) );
+		}
 	}
 
 	if( pOldPen != 0 )
@@ -5395,7 +5406,7 @@ void CLinkageView::DrawFasteners( CRenderer* pRenderer, unsigned int OnLayers, C
 	ASSERT_VALID(pDoc);
 
 	CBrush Brush;
-	Brush.CreateSolidBrush( RGB( 220, 220, 220 ) );
+	Brush.CreateSolidBrush( COLOR_MINORSELECTION );
 	LOGBRUSH lBrush = { 0 };
 	Brush.GetLogBrush( &lBrush );
     DWORD Style[] = { 3, 1 };
@@ -6346,7 +6357,7 @@ void CLinkageView::DrawLink( CRenderer* pRenderer, const GearConnectionList *pGe
 				CLinkageDoc* pDoc = GetDocument();
 				ASSERT_VALID(pDoc);
 
-				GrayPen.CreatePen( PS_SOLID, 1, pDoc->GetLastSelectedLink() == pLink ? RGB( 255, 200, 200 ) : RGB( 220, 220, 220 ) ) ;
+				GrayPen.CreatePen( PS_SOLID, 1, pDoc->GetLastSelectedLink() == pLink ? RGB( 255, 200, 200 ) : COLOR_MINORSELECTION ) ;
 				pOldPen = pRenderer->SelectObject( &GrayPen );
 
 				CFRect AreaRect;
@@ -6485,7 +6496,7 @@ void CLinkageView::DrawLink( CRenderer* pRenderer, const GearConnectionList *pGe
 
 				pRenderer->SelectObject( pOldPen );
 
-				Spacing += UnscaledUnits( 12 );
+				Spacing += (int)UnscaledUnits( 12 );
 			}
 
 			pRenderer->TextOut( Average.x + Spacing, Average.y, Number );
@@ -7054,6 +7065,8 @@ bool CLinkageView::LinkProperties( CLink *pLink )
 		Dialog.m_ActuatorCPM = pLink->GetCPM();
 		Dialog.m_bAlwaysManual = pLink->IsAlwaysManual();
 		Dialog.m_ThrowDistance = pLink->GetStroke() * pDoc->GetUnitScale();
+		if( !pLink->IsActuator() )
+			Dialog.m_ThrowDistance = pLink->GetLength() / 2 * pDoc->GetUnitScale();
 		Dialog.m_SelectedLinkCount = 1;
 		Dialog.m_bIsGear = pLink->IsGear();
 		Dialog.m_bLocked = pLink->IsLocked();

@@ -1,6 +1,15 @@
 #pragma once
 #include "linkageDoc.h"
 
+class CSimulatorError
+{
+	public:
+	ConnectorList m_BadConectors;
+	LinkList m_BadLinks;
+	enum ErrorType { None, Bind, Flop };
+	ErrorType m_Error;
+};
+
 class CSimulator
 {
 public:

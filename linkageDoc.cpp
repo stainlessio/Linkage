@@ -1162,7 +1162,7 @@ bool CLinkageDoc::FindElement( CFPoint Point, double GrabDistance, CLink *&pFoun
 
 bool CLinkageDoc::AutoJoinSelected( void )
 {
-	if( m_SelectedConnectors.GetCount() != 1 )
+	if( m_SelectedConnectors.GetCount() != 1 || m_SelectedLinks.GetCount() > 0 )
 		return false;
 
 	CConnector *pConnector = (CConnector*)m_SelectedConnectors.GetHead();
@@ -2139,7 +2139,7 @@ bool CLinkageDoc::IsLinkLocked( CConnector *pConnector )
 
 bool CLinkageDoc::JoinSelected( bool bSaveUndoState )
 {
-	if( m_SelectedConnectors.GetCount() < 2 )
+	if( !m_bSelectionJoinable )
 		return false;
 
 	CFPoint AveragePoint;
@@ -2154,6 +2154,7 @@ bool CLinkageDoc::JoinSelected( bool bSaveUndoState )
 	unsigned int CombinedLayers = 0;
 	int LockedLinks = 0;
 	CConnector *pLockedConnector = 0;
+	int Connectors = m_SelectedConnectors.GetCount();
 
 	POSITION Position = m_SelectedConnectors.GetHeadPosition();
 	CConnector *pKeepConnector = m_SelectedConnectors.GetAt( Position );
@@ -2190,6 +2191,9 @@ bool CLinkageDoc::JoinSelected( bool bSaveUndoState )
 		return false;
 
 	if( LockedLinks > 1 )
+		return false;
+
+	if( m_SelectedLinks.GetCount() > 0 && Sliders > 0 )
 		return false;
 
 	if( pKeepConnector->IsSlider() && LockedLinks > 0 && pLockedConnector != pKeepConnector )
@@ -2289,6 +2293,21 @@ bool CLinkageDoc::JoinSelected( bool bSaveUndoState )
 
 	m_SelectedConnectors.RemoveAll();
 	m_SelectedConnectors.AddHead( pKeepConnector );
+
+	/*
+	 * Now that all connectors are joined, join the new single connector to all of the selected links.
+	 */
+	if( m_SelectedLinks.GetCount() )
+	{
+		Position = m_SelectedLinks.GetHeadPosition();
+		while( Position != 0 )
+		{
+			CLink *pLink = m_SelectedLinks.GetNext( Position );
+			if( pLink == 0 )
+				continue;
+			pLink->AddConnector( pKeepConnector );
+		}
+	}
 
 	NormalizeConnectorLinks();
 
@@ -3906,7 +3925,7 @@ void CLinkageDoc::SetSelectedModifiableCondition( void )
 		CConnector* pConnector2 = GetSelectedConnector( 1 );
 		m_bSelectionCombinable = SelectedLinks > 1 && Actuators == 0 && SelectedGears == 0;
 		m_bSelectionConnectable = SelectedRealLinks == 0 && SelectedConnectors == 2 && pConnector1->GetSharingLink( pConnector2 ) == 0 && !pConnector1->IsSlider();
-		m_bSelectionJoinable = SelectedConnectors > 1 && Sliders <= 1;
+		m_bSelectionJoinable = ( SelectedConnectors > 1 && Sliders <= 1 ) || ( SelectedConnectors == 1 && SelectedRealLinks >= 1 );
 		m_bSelectionSlideable = ConnectSliderLimits( true );
 		m_bSelectionLockable = SelectedConnectors == 0 && SelectedRealLinks > 0;
 		m_bSelectionMakeAnchor = SelectedConnectors > 0 && SelectedRealLinks == 0;
@@ -4204,7 +4223,6 @@ bool CLinkageDoc::SetSelectedElementCoordinates( const char *pCoordinateString )
 	double xValue = 0.0;
 	double yValue = 0.0;
 	char Dummy1;
-	char Dummy2;
 	char PercentSign;
 	int CoordinateCount = 0;
 	double Percentage = 0.0;
