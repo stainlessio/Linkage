@@ -174,7 +174,7 @@ void CLink::SelectAllConnectors( bool bSelected )
 	Select( bSelected );
 }
 
-bool CLink::PointOnLink( const GearConnectionList &GearConnections, CFPoint Point, double TestDistance )
+bool CLink::PointOnLink( const GearConnectionList &GearConnections, CFPoint Point, double TestDistance, double SolidLinkExpandion )
 {
 	if( m_bGear )
 	{

@@ -1095,7 +1095,7 @@ bool CLinkageDoc::SelectElement( CConnector *pConnector )
 	return true;
 }
 
-bool CLinkageDoc::SelectElement( CFRect Rect, bool bMultiSelect, bool &bSelectionChanged )
+bool CLinkageDoc::SelectElement( CFRect Rect, double SolidLinkExpansion, bool bMultiSelect, bool &bSelectionChanged )
 {
 	bSelectionChanged = false;
 	if( !bMultiSelect )
@@ -1130,7 +1130,7 @@ bool CLinkageDoc::SelectElement( CFRect Rect, bool bMultiSelect, bool &bSelectio
 	return bSelectionChanged;
 }
 
-bool CLinkageDoc::FindElement( CFPoint Point, double GrabDistance, CLink *&pFoundLink, CConnector *&pFoundConnector )
+bool CLinkageDoc::FindElement( CFPoint Point, double GrabDistance, double SolidLinkExpansion, CLink *&pFoundLink, CConnector *&pFoundConnector )
 {
 	pFoundLink = 0;
 	pFoundConnector = 0;
@@ -1150,7 +1150,7 @@ bool CLinkageDoc::FindElement( CFPoint Point, double GrabDistance, CLink *&pFoun
 	while( Position != NULL )
 	{
 		CLink* pLink = m_Links.GetNext( Position );
-		if( pLink != 0 && pLink->PointOnLink( m_GearConnectionList, Point, GrabDistance )
+		if( pLink != 0 && pLink->PointOnLink( m_GearConnectionList, Point, GrabDistance, SolidLinkExpansion )
 		    && ( pLink->GetLayers() & m_EditLayers ) != 0 )
 		{
 			pFoundLink = pLink;
@@ -1193,7 +1193,7 @@ bool CLinkageDoc::AutoJoinSelected( void )
 	return true;
 }
 
-bool CLinkageDoc::SelectElement( CFPoint Point, double GrabDistance, bool bMultiSelect, bool &bSelectionChanged )
+bool CLinkageDoc::SelectElement( CFPoint Point, double GrabDistance, double SolidLinkExpansion, bool bMultiSelect, bool &bSelectionChanged )
 {
 	CConnector* pSelectingConnector = 0;
 	CLink *pSelectingLink = 0;
@@ -1223,7 +1223,7 @@ bool CLinkageDoc::SelectElement( CFPoint Point, double GrabDistance, bool bMulti
 		while( Position != NULL )
 		{
 			CLink* pLink = m_Links.GetNext( Position );
-			if( pLink != 0 && pLink->IsSelected() && pLink->PointOnLink( m_GearConnectionList, Point, GrabDistance )
+			if( pLink != 0 && pLink->IsSelected() && pLink->PointOnLink( m_GearConnectionList, Point, GrabDistance, SolidLinkExpansion )
 			    && ( pLink->GetLayers() & m_EditLayers ) != 0 )
 			{
 				if( pLink->GetConnectorCount() == 1 && !pLink->IsGear() )
@@ -1279,7 +1279,7 @@ bool CLinkageDoc::SelectElement( CFPoint Point, double GrabDistance, bool bMulti
 		while( Position != NULL )
 		{
 			CLink* pLink = m_Links.GetNext( Position );
-			if( pLink != NULL && pLink->PointOnLink( m_GearConnectionList, Point, GrabDistance )
+			if( pLink != NULL && pLink->PointOnLink( m_GearConnectionList, Point, GrabDistance, 0 )
 			    && ( pLink->GetLayers() & m_EditLayers ) != 0 )
 			{
 				CConnector *pStrokeConnector = pLink->GetStrokeConnector( 0 );

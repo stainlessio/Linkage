@@ -226,6 +226,7 @@ private:
 	void GetAdjustmentControlRect( AdjustmentControl Control, CRect &Rect );
 		
 	bool SelectVideoBox( UINT nFlags, CPoint Point );
+	bool GrabAdjustmentControl( CFPoint Point, CFPoint GrabPoint, _AdjustmentControl CheckControl, MouseAction DoMouseAction, _AdjustmentControl *pSelectControl, CFPoint *pDragOffset, MouseAction *pMouseAction );
 	bool SelectAdjustmentControl( UINT nFlags, CPoint Point );
 	bool SelectDocumentItem( UINT nFlags, CPoint Point );
 	bool DragSelectionBox( UINT nFlags, CPoint point );

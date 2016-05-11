@@ -2359,6 +2359,21 @@ bool CLinkageView::SelectVideoBox( UINT nFlags, CPoint Point )
 	}
 }
 
+bool CLinkageView::GrabAdjustmentControl( CFPoint Point, CFPoint GrabPoint, _AdjustmentControl CheckControl, MouseAction DoMouseAction, _AdjustmentControl *pSelectControl, CFPoint *pDragOffset, MouseAction *pMouseAction )
+{
+	CFRect Rect( 0, 0, 0, 0 );
+	GetAdjustmentControlRect( CheckControl, Rect );
+	Rect.InflateRect( 2, 2 );
+	if( Rect.PointInRect( Point ) )
+	{
+		*pSelectControl = CheckControl;
+		*pDragOffset = Point - GrabPoint;
+		*pMouseAction = DoMouseAction;
+		return true;
+	}
+	return false;
+}
+
 bool CLinkageView::SelectAdjustmentControl( UINT nFlags, CPoint Point )
 {
 	if( m_VisibleAdjustment == ADJUSTMENT_NONE || m_MouseAction != ACTION_NONE )
@@ -2372,7 +2387,7 @@ bool CLinkageView::SelectAdjustmentControl( UINT nFlags, CPoint Point )
 	/*
 	 * The line of code below gets screwed up by the compiler if the option
 	 * is set to allow any appropriate function to be inline. Only functions
-	 * marked as _inline shuold be allowed to avoid this compiler bug.
+	 * marked as _inline should be allowed to avoid this compiler bug.
 	 */
 	GetAdjustmentControlRect( AC_ROTATE, Rect );
 	Rect.InflateRect( 2, 2 );
@@ -2389,74 +2404,26 @@ bool CLinkageView::SelectAdjustmentControl( UINT nFlags, CPoint Point )
 
 	bool bVertical = fabs( m_SelectionContainerRect.Height() ) > 0;
 	bool bHorizontal = fabs( m_SelectionContainerRect.Width() ) > 0;
-	bool bBoth = bHorizontal && bVertical;
 
-	GetAdjustmentControlRect( AC_TOP_LEFT, Rect );
-	Rect.InflateRect( 2, 2 );
-	if( bBoth && Rect.PointInRect( FPoint ) )
+	if( bHorizontal && bVertical )
 	{
-		m_StretchingControl = AC_TOP_LEFT;
-		m_DragOffset = FPoint - AdjustmentRect.TopLeft();
-		m_MouseAction = DoMouseAction;
-	}
-	GetAdjustmentControlRect( AC_TOP_RIGHT, Rect );
-	Rect.InflateRect( 2, 2 );
-	if( bBoth && Rect.PointInRect( FPoint ) )
-	{
-		m_StretchingControl = AC_TOP_RIGHT;
-		m_DragOffset = FPoint - CFPoint( AdjustmentRect.right, AdjustmentRect.top );
-		m_MouseAction = DoMouseAction;
-	}
-	GetAdjustmentControlRect( AC_BOTTOM_RIGHT, Rect );
-	Rect.InflateRect( 2, 2 );
-	if( bBoth && Rect.PointInRect( FPoint ) )
-	{
-		m_StretchingControl = AC_BOTTOM_RIGHT;
-		m_DragOffset = FPoint - AdjustmentRect.BottomRight();
-		m_MouseAction = DoMouseAction;
-	}
-	GetAdjustmentControlRect( AC_BOTTOM_LEFT, Rect );
-	Rect.InflateRect( 2, 2 );
-	if( bBoth && Rect.PointInRect( FPoint ) )
-	{
-		m_StretchingControl = AC_BOTTOM_LEFT;
-		m_DragOffset = FPoint - CFPoint( AdjustmentRect.left, AdjustmentRect.bottom );
-		m_MouseAction = DoMouseAction;
+		GrabAdjustmentControl( FPoint, AdjustmentRect.TopLeft(), AC_TOP_LEFT, DoMouseAction, &m_StretchingControl, &m_DragOffset, &m_MouseAction );
+		GrabAdjustmentControl( FPoint, CFPoint( AdjustmentRect.right, AdjustmentRect.top ), AC_TOP_RIGHT, DoMouseAction, &m_StretchingControl, &m_DragOffset, &m_MouseAction );
+		GrabAdjustmentControl( FPoint, AdjustmentRect.BottomRight(), AC_BOTTOM_RIGHT, DoMouseAction, &m_StretchingControl, &m_DragOffset, &m_MouseAction );
+		GrabAdjustmentControl( FPoint,  CFPoint( AdjustmentRect.left, AdjustmentRect.bottom ), AC_BOTTOM_LEFT, DoMouseAction, &m_StretchingControl, &m_DragOffset, &m_MouseAction );
 	}
 
 	if( m_VisibleAdjustment == ADJUSTMENT_STRETCH )
 	{
-		GetAdjustmentControlRect( AC_TOP, Rect );
-		Rect.InflateRect( 2, 2 );
-		if( bVertical && Rect.PointInRect( FPoint ) )
+		if( bVertical )
 		{
-			m_StretchingControl = AC_TOP;
-			m_DragOffset = FPoint - CFPoint( ( AdjustmentRect.left + AdjustmentRect.right ) / 2, AdjustmentRect.top );
-			m_MouseAction = ACTION_STRETCH;
+			GrabAdjustmentControl( FPoint, CFPoint( ( AdjustmentRect.left + AdjustmentRect.right ) / 2 ), AC_TOP, ACTION_STRETCH, &m_StretchingControl, &m_DragOffset, &m_MouseAction );
+			GrabAdjustmentControl( FPoint, CFPoint( ( AdjustmentRect.left + AdjustmentRect.right ) / 2, AdjustmentRect.bottom ), AC_BOTTOM, ACTION_STRETCH, &m_StretchingControl, &m_DragOffset, &m_MouseAction );
 		}
-		GetAdjustmentControlRect( AC_RIGHT, Rect );
-		Rect.InflateRect( 2, 2 );
-		if( bHorizontal && Rect.PointInRect( FPoint ) )
+		if( bHorizontal )
 		{
-			m_StretchingControl = AC_RIGHT;
-			m_DragOffset = FPoint - CFPoint( AdjustmentRect.right, ( AdjustmentRect.top + AdjustmentRect.bottom ) / 2 );
-			m_MouseAction = ACTION_STRETCH;
-		}
-		GetAdjustmentControlRect( AC_BOTTOM, Rect );
-		Rect.InflateRect( 2, 2 );
-		if( bVertical && Rect.PointInRect( FPoint ) )
-		{
-			m_StretchingControl = AC_BOTTOM;
-			m_DragOffset = FPoint - CFPoint( ( AdjustmentRect.left + AdjustmentRect.right ) / 2, AdjustmentRect.bottom );
-			m_MouseAction = ACTION_STRETCH;
-		}
-		GetAdjustmentControlRect( AC_LEFT, Rect );
-		Rect.InflateRect( 2, 2 );
-		if( bHorizontal && Rect.PointInRect( FPoint ) )
-		{
-			m_StretchingControl = AC_LEFT;
-			m_DragOffset = FPoint - CFPoint( AdjustmentRect.left, ( AdjustmentRect.top + AdjustmentRect.bottom ) / 2 );
-			m_MouseAction = ACTION_STRETCH;
+			GrabAdjustmentControl( FPoint, CFPoint( AdjustmentRect.right, ( AdjustmentRect.top + AdjustmentRect.bottom ) / 2 ), AC_RIGHT, ACTION_STRETCH, &m_StretchingControl, &m_DragOffset, &m_MouseAction );
+			GrabAdjustmentControl( FPoint, CFPoint( AdjustmentRect.left, ( AdjustmentRect.top + AdjustmentRect.bottom ) / 2 ), AC_LEFT, ACTION_STRETCH, &m_StretchingControl, &m_DragOffset, &m_MouseAction );
 		}
 	}
 
@@ -2500,7 +2467,7 @@ bool CLinkageView::FindDocumentItem( CPoint Point, CLink *&pFoundLink, CConnecto
 
 	double GrabDistance = Unscale( GRAB_DISTANCE );
 
-	return pDoc->FindElement( AdjustedPoint, GrabDistance, pFoundLink, pFoundConnector );
+	return pDoc->FindElement( AdjustedPoint, GrabDistance, 0, pFoundLink, pFoundConnector );
 }
 
 bool CLinkageView::SelectDocumentItem( UINT nFlags, CPoint point )
@@ -2518,7 +2485,7 @@ bool CLinkageView::SelectDocumentItem( UINT nFlags, CPoint point )
 	double GrabDistance = Unscale( GRAB_DISTANCE );
 
 	bool bSelectionChanged = false;
-	m_MouseAction = pDoc->SelectElement( AdjustedPoint, GrabDistance, bMultiSelect, bSelectionChanged ) ? ACTION_DRAG : ACTION_NONE;
+	m_MouseAction = pDoc->SelectElement( AdjustedPoint, GrabDistance, 0, bMultiSelect, bSelectionChanged ) ? ACTION_DRAG : ACTION_NONE;
 
 	MarkSelection( bSelectionChanged );
 	ShowSelectedElementCoordinates();
@@ -2789,7 +2756,7 @@ void CLinkageView::OnMouseMoveStretch(UINT nFlags, CPoint point, bool bEndStretc
 					NewHeight = m_SelectionAdjustmentRect.Width() == 0 ? 0 : m_SelectionAdjustmentRect.Height() * NewRect.Width() / m_SelectionAdjustmentRect.Width();
 					NewWidth = m_SelectionAdjustmentRect.Height() == 0 ? 0 : m_SelectionAdjustmentRect.Width() * NewRect.Height() / m_SelectionAdjustmentRect.Height();
 
-					if( NewWidth > NewRect.Width() )
+					if( fabs( NewWidth ) > fabs( NewRect.Width() ) )
 						NewRect.left = NewRect.right - NewWidth;
 					else
 						NewRect.top = NewRect.bottom - NewHeight;
@@ -2800,7 +2767,7 @@ void CLinkageView::OnMouseMoveStretch(UINT nFlags, CPoint point, bool bEndStretc
 					NewHeight = m_SelectionAdjustmentRect.Width() == 0 ? 0 : m_SelectionAdjustmentRect.Height() * NewRect.Width() / m_SelectionAdjustmentRect.Width();
 					NewWidth = m_SelectionAdjustmentRect.Height() == 0 ? 0 : m_SelectionAdjustmentRect.Width() * NewRect.Height() / m_SelectionAdjustmentRect.Height();
 
-					if( NewWidth < NewRect.Width() )
+					if( fabs( NewWidth ) > fabs( NewRect.Width() ) )
 						NewRect.right = NewRect.left + NewWidth;
 					else
 						NewRect.top = NewRect.bottom - NewHeight;
@@ -2811,7 +2778,7 @@ void CLinkageView::OnMouseMoveStretch(UINT nFlags, CPoint point, bool bEndStretc
 					NewHeight = m_SelectionAdjustmentRect.Width() == 0 ? 0 : m_SelectionAdjustmentRect.Height() * NewRect.Width() / m_SelectionAdjustmentRect.Width();
 					NewWidth = m_SelectionAdjustmentRect.Height() == 0 ? 0 : m_SelectionAdjustmentRect.Width() * NewRect.Height() / m_SelectionAdjustmentRect.Height();
 
-					if( NewWidth > NewRect.Width() )
+					if( fabs( NewWidth ) > fabs( NewRect.Width() ) )
 						NewRect.left = NewRect.right - NewWidth;
 					else
 						NewRect.bottom = NewRect.top + NewHeight;
@@ -2822,7 +2789,7 @@ void CLinkageView::OnMouseMoveStretch(UINT nFlags, CPoint point, bool bEndStretc
 					NewHeight = m_SelectionAdjustmentRect.Width() == 0 ? 0 : m_SelectionAdjustmentRect.Height() * NewRect.Width() / m_SelectionAdjustmentRect.Width();
 					NewWidth = m_SelectionAdjustmentRect.Height() == 0 ? 0 : m_SelectionAdjustmentRect.Width() * NewRect.Height() / m_SelectionAdjustmentRect.Height();
 
-					if( NewWidth < NewRect.Width() )
+					if( fabs( NewWidth ) > fabs( NewRect.Width() ) )
 						NewRect.right = NewRect.left + NewWidth;
 					else
 						NewRect.bottom = NewRect.top + NewHeight;
@@ -2952,7 +2919,7 @@ void CLinkageView::OnMouseEndSelect(UINT nFlags, CPoint point)
 	bool bMultiSelect = ( nFlags & ( MK_CONTROL | MK_SHIFT ) ) != 0;
 
 	bool bSelectionChanged = false;
-	m_MouseAction = pDoc->SelectElement( Rect, bMultiSelect, bSelectionChanged ) ? ACTION_DRAG : ACTION_NONE;
+	m_MouseAction = pDoc->SelectElement( Rect, 0, bMultiSelect, bSelectionChanged ) ? ACTION_DRAG : ACTION_NONE;
 
     if( pDoc->IsSelectionAdjustable() )
     {
@@ -6366,7 +6333,7 @@ void CLinkageView::DrawLink( CRenderer* pRenderer, const GearConnectionList *pGe
 				if( pLink->GetConnectorList()->GetCount() > 1 || pLink->IsGear() )
 				{
 					AreaRect = Scale( AreaRect );
-					AreaRect.InflateRect( 2 + m_ConnectorRadius, 2 + m_ConnectorRadius );
+					AreaRect.InflateRect( 2 * m_ConnectorRadius, 2 * m_ConnectorRadius );
 					pRenderer->DrawRect( AreaRect );
 				}
 				pRenderer->SelectObject( pOldPen );

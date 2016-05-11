@@ -93,7 +93,7 @@ class CLink : public CElement
 	void GetArea( const GearConnectionList &GearConnections, CFRect &Rect );
 	void GetAdjustArea( const GearConnectionList &GearConnections, CFRect &Rect );
 	void GetAveragePoint( const GearConnectionList &GearConnections, CFPoint &Point );
-	bool PointOnLink( const GearConnectionList &GearConnections, CFPoint Point, double TestDistance );
+	bool PointOnLink( const GearConnectionList &GearConnections, CFPoint Point, double TestDistance, double SolidLinkExpandion );
 	int GetConnectorCount( void ) { return m_Connectors.GetCount(); }
 	int GetAnchorCount( void );
 	bool CanOnlySlide( CConnector** pLimit1 = 0, CConnector** pLimit2 = 0, CConnector** pSlider1 = 0, CConnector** pSlider2 = 0, bool *pbSlidersOnLink = 0 );

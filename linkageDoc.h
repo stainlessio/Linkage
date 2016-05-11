@@ -90,12 +90,12 @@ public:
 	bool ClearSelection( void );
 	bool SelectElement( CConnector *pConnector );
 	bool SelectElement( CLink *pLink );
-	bool SelectElement( CFPoint Point, double GrabDistance, bool bMultiSelect, bool &bSelectionChanged );
-	bool SelectElement( CFRect Rect, bool bMultiSelect, bool &bSelectionChanged );
+	bool SelectElement( CFPoint Point, double GrabDistance, double SolidLinkExpansion, bool bMultiSelect, bool &bSelectionChanged );
+	bool SelectElement( CFRect Rect, double SolidLinkExpansion, bool bMultiSelect, bool &bSelectionChanged );
 	bool SelectElement( void );
 	bool CLinkageDoc::DeSelectElement( CLink *pLink );
 	bool DeSelectElement( CConnector *pConnector );
-	bool FindElement( CFPoint Point, double GrabDistance, CLink *&pFoundLink, CConnector *&pFoundConnector );
+	bool FindElement( CFPoint Point, double GrabDistance, double SolidLinkExpansion, CLink *&pFoundLink, CConnector *&pFoundConnector );
 	CFPoint CheckForSnap( double SnapDistance, bool bElementSnap, bool bGridSnap, double xGrid, double yGrid, CFPoint &ReferencePoint );
 	bool MoveSelected( CFPoint Point, bool bElementSnap, bool bGridSnap, double xGrid, double yGrid, double SnapDistance, CFPoint &ReferencePoint );
 	bool RotateSelected( CFPoint CenterPoint, double Angle );
