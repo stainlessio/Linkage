@@ -89,6 +89,7 @@ public:
 	bool PointOnConnector( CFPoint Point, double TestDistance );
 	double GetRotationAngle( void ) { return m_RotationAngle; }
 	double GetTempRotationAngle( void ) { return m_TempRotationAngle; }
+	void MakeAnglePermenant( void ) { m_RotationAngle = m_TempRotationAngle; }
 	void GetArea( CFRect &Rect );
 	void GetAdjustArea( CFRect &Rect );
 	CFPoint * GetMotionPath( int &StartPoint, int &PointCount, int &MaxPoint );

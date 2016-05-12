@@ -217,7 +217,12 @@ class CSimulatorImplementation
 
 		int StartStep = m_SimulationStep;
 
-		while( StepsToMove != 0 && GetTickCount() < TickCount + MAX_TIME_TO_SIMULATE )
+		bool IgnoreTime = false;
+		#if defined( _DEBUG )
+			IgnoreTime = true;
+		#endif
+
+		while( StepsToMove != 0 && ( GetTickCount() < TickCount + MAX_TIME_TO_SIMULATE || IgnoreTime ) )
 		{
 			m_SimulationStep += Direction;
 			StepsToMove -= Direction;
@@ -254,7 +259,11 @@ class CSimulatorImplementation
 						 */
 
 						if( !pConnector->IsAlwaysManual() )
+						{
 							pConnector->SetRotationAngle( ( ( m_SimulationStep * INTERMEDIATE_STEPS ) - ( IntermediateStep * Direction ) ) * ( -( pConnector->GetRPM() * 0.2 ) / INTERMEDIATE_STEPS ) );
+							pConnector->MakeAnglePermenant();
+
+						}
 					}
 					else
 					{
@@ -409,133 +418,6 @@ class CSimulatorImplementation
 		return bResult;
 	}
 
-	#if 0 // Dont need it since the link knows how to rotate around things on its own.
-	bool RotateAround( CLink *pLink, CConnector* pConnector )
-	{
-		#pragma message( "FIX ME! RotateAround() will allow stretching of links." )
-		#pragma message( "Just make two anchors with two links that are connected and one of the links gets stretched!" )
-
-		if( pConnector == 0 )
-			return false;
-
-		pConnector->SetTempFixed( true );
-
-		CFPoint Offset;
-		Offset.x = pConnector->GetTempPoint().x - pConnector->GetOriginalPoint().x;
-		Offset.y = pConnector->GetTempPoint().y - pConnector->GetOriginalPoint().y;
-
-		POSITION Position = pLink->GetConnectorList()->GetHeadPosition();
-		while( Position != 0 )
-		{
-			CConnector* pUseConnector = pLink->GetConnectorList()->GetNext( Position );
-			if( pUseConnector == 0 || pUseConnector == pConnector )
-				continue;
-
-			// Is this connector connected to something fixed? If so, we should
-			// get an error instead of trying to move it. This will break
-			// locomotive drive wheel assemblies but that is acceptable at this
-			// time.
-
-			if( pConnector->IsInput() )
-			{
-				CList<CLink*,CLink*> *pList = pUseConnector->GetLinkList();
-				POSITION Position2 = pList->GetHeadPosition();
-				while( Position2 != 0 )
-				{
-					CLink *pTestLink = pList->GetNext( Position2 );
-					if( pList == 0 || pTestLink == pLink )
-						continue;
-
-					POSITION Position3 = pTestLink->GetConnectorList()->GetHeadPosition();
-					while( Position3 != 0 )
-					{
-						CConnector* pAnotherConnector = pTestLink->GetConnectorList()->GetNext( Position3 );
-						if( pAnotherConnector == 0 || pAnotherConnector == pConnector || pAnotherConnector == pUseConnector )
-							continue;
-
-						// Any connectors of this link that are fixed/anchors will
-						// make us unable to move pUseConnector.
-						if( pAnotherConnector->IsFixed() || pAnotherConnector->IsTempFixed() )
-						{
-							pUseConnector->SetPositionValid( false );
-							pUseConnector->SetTempFixed( false );
-							pUseConnector->SetPositionValid( false );
-							return false;
-						}
-					}
-				}
-			}
-
-			CFPoint Temp = pUseConnector->GetOriginalPoint();
-
-			if( pLink->IsActuator() )
-			{
-				CFLine Line( pConnector->GetOriginalPoint(), Temp );
-				Line.SetDistance( pLink->GetActuatedConnectorDistance( pConnector, pUseConnector ) );
-				Temp = Line.GetEnd();
-			}
-
-			Temp.x += Offset.x;
-			Temp.y += Offset.y;
-			pUseConnector->MovePoint( Temp );
-
-			pUseConnector->RotateAround( pConnector->GetTempPoint(), pConnector->GetTempRotationAngle() );
-			pUseConnector->SetTempFixed( true );
-			pLink->IncrementMoveCount();
-		}
-
-		// Save a rotation angle for this link.
-		pLink->SetRotationAngle( pConnector->GetTempRotationAngle() );
-		pLink->SetTempFixed( true );
-
-		Position = pLink->GetFastenedElementList()->GetHeadPosition();
-		while( Position != 0 )
-		{
-			CElementItem *pItem = pLink->GetFastenedElementList()->GetNext( Position );
-			if( pItem == 0 )
-				continue;
-
-			CConnector *pMoveConnector = pItem->GetConnector();
-			CLink *pMoveLink = pItem->GetLink();
-
-			if( pMoveConnector != 0 || pMoveLink != 0 )
-			{
-				POSITION Position2 = pMoveLink == 0 ? 0 : pMoveLink->GetConnectorList()->GetHeadPosition();
-				if( pMoveConnector == 0 )
-					pMoveConnector = pMoveLink->GetConnectorList()->GetNext( Position2 );
-
-				while( true )
-				{
-					if( pMoveConnector != pConnector )
-					{
-						CFPoint Temp = pMoveConnector->GetOriginalPoint();
-
-						Temp.x += Offset.x;
-						Temp.y += Offset.y;
-						pMoveConnector->MovePoint( Temp );
-
-						pMoveConnector->RotateAround( pConnector->GetTempPoint(), pConnector->GetTempRotationAngle() );
-						pMoveConnector->SetTempFixed( true );
-					}
-
-					if( Position2 == 0 )
-						break;
-
-					pMoveConnector = pMoveLink->GetConnectorList()->GetNext( Position2 );
-				}
-			}
-
-			if( pMoveLink != 0 )
-			{
-				pMoveLink->SetRotationAngle( pConnector->GetTempRotationAngle() );
-				pMoveLink->SetTempFixed( true );
-			}
-		}
-
-		return true;
-	}
-	#endif
-
 	bool FindGearsToMatch( CLink *pLink, GearConnectionList &GearConnections )
 	{
 		if( !pLink->IsFixed() && !pLink->IsTempFixed() )
@@ -572,8 +454,10 @@ class CSimulatorImplementation
 						continue;
 				}
 
-				double GearAngle = pLink->GetRotationAngle();
-				double LinkAngle = pConnectionLink == 0 ? 0 : -pConnectionLink->GetRotationAngle();
+				pConnection->m_pDriveGear = pLink;
+
+				double GearAngle = pLink->GetTempRotationAngle();
+				double LinkAngle = pConnectionLink == 0 ? 0 : -pConnectionLink->GetTempRotationAngle();
 				double UseAngle = GearAngle + LinkAngle;
 
 				if( pConnection->m_ConnectionType == pConnection->CHAIN )

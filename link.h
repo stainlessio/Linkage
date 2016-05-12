@@ -36,6 +36,7 @@ class CGearConnection
 	{
 		m_pGear1 = 0;
 		m_pGear2 = 0;
+		m_pDriveGear = 0;
 		m_Gear1Size = 0.0;
 		m_Gear2Size = 0.0;
 		m_ConnectionType = GEARS;
@@ -44,6 +45,7 @@ class CGearConnection
 
 	CLink *m_pGear1;
 	CLink *m_pGear2;
+	CLink *m_pDriveGear;
 	double m_Gear1Size;
 	double m_Gear2Size;
 	ConnectionType m_ConnectionType;

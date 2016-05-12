@@ -9,8 +9,7 @@
 //
 #define SPECSTRING_SUPP_H
 #define SAL_SUPP_H
-#include "afxres.h"
-
+#include "afxres.h"
 /////////////////////////////////////////////////////////////////////////////
 #undef APSTUDIO_READONLY_SYMBOLS
 
@@ -507,8 +506,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 3,2,7,0
- PRODUCTVERSION 3,2,7,0
+ FILEVERSION 3,2,8,0
+ PRODUCTVERSION 3,2,8,0
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -524,12 +523,12 @@ BEGIN
         BLOCK "080004e4"
         BEGIN
             VALUE "FileDescription", "linkage Application"
-            VALUE "FileVersion", "3.2.7.0"
+            VALUE "FileVersion", "3.2.8.0"
             VALUE "InternalName", "Linkage"
             VALUE "LegalCopyright", "Copyright © 2002 - 2016 David Rector"
             VALUE "OriginalFilename", "Linkage.exe"
             VALUE "ProductName", "Linkage Application"
-            VALUE "ProductVersion", "3.2.7.0"
+            VALUE "ProductVersion", "3.2.8.0"
         END
     END
     BLOCK "VarFileInfo"
@@ -659,10 +658,31 @@ BEGIN
     ID_EDIT_JOIN            "Convert the selected connectors into a single connector.\nJoin Connectors"
     ID_EDIT_GRIDSNAP        "Snap to align with an invisible grid.\nGrid Snap"
     ID_VIEW_DIMENSIONS      "Automatically draw dimension lines for all links.\nAuto Dimensions"
-    ID_VIEW_GROUNDDIMENSIONS "Include ground dimensions with the automatic dimensions. Show the ground link relative to the page in the parts list.\nInclude Ground Dimensions"
-	ID_VIEW_GRID			"Display an automatically sized grid.\nShowGrid"
-	ID_VIEW_PARTS			"Display the mechanism as separate parts.\nParts List"
-	ID_VIEW_LARGEFONT		"Use the large for for labels and other text.\nLarge Text"
+    ID_VIEW_GROUNDDIMENSIONS 
+                            "Include ground dimensions with the automatic dimensions. Show the ground link relative to the page in the parts list.\nInclude Ground Dimensions"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_RIBBON_VIEW_GRID    "Show Grid"
+    ID_VIEW_GRID            "Display an automatically sized grid.\nShowGrid"
+    IDS_RIBBON_VIEW_PARTS   "Parts List"
+    ID_VIEW_PARTS           "Display the mechanism as separate parts.\nParts List"
+END
+
+STRINGTABLE
+BEGIN
+    ID_VIEW_LARGEFONT       "Use the large for for labels and other text.\nLarge Text"
+    ID_INSERT_GEAR          "Add a gear to the mechanism.\nInsert Gear"
+    IDS_RIBBON_INSERTGEAR   "Gear"
+    IDS_RIBBON_UNFASTEN     "Unfasten\nf"
+    ID_EDIT_UNFASTEN        "Unfasten the selected drawing elements or gears.\nUnfasten"
+    IDS_SAMPLE_FOURGEARS    "Four gear reduction mechanism.\nFour Gears"
+    IDS_SAMPLE_ORBITGEARS   "Sun-planet-moon orbit gear and chain mechanism.\nOrbit Machine"
+    IDS_SAMPLE_OSCILLATORGEARS 
+                            "Applified rocking motion mechanism.\nAmplified Rocking"
+    IDS_SAMPLE_STEPHENSON   "Stephenson valve gear.\nStephenson Valve Gear"
+    IDS_SAMPLE_PEAUCELLIER  "Peaucellier straight link mechanism.\\Peaucellier Mechanism"
 END
 
 STRINGTABLE
@@ -670,9 +690,9 @@ BEGIN
     IDS_SAMPLE_LINK3        "Complex drawing mechanism using sliding connectors.\nSmile 2"
     IDS_SAMPLE_LINK4        "Sliding link drawing mechanism with solid links.\nSliding Link 3"
     IDS_RIBBON_DIMENSIONS   "Auto Dimensions"
-    IDS_RIBBON_GROUNDDIMENSIONS   "Ground Dimensions"
     ID_EDIT_LOCK            "Lock the size and shape of a link.\nLock"
     IDS_RIBBON_LOCK         "Lock"
+    IDS_RIBBON_GROUNDDIMENSIONS "Ground Dimensions"
 END
 
 STRINGTABLE
@@ -685,20 +705,6 @@ BEGIN
     ID_EDIT_FASTEN          "Fasten the selected drawing elements or gears to the selected link.\nFasten"
     ID_INSERT_ANCHORLINK    "Add a link with an anchor and a connector.\nInsert Anchor Link"
     IDS_SAMPLE_LIFTER       "Two-stage ball lifting mechanism.\nBall Lifter"
-END
-
-STRINGTABLE
-BEGIN
-    ID_INSERT_GEAR          "Add a gear to the mechanism.\nInsert Gear"
-    IDS_RIBBON_INSERTGEAR   "Gear"
-    IDS_RIBBON_UNFASTEN     "Unfasten\nf"
-    ID_EDIT_UNFASTEN        "Unfasten the selected drawing elements or gears.\nUnfasten"
-    IDS_SAMPLE_FOURGEARS    "Four gear reduction mechanism.\nFour Gears"
-    IDS_SAMPLE_ORBITGEARS   "Sun-planet-moon orbit gear and chain mechanism.\nOrbit Machine"
-    IDS_SAMPLE_OSCILLATORGEARS 
-                            "Applified rocking motion mechanism.\nAmplified Rocking"
-    IDS_SAMPLE_STEPHENSON   "Stephenson valve gear.\nStephenson Valve Gear"
-    IDS_SAMPLE_PEAUCELLIER  "Peaucellier straight link mechanism.\\Peaucellier Mechanism"
 END
 
 STRINGTABLE
@@ -821,12 +827,6 @@ BEGIN
     IDS_RIBBON_SETTINGS     "Settings"
     IDS_RIBBON_SETTINGSOPTIONS "Options"
     IDS_RIBBON_VIEW_LARGEFONT "Large Text"
-END
-
-STRINGTABLE
-BEGIN
-    IDS_RIBBON_VIEW_GRID    "Show Grid"
-    IDS_RIBBON_VIEW_PARTS   "Parts List"
 END
 
 STRINGTABLE
@@ -957,14 +957,14 @@ BEGIN
     IDS_RIBBON_SLIDE        "Slide\nl"
     IDS_RIBBON_SPLIT        "Split"
     ID_RIBBON_SAMPLE_GALLERY "Open one of the sample mechanisms.\nOpen Sample"
-    ID_VIEW_ZOOMFIT         "Zoom to 100% and move the content to be centered in the window.\Zoom 100%"
+    ID_VIEW_ZOOMFIT         "Zoom to 100% and move the content to be centered in the window.\\Zoom 100%"
     IDS_RIBBON_ALIGN        "Edit"
 END
 
 STRINGTABLE
 BEGIN
-    ID_VIEW_ZOOMIN          "Show a closer and more detailed view of the mechanism.\Zoom In"
-    ID_VIEW_ZOOMOUT         "Show the mechanism from farther away, making it smaller.\Zoom Out"
+    ID_VIEW_ZOOMIN          "Show a closer and more detailed view of the mechanism.\\Zoom In"
+    ID_VIEW_ZOOMOUT         "Show the mechanism from farther away, making it smaller.\\Zoom Out"
 END
 
 STRINGTABLE

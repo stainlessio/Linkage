@@ -5,6 +5,7 @@
 
 #define RADIANS_TO_DEGREES_BEST_FOR_THIS_CODE 57.295779513082320876798154814105
 #define DEGREES_TO_RADIANS_BEST_FOR_THIS_CODE 0.0174532925199432957692369076848
+#define PI_FOR_THIS_CODE 3.141592653589793238462643383279
 
 static void swap( double& a, double& b )
 {
@@ -122,6 +123,7 @@ class CFLine
 	void PerpendicularLine( CFLine &Perp, double length, int Direction = 1 ) const;
 
 	void MoveEnds( double MoveStartDistance, double MoveEndDistance );
+	void MoveEndsFromStart( double MoveStartDistance, double MoveEndDistance );
 
 	CFPoint MidPoint( double ScaleDistance );
 	

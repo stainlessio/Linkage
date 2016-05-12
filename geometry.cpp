@@ -482,6 +482,27 @@ void CFLine::MoveEnds( double MoveStartDistance, double MoveEndDistance )
 	m_End.y = m_End.y + ( ( m_End.y - m_Start.y ) * ScaleFactor );
 }
 
+void CFLine::MoveEndsFromStart( double MoveStartDistance, double MoveEndDistance )
+{
+	if( m_End.x == m_Start.x && m_End.y == m_Start.y )
+		return;
+
+	double Length = sqrt( ( ( m_End.x - m_Start.x )  * ( m_End.x - m_Start.x ) ) + ( ( m_End.y - m_Start.y ) * ( m_End.y - m_Start.y ) ) );
+
+	double ScaleFactor = MoveStartDistance / Length;
+	CFPoint NewStart;
+	NewStart.x = m_Start.x + ( ( m_End.x - m_Start.x ) * ScaleFactor );
+	NewStart.y = m_Start.y + ( ( m_End.y - m_Start.y ) * ScaleFactor );
+
+	ScaleFactor = MoveEndDistance / Length;
+	CFPoint NewEnd;
+	NewEnd.x = m_Start.x + ( ( m_End.x - m_Start.x ) * ScaleFactor );
+	NewEnd.y = m_Start.y + ( ( m_End.y - m_Start.y ) * ScaleFactor );
+
+	m_Start = NewStart;
+	m_End = NewEnd;
+}
+
 void CFLine::SetDistance( const double Distance )
 {
 	if( m_End.x == m_Start.x && m_End.y == m_Start.y )
@@ -560,7 +581,7 @@ bool CFArc::PointOnArc( CFPoint &Point )
 bool GetTangents( const CFCircle &Circle1, const CFCircle &Circle2, CFLine &Result1, CFLine &Result2 )
 {
 	if( Circle1.r > Circle2.r )
-		return GetTangents( Circle2, Circle1, Result2, Result1 );
+		return GetTangents( Circle2, Circle1, Result1, Result2 );
 	else if( Circle1.r == Circle2.r )
 	{
 		CFLine Line( Circle1.GetCenter(), Circle2.GetCenter() );
@@ -569,8 +590,8 @@ bool GetTangents( const CFCircle &Circle1, const CFCircle &Circle2, CFLine &Resu
 		CFLine Perp;
 		Line.PerpendicularLine( Perp, 1 );
 		Perp.SetDistance( Circle2.r );
-		Result1 += Perp.GetEnd() - Circle2.GetCenter();
-		Result2 -= Perp.GetEnd() - Circle2.GetCenter();
+		Result1 -= Perp.GetEnd() - Circle2.GetCenter();
+		Result2 += Perp.GetEnd() - Circle2.GetCenter();
 		return true;
 	}
 

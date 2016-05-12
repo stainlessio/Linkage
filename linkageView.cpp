@@ -60,6 +60,7 @@ static COLORREF COLOR_SNAPHINT = RGB( 170, 170, 240 );
 static COLORREF COLOR_SUPERHIGHLIGHT = RGB( 255, 255, 192 );
 static COLORREF COLOR_SUPERHIGHLIGHT2 = RGB( 255, 255, 128 );
 static COLORREF COLOR_TEXT = RGB( 24, 24, 24 );
+static COLORREF COLOR_CHAIN = RGB( 50, 50, 50 );
 static COLORREF COLOR_STRETCHDOTS = RGB( 220, 220, 220 );
 static COLORREF COLOR_MOTIONPATH = RGB( 60, 60, 60 );
 static COLORREF COLOR_DRAWINGLIGHT = RGB( 200, 200, 200 );
@@ -3235,7 +3236,9 @@ void CLinkageView::StartMechanismSimulate( enum _SimulationControl SimulationCon
 		SetStatusText( "Recording simulation video." );
 	else
 		SetStatusText( "Running simulation." );
+
 	pDoc->Reset( true );
+
 	m_Simulator.Reset();
 	m_bSimulating = true;
 	m_SimulationControl = SimulationControl;
@@ -5289,7 +5292,7 @@ void CLinkageView::DrawConnector( CRenderer* pRenderer, unsigned int OnLayers, C
 
 			DrawFasteners( pRenderer, OnLayers, pConnector );
 		}
-		if( pConnector->IsLinkSelected() )
+		if( pConnector->IsLinkSelected() && !pConnector->IsAlone() )
 		{
 			CPen GrayPen;
 			GrayPen.CreatePen( PS_SOLID, 1, COLOR_MINORSELECTION ) ;
@@ -6266,6 +6269,39 @@ CFArea CLinkageView::DrawDimensions( CRenderer* pRenderer, unsigned int OnLayers
 	return DimensionsArea;
 }
 
+static void DrawChainLine( CRenderer* pRenderer, CFLine Line, double ShiftingFactor )
+{
+	const double Gapping = 6.0;
+
+	double Offset = fmod( ShiftingFactor, Gapping * 2 );
+
+	double Start = -Gapping + Offset;
+	double End = Start + Gapping;
+
+	CFLine DarkLine( Line );
+	if( End > 0 )
+	{
+		DarkLine.MoveEndsFromStart( Start < 0 ? 0 : Start, End );
+		pRenderer->DrawLine( DarkLine );
+	}
+
+	double Length = Line.GetDistance();
+
+	for( int Step = 1; ; ++Step )
+	{
+		Start = End;
+		End = Start + Gapping;
+		if( Step % 2 == 0 )
+		{
+			DarkLine.SetLine( Line );
+			DarkLine.MoveEndsFromStart( Start < 0 ? 0 : Start, End > Length ? Length : End );
+			pRenderer->DrawLine( DarkLine );
+		}
+		if( End >= Length )
+			break;
+	}
+}
+
 void CLinkageView::DrawChain( CRenderer* pRenderer, unsigned int OnLayers, CGearConnection *pGearConnection )
 {
 	if( pGearConnection == 0 || pGearConnection->m_pGear1 == 0 || pGearConnection->m_pGear2 == 0 )
@@ -6286,7 +6322,7 @@ void CLinkageView::DrawChain( CRenderer* pRenderer, unsigned int OnLayers, CGear
 	double Radius2 = 0;
 	pGearConnection->m_pGear1->GetGearsRadius( pGearConnection, Radius1, Radius2 );
 
-	CPen DotPen( PS_DOT, 1, RGB( 0, 0, 0 ) );
+	CPen DotPen( PS_SOLID, 1, COLOR_CHAIN );
 	CPen* pOldPen = pRenderer->SelectObject( &DotPen );
 
 	CFLine Line1;
@@ -6294,8 +6330,17 @@ void CLinkageView::DrawChain( CRenderer* pRenderer, unsigned int OnLayers, CGear
 	if( !GetTangents( CFCircle( pConnector1->GetPoint(), Radius1 ), CFCircle( pConnector2->GetPoint(), Radius2 ), Line1, Line2 ) )
 		return;
 
-	pRenderer->DrawLine( Scale( Line1 ) );
-	pRenderer->DrawLine( Scale( Line2 ) );
+	// SOME CHAIN MOVEMENT TEST CODE...
+	double GearAngle = pGearConnection->m_pGear1->GetRotationAngle();
+	CLink *pConnectionLink = pGearConnection->m_pGear1->GetConnector( 0 )->GetSharingLink( pGearConnection->m_pGear2->GetConnector( 0 ) );
+	double LinkAngle = pConnectionLink == 0 ? 0 : -pConnectionLink->GetTempRotationAngle();
+	double UseAngle = GearAngle + LinkAngle;
+
+	double DistanceAround = ( -UseAngle / 360.0 ) * Radius1 * 2 * PI_FOR_THIS_CODE;
+
+	DrawChainLine( pRenderer, Scale( Line1 ), Scale( DistanceAround ) );
+	Line2.ReverseDirection();
+	DrawChainLine( pRenderer, Scale( Line2 ), Scale( DistanceAround ) );
 
 	pRenderer->SelectObject( pOldPen );
 }
@@ -7360,7 +7405,10 @@ void CLinkageView::OnSimulatePause()
 	if( m_bSimulating && m_SimulationControl == AUTO )
 		m_SimulationControl = STEP;
 	else
+	{
+		ConfigureControlWindow( STEP );
 		StartMechanismSimulate( STEP );
+	}
 }
 
 void CLinkageView::OnSimulateForward()
