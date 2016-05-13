@@ -308,7 +308,7 @@ Received some feature requests recently. These are some NOT YET ADDED:
 4/19/2016 12:00 AM: Fixed bug in undo feature that could cause a crash later wel after the undo.
 5/10/2016 12:00 AM: Changes to the stretching computations to be more consistent.
 5/12/2016 1:47 AM: Draw chains to show chain link movement.
-
+5/12/2016 12:09 PM: Fixed bug that caused rotation angle of links to change by 360 or -360 unexpectedly. It only screwed things up for some gears that are on connectors of the screwed up link.
 
 
 

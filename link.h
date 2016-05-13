@@ -73,7 +73,10 @@ class CLink : public CElement
 
 	void SelectAllConnectors( bool bSelected );
 	void SetTempFixed( bool bSet ) { m_bTempFixed = bSet; }
-	void SetRotationAngle( double Value ) { m_TempRotationAngle = Value; ++m_MoveCount; }
+	void SetRotationAngle( double Value ) 
+	{
+		m_TempRotationAngle = Value; ++m_MoveCount; 
+	}
 	double GetRotationAngle( void ) { return m_RotationAngle; }
 	double GetTempRotationAngle( void ) { return m_TempRotationAngle; }
 

@@ -5312,20 +5312,22 @@ void CLinkageView::DebugDrawLink( CRenderer* pRenderer, unsigned int OnLayers, C
 	if( !m_bShowDebug )
 		return;
 
-	if( ( pLink->GetLayers() & OnLayers ) == 0 )
-		return;
+	CLinkageDoc* pDoc = GetDocument();
+	ASSERT_VALID(pDoc);
 
 	CPen CustomPen;
 	CustomPen.CreatePen( PS_USERSTYLE, 1, RGB( 0, 0, 0 ) );
 	CPen *pOldPen = pRenderer->SelectObject( &CustomPen );
 
-	if( pLink->IsGear() )
+	if( 1 || pLink->IsGear() )
 	{
+		CFPoint AveragePoint;
+		pLink->GetAveragePoint( *pDoc->GetGearConnections(), AveragePoint );
 		CConnector* pConnector = pLink->GetConnector( 0 );
 		if( pConnector != 0 )
 		{
 			CFPoint Point = pConnector->GetPoint();
-			Point = Scale( Point );
+			Point = Scale( AveragePoint );
 
 			pRenderer->SetTextColor( RGB( 25, 0, 0 ) );
 			pRenderer->SetBkMode( OPAQUE );
@@ -5334,7 +5336,7 @@ void CLinkageView::DebugDrawLink( CRenderer* pRenderer, unsigned int OnLayers, C
 
 			CString String;
 			//double DocumentScale = pDoc->GetUnitScale();
-			String.Format( "%.4lf", pLink->GetRotationAngle() );
+			String.Format( "LA %.4lf", pLink->GetRotationAngle() );
 
 			double Radius = m_ConnectorRadius * 5;
 

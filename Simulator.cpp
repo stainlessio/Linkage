@@ -747,6 +747,7 @@ class CSimulatorImplementation
 		{
 			double TempAngle = GetAngle( pFixedConnection->GetTempPoint(), Intersect, pFixedConnection->GetOriginalPoint(), pCommonConnector->GetOriginalPoint() );
 
+			TempAngle = GetClosestAngle( pFixedConnection->GetRotationAngle(), TempAngle );
 			pFixedConnection->SetRotationAngle( TempAngle );
 			if( !pLink->RotateAround( pFixedConnection ) )
 				return false;
@@ -992,6 +993,7 @@ class CSimulatorImplementation
 		{
 			double TempAngle = GetAngle( pFixedConnection->GetTempPoint(), Intersect, pFixedConnection->GetOriginalPoint(), pCommonConnector->GetOriginalPoint() );
 
+			TempAngle = GetClosestAngle( pFixedConnection->GetRotationAngle(), TempAngle );
 			pFixedConnection->SetRotationAngle( TempAngle );
 			if( !pLink->RotateAround( pFixedConnection ) )
 				return false;
@@ -1012,6 +1014,7 @@ class CSimulatorImplementation
 		 * and the rotation happens around the common connector.
 		 */
 
+		Angle = GetClosestAngle( pCommonConnector->GetRotationAngle(), Angle );
 		pCommonConnector->SetRotationAngle( Angle );
 		if( !pOtherLink->RotateAround( pCommonConnector ) )
 			return false;
@@ -1089,8 +1092,10 @@ class CSimulatorImplementation
 
 		if( d2 < d1 )
 			Intersect = Intersect2;
-
-		pFixedConnection->SetRotationAngle( GetAngle( pFixedConnection->GetTempPoint(), Intersect, pFixedConnection->GetOriginalPoint(), pSlider->GetOriginalPoint() ) );
+		
+		double Angle = GetAngle( pFixedConnection->GetTempPoint(), Intersect, pFixedConnection->GetOriginalPoint(), pSlider->GetOriginalPoint() );
+		Angle = GetClosestAngle( pFixedConnection->GetRotationAngle(), Angle );
+		pFixedConnection->SetRotationAngle( Angle );
 		if( !pLink->RotateAround( pFixedConnection ) )
 			return false;
 
@@ -1185,6 +1190,7 @@ class CSimulatorImplementation
 		NewSlideLine.SetDistance( IntersectToSlider );
 		DebugItemList.AddTail( new CDebugItem( NewSlideLine ) );
 
+		ChangeAngle = GetClosestAngle( pSlider1->GetRotationAngle(), ChangeAngle );
 		pSlider1->SetRotationAngle( ChangeAngle );
 		pSlider1->MovePoint( NewSlideLine.m_End );
 		pLink->RotateAround( pSlider1 );
@@ -1478,7 +1484,7 @@ class CSimulatorImplementation
 		pCommonConnector->SetTempFixed( false ); // needed so it can be rotated again.
 		pLink->IncrementMoveCount( -1 ); // Don't count that one twice.
 		Angle = GetAngle( pOtherFixedConnector->GetTempPoint(), Intersect, pOtherFixedConnector->GetOriginalPoint(), pCommonConnector->GetOriginalPoint() );
-		Angle = GetClosestAngle( pOtherFixedConnector->GetRotationAngle(), Angle );
+		Angle = GetClosestAngle( pOtherToRotate->GetRotationAngle(), Angle );
 		pOtherFixedConnector->SetRotationAngle( Angle );
 		if( !pOtherToRotate->RotateAround( pOtherFixedConnector ) )
 			return false;
