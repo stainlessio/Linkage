@@ -97,6 +97,9 @@ public:
 	bool DeSelectElement( CConnector *pConnector );
 	bool FindElement( CFPoint Point, double GrabDistance, double SolidLinkExpansion, CLink *&pFoundLink, CConnector *&pFoundConnector );
 	CFPoint CheckForSnap( double SnapDistance, bool bElementSnap, bool bGridSnap, double xGrid, double yGrid, CFPoint &ReferencePoint );
+	bool CheckForGridSnap( CConnector *pConnector, double SnapDistance, double xGrid, double yGrid, CFPoint &ReferencePoint, CFPoint &Adjustment );
+	bool CheckForElementSnap( CConnector *pConnector, double SnapDistance, CFPoint &ReferencePoint, CFPoint &Adjustment );
+	bool CheckForSliderSnap( CConnector *pConnector, CFPoint &Adjustment );
 	bool MoveSelected( CFPoint Point, bool bElementSnap, bool bGridSnap, double xGrid, double yGrid, double SnapDistance, CFPoint &ReferencePoint );
 	bool RotateSelected( CFPoint CenterPoint, double Angle );
 	bool StretchSelected( CFRect OriginalRect, CFRect NewRect, _Direction Direction );

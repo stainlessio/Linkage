@@ -1188,6 +1188,7 @@ bool CLinkageDoc::AutoJoinSelected( void )
 			SelectElement( pCheckConnector );
 	}
 
+	m_bSelectionJoinable = true;
 	JoinSelected( false );
 
 	return true;
@@ -1550,6 +1551,96 @@ bool CLinkageDoc::MoveCapturedController( CFPoint Point )
 	return true;
 }
 
+bool CLinkageDoc::CheckForSliderSnap( CConnector *pConnector, CFPoint &Adjustment )
+{
+	return true;
+}
+
+bool CLinkageDoc::CheckForElementSnap( CConnector *pConnector, double SnapDistance, CFPoint &ReferencePoint, CFPoint &Adjustment )
+{
+	bool bSnapItem = false;
+	CFPoint ConnectorPoint = pConnector->GetPoint();
+
+	POSITION Position2 = m_Connectors.GetHeadPosition();
+	while( Position2 != 0 )
+	{
+		CConnector* pCheckConnector = m_Connectors.GetNext( Position2 );
+		if( pCheckConnector == 0 || ( pConnector->GetLayers() & m_EditLayers ) == 0 )
+			continue;
+
+		if( pCheckConnector->IsSelected() || pCheckConnector->IsLinkSelected() )
+			continue;
+
+		/*
+			* This is a snap to the horizontal or vertical position of the
+			* connector, not a snap to both coordinates. Check the distance
+			* in each direction instead of an absolute distance.
+			*/
+
+		CFPoint CheckPoint = pCheckConnector->GetOriginalPoint();
+		if( fabs( ConnectorPoint.x - CheckPoint.x ) < SnapDistance )
+		{
+			bSnapItem = true;
+			Adjustment.x = CheckPoint.x - ConnectorPoint.x;
+			m_SnapLine[0].SetLine( CheckPoint, CFPoint( ConnectorPoint.x + Adjustment.x, ConnectorPoint.y ) );
+			ReferencePoint.x = ConnectorPoint.x + Adjustment.x;
+		}
+		if( fabs( ConnectorPoint.y - CheckPoint.y ) < SnapDistance )
+		{
+			bSnapItem = true;
+			Adjustment.y = CheckPoint.y - ConnectorPoint.y;
+			m_SnapLine[1].SetLine( CheckPoint, CFPoint( ConnectorPoint.x, ConnectorPoint.y + Adjustment.y ) );
+			ReferencePoint.y = ConnectorPoint.y + Adjustment.y;
+		}
+	}
+	return bSnapItem;
+}
+
+bool CLinkageDoc::CheckForGridSnap( CConnector *pConnector, double SnapDistance, double xGrid, double yGrid, CFPoint &ReferencePoint, CFPoint &Adjustment )
+{
+	bool bSnapGrid = false;
+
+	CFPoint ConnectorPoint = pConnector->GetPoint();
+
+	double xMin = ( (int)( ConnectorPoint.x / xGrid ) ) * xGrid;
+	double xMax = xMin + ( xGrid * ( ConnectorPoint.x >= 0 ? 1 : -1 ) );
+
+	double yMin = ( (int)( ConnectorPoint.y / yGrid ) ) * yGrid;
+	double yMax = yMin + ( yGrid * ( ConnectorPoint.y >= 0 ? 1 : -1 ) );
+
+	if( fabs( ConnectorPoint.x - xMin ) < SnapDistance )
+	{
+		bSnapGrid = true;
+		Adjustment.x = xMin - ConnectorPoint.x;
+		m_SnapLine[0].SetLine( xMin, -99999, xMin, 99999 );
+		ReferencePoint.x = ConnectorPoint.x + Adjustment.x;
+	}
+	else if( fabs( ConnectorPoint.x - xMax ) < SnapDistance )
+	{
+		bSnapGrid = true;
+		Adjustment.x = xMax - ConnectorPoint.x;
+		m_SnapLine[0].SetLine( xMax, -99999, xMax, 99999 );
+		ReferencePoint.x = ConnectorPoint.x + Adjustment.x;
+	}
+	if( fabs( ConnectorPoint.y - yMin ) < SnapDistance )
+	{
+		bSnapGrid = true;
+		Adjustment.y = yMin - ConnectorPoint.y;
+		m_SnapLine[1].SetLine( -99999, yMin, 99999, yMin );
+		ReferencePoint.y = ConnectorPoint.y + Adjustment.y;
+	}
+	else if( fabs( ConnectorPoint.y - yMax ) < SnapDistance )
+	{
+		bSnapGrid = true;
+		Adjustment.y = yMax - ConnectorPoint.y;
+		m_SnapLine[1].SetLine( -99999, yMax, 99999, yMax );
+		ReferencePoint.y = ConnectorPoint.y + Adjustment.y;
+	}
+
+	return bSnapGrid;
+}
+
+
 CFPoint CLinkageDoc::CheckForSnap( double SnapDistance, bool bElementSnap, bool bGridSnap, double xGrid, double yGrid, CFPoint &ReferencePoint )
 {
 	CFPoint Adjustment( 0, 0 );
@@ -1571,42 +1662,9 @@ CFPoint CLinkageDoc::CheckForSnap( double SnapDistance, bool bElementSnap, bool 
 			if( pConnector->IsSlider() )
 				continue;
 
-			CFPoint ConnectorPoint = pConnector->GetPoint();
-
-			double xMin = ( (int)( ConnectorPoint.x / xGrid ) ) * xGrid;
-			double xMax = xMin + ( xGrid * ( ConnectorPoint.x >= 0 ? 1 : -1 ) );
-
-			double yMin = ( (int)( ConnectorPoint.y / yGrid ) ) * yGrid;
-			double yMax = yMin + ( yGrid * ( ConnectorPoint.y >= 0 ? 1 : -1 ) );
-
-			if( fabs( ConnectorPoint.x - xMin ) < SnapDistance )
-			{
-				bSnapGrid = true;
-				Adjustment.x = xMin - ConnectorPoint.x;
-				m_SnapLine[0].SetLine( xMin, -99999, xMin, 99999 );
-				ReferencePoint.x = ConnectorPoint.x + Adjustment.x;
-			}
-			else if( fabs( ConnectorPoint.x - xMax ) < SnapDistance )
-			{
-				bSnapGrid = true;
-				Adjustment.x = xMax - ConnectorPoint.x;
-				m_SnapLine[0].SetLine( xMax, -99999, xMax, 99999 );
-				ReferencePoint.x = ConnectorPoint.x + Adjustment.x;
-			}
-			if( fabs( ConnectorPoint.y - yMin ) < SnapDistance )
-			{
-				bSnapGrid = true;
-				Adjustment.y = yMin - ConnectorPoint.y;
-				m_SnapLine[1].SetLine( -99999, yMin, 99999, yMin );
-				ReferencePoint.y = ConnectorPoint.y + Adjustment.y;
-			}
-			else if( fabs( ConnectorPoint.y - yMax ) < SnapDistance )
-			{
-				bSnapGrid = true;
-				Adjustment.y = yMax - ConnectorPoint.y;
-				m_SnapLine[1].SetLine( -99999, yMax, 99999, yMax );
-				ReferencePoint.y = ConnectorPoint.y + Adjustment.y;
-			}
+			bSnapGrid = CheckForGridSnap( pConnector, SnapDistance, xGrid, yGrid, ReferencePoint, Adjustment );
+			if( bSnapGrid )
+				break;
 		}
 	}
 
@@ -1637,65 +1695,14 @@ CFPoint CLinkageDoc::CheckForSnap( double SnapDistance, bool bElementSnap, bool 
 			if( pConnector->IsSlider() )
 				continue;
 
-			CFPoint ConnectorPoint = pConnector->GetPoint();
-
-			POSITION Position2 = m_Connectors.GetHeadPosition();
-			while( Position2 != 0 )
-			{
-				CConnector* pCheckConnector = m_Connectors.GetNext( Position2 );
-				if( pCheckConnector == 0 || ( pConnector->GetLayers() & m_EditLayers ) == 0 )
-					continue;
-
-				if( pCheckConnector->IsSelected() || pCheckConnector->IsLinkSelected() )
-					continue;
-
-				/*
-				 * This is a snap to the horizontal or vertical position of the
-				 * connector, not a snap to both coordinates. Check the distance
-				 * in each direction instead of an absolute distance.
-				 */
-
-				CFPoint CheckPoint = pCheckConnector->GetOriginalPoint();
-				if( fabs( ConnectorPoint.x - CheckPoint.x ) < SnapDistance )
-				{
-					bSnapItem = true;
-					Adjustment.x = CheckPoint.x - ConnectorPoint.x;
-					m_SnapLine[0].SetLine( CheckPoint, CFPoint( ConnectorPoint.x + Adjustment.x, ConnectorPoint.y ) );
-					ReferencePoint.x = ConnectorPoint.x + Adjustment.x;
-				}
-				if( fabs( ConnectorPoint.y - CheckPoint.y ) < SnapDistance )
-				{
-					bSnapItem = true;
-					Adjustment.y = CheckPoint.y - ConnectorPoint.y;
-					m_SnapLine[1].SetLine( CheckPoint, CFPoint( ConnectorPoint.x, ConnectorPoint.y + Adjustment.y ) );
-					ReferencePoint.y = ConnectorPoint.y + Adjustment.y;
-				}
-			}
+			bSnapItem = CheckForElementSnap( pConnector, SnapDistance, ReferencePoint, Adjustment );
+			if( bSnapItem )
+				break;
 		}
 	}
 
-	#if 0
 	if( bSnapItem || bSnapGrid )
-	{
-		POSITION Position = m_Connectors.GetHeadPosition();
-		while( Position != 0 )
-		{
-			CConnector* pConnector = m_Connectors.GetNext( Position );
-			if( pConnector == 0 )
-				continue;
-
-			if( !pConnector->IsSelected() && !pConnector->IsLinkSelected() )
-				continue;
-
-			CFPoint ConnectorPoint = pConnector->GetPoint();
-			ConnectorPoint += Adjustment;
-			pConnector->SetIntermediatePoint( ConnectorPoint );
-		}
-	}
-	#endif
-
-	if( bSnapItem || bSnapGrid )
-		return Adjustment; //bSnapItem || bSnapGrid;
+		return Adjustment;
 	else
 		return CFPoint( 0, 0 );
 }
