@@ -314,7 +314,7 @@ void CMainFrame::CreateInsertPanel( CMFCRibbonCategory* pCategory )
 	CMFCRibbonButton* pInsertButton = new CMFCRibbonButton( ID_EDIT_INSERTBUTTON, strTemp, 28, 28 );
 
 	AppendMenuItem( pInsertButton, IDS_RIBBON_INSERT_CONNECTOR, ID_INSERT_CONNECTOR, 29 );
-	AppendMenuItem( pInsertButton, IDS_RIBBON_INSERT_ANCHOR, ID_INSERT_ANCHOR, 27 );
+	AppendMenuItem( pInsertButton, IDS_RIBBON_INSERT_ANCHOR, ID_INSERT_ANCHOR, 89 );
 	AppendMenuItem( pInsertButton, IDS_RIBBON_INSERT_LINK2, ID_INSERT_LINK2, 28 );
 	AppendMenuItem( pInsertButton, IDS_RIBBON_INSERT_ANCHORLINK, ID_INSERT_ANCHORLINK, 27 );
 	AppendMenuItem( pInsertButton, IDS_RIBBON_INSERT_INPUT, ID_INSERT_INPUT, 26 );
