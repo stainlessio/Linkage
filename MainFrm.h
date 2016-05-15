@@ -58,14 +58,14 @@ public:
 protected:  // control bar embedded members
 	CMFCRibbonApplicationButton m_MainButton;
 	CMFCToolBarImages m_PanelImages;
-	CImageList m_PanelImagesList;
+	//CImageList m_PanelImagesList;
 
 private:
 	void CreateMainCategory( void );
 	void CreateHomeCategory( void );
 	void CreatePrintingCategory( void );
 	void CreateQuickAccessCommands( void );
-	void CreateSamplePanel( CMFCRibbonCategory* pCategory );
+	//void CreateSamplePanel( CMFCRibbonCategory* pCategory );
 	void CreateClipboardPanel( CMFCRibbonCategory* pCategory );
 	void CreateViewPanel( CMFCRibbonCategory* pCategory );
 	void CreateDimensionsPanel( CMFCRibbonCategory* pCategory );
@@ -77,8 +77,10 @@ private:
 	void CreateSettingsPanel( CMFCRibbonCategory* pCategory );
 	void CreatePrintOptionsPanel( CMFCRibbonCategory* pCategory );
 	void CreateHelpButtons( void );
+	void CreateHelpCategory( void );
+	void CreateHelpPanel( CMFCRibbonCategory* pCategory );
 	void InitializeRibbon();
-	int FindFocusedOutlookWnd(CMFCOutlookBarTabCtrl** ppOutlookWnd);
+	//int FindFocusedOutlookWnd(CMFCOutlookBarTabCtrl** ppOutlookWnd);
 	void ConfigureDocumentationMenu( CMenu *pMenu );
 	void AppendMenuItem( CMenu &Menu, UINT StringID, UINT ID, int BitmapIndex );
 	void AppendMenuItem( CMFCRibbonButton *pButton, UINT StringID, UINT ID, int BitmapIndex );

@@ -26,6 +26,8 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWndEx)
 	ON_UPDATE_COMMAND_UI(ID_FILE_PRINT_PREVIEW, &CMainFrame::OnUpdateFilePrintPreview)
 	ON_COMMAND(ID_HELP_USERGUIDE, &CMainFrame::OnHelpUserguide)
 	ON_COMMAND(ID_HELP_ABOUT, &CMainFrame::OnHelpAbout)
+	ON_COMMAND(ID_FILE_HELPDOC, &CMainFrame::OnHelpUserguide)
+	ON_COMMAND(ID_FILE_HELPABOUT, &CMainFrame::OnHelpAbout)
 	ON_COMMAND(ID_RIBBON_SAMPLE_GALLERY, &CMainFrame::OnSelectSample)
 	ON_WM_DROPFILES()
 END_MESSAGE_MAP()
@@ -283,6 +285,14 @@ void CMainFrame::CreatePrintPanel( CMFCRibbonCategory* pCategory )
 
 	AddRibbonButton( pPanePrint, IDS_RIBBON_PRINT_QUICK, ID_FILE_PRINT_DIRECT, 7, LARGE );
 	AddRibbonButton( pPanePrint, IDS_RIBBON_PRINT_PREVIEW, ID_FILE_PRINT_PREVIEW, 8, LARGE );
+}
+
+void CMainFrame::CreateHelpPanel( CMFCRibbonCategory* pCategory )
+{
+	CMFCRibbonPanel* pPanelHelp = AddPanel( pCategory, IDS_RIBBON_HELP, m_PanelImages.ExtractIcon(33) );
+
+	AddRibbonButton( pPanelHelp, IDS_RIBBON_HELPABOUT, ID_FILE_HELPABOUT, 91, LARGE );
+	AddRibbonButton( pPanelHelp, IDS_RIBBON_HELPDOC, ID_FILE_HELPDOC, 92, LARGE );
 }
 
 void CMainFrame::CreateSettingsPanel( CMFCRibbonCategory* pCategory )
@@ -611,6 +621,12 @@ void CMainFrame::CreatePrintingCategory( void )
 	CreatePrintOptionsPanel( pCategoryPrinting );
 }
 
+void CMainFrame::CreateHelpCategory( void )
+{
+	CMFCRibbonCategory* pCategoryHelp = CreateCategory( &m_wndRibbonBar, IDS_RIBBON_HELPCAT );
+	CreateHelpPanel( pCategoryHelp );
+}
+
 void CMainFrame::CreateHomeCategory( void )
 {
 	CMFCRibbonCategory* pCategoryHome = CreateCategory( &m_wndRibbonBar, IDS_RIBBON_HOME );
@@ -632,11 +648,12 @@ void CMainFrame::InitializeRibbon()
 	m_PanelImages.SetImageSize(CSize(16, 16));
 	m_PanelImages.Load(IDB_BUTTONS);
 
-	m_PanelImagesList.Create( IDB_BUTTONS, 16, 1, ILC_COLOR32 );
+	//m_PanelImagesList.Create( IDB_BUTTONS, 16, 1, ILC_COLOR32 );
 
 	CreateMainCategory();
 	CreateHomeCategory();
 	CreatePrintingCategory();
+	CreateHelpCategory();
 	CreateQuickAccessCommands();
 	CreateHelpButtons();
 

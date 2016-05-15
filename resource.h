@@ -78,6 +78,12 @@
 #define ID_SIMULATE_BACKWARD_BIG        3016
 #define ID_EDIT_SET_RATIO               3017
 #define IDS_RIBBON_SET_RATIO            3018
+#define IDS_RIBBON_HELPCAT              3019
+#define IDS_RIBBON_HELPABOUT            3020
+#define ID_FILE_HELPABOUT               3021
+#define IDS_RIBBON_HELPDOC              3022
+#define ID_FILE_HELPDOC                 3023
+#define IDS_RIBBON_HELP                 3024
 #define IDB_NAVIGATION_LARGE_HC         4100
 #define IDB_PAGES                       4101
 #define IDB_PAGES_HC                    4102
@@ -190,7 +196,7 @@
 #define ID_EDIT_JOIN                    4796
 #define ID_EDIT_GRIDSNAP                4797
 #define ID_VIEW_DIMENSIONS              4798
-#define ID_VIEW_GROUNDDIMENSIONS		4799
+#define ID_VIEW_GROUNDDIMENSIONS        4799
 #define ID_EDIT_SPLIT                   4801
 #define ID_ALIGN_RIGHTANGLE             4802
 #define ID_ALIGN_RECTANGLE              4803
@@ -456,6 +462,7 @@
 #define IDC_COLORPROMPT                 5417
 #define IDC_GEARRADIUSPROMPT            5418
 #define IDS_SAMPLE_FOURGEARS            5419
+#define IDC_COLOR2                      5419
 #define IDS_SAMPLE_ORBITGEARS           5420
 #define IDS_SAMPLE_OSCILLATORGEARS      5421
 #define IDS_SAMPLE_STEPHENSON           5422
