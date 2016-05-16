@@ -460,9 +460,9 @@
 #define IDC_FASTENEDTO                  5415
 #define IDC_COLOR                       5416
 #define IDC_COLORPROMPT                 5417
+#define IDC_COLOR2                      5417
 #define IDC_GEARRADIUSPROMPT            5418
 #define IDS_SAMPLE_FOURGEARS            5419
-#define IDC_COLOR2                      5419
 #define IDS_SAMPLE_ORBITGEARS           5420
 #define IDS_SAMPLE_OSCILLATORGEARS      5421
 #define IDS_SAMPLE_STEPHENSON           5422
@@ -479,7 +479,7 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        6003
+#define _APS_NEXT_RESOURCE_VALUE        6004
 #define _APS_NEXT_COMMAND_VALUE         7002
 #define _APS_NEXT_CONTROL_VALUE         8001
 #define _APS_NEXT_SYMED_VALUE           9000

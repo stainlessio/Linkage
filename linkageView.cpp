@@ -385,6 +385,9 @@ CLinkageView::CLinkageView()
 	m_bUseVideoCounters = false;
 	m_bShowSelection = true;
 
+	m_SelectedEditLayers = CLinkageDoc::ALLLAYERS;
+	m_SelectedViewLayers = CLinkageDoc::ALLLAYERS;
+
 	m_pAvi = 0;
 	m_bRecordingVideo = false;
 	m_RecordQuality = 0;
@@ -435,11 +438,11 @@ CLinkageView::CLinkageView()
 		m_bShowGrid = pApp->GetProfileInt( "Settings", "ShowGrid", 0 ) != 0;
 		m_bShowParts = pApp->GetProfileInt( "Settings", "ShowParts", 0 ) != 0;
 		m_bAllowEdit = !m_bShowParts;
-
 		GetSetGroundDimensionVisbility( false );
-
 		m_bShowDimensions = pApp->GetProfileInt( "Settings", "Showdimensions", 0 ) != 0;
 		m_bShowGroundDimensions = pApp->GetProfileInt( "Settings", "Showgrounddimensions", 1 ) != 0;
+		m_SelectedEditLayers = (unsigned int)pApp->GetProfileInt( "Settings", "EditLayers", 0xFFFFFFFF );
+		m_SelectedViewLayers = (unsigned int)pApp->GetProfileInt( "Settings", "ViewLayers", 0xFFFFFFFF );
 
 		m_Rotate0 = pApp->LoadIcon( IDI_ICON5 );
 		m_Rotate1 = pApp->LoadIcon( IDI_ICON1 );
@@ -518,6 +521,8 @@ void CLinkageView::SaveSettings( void )
 	pApp->WriteProfileInt( "Settings", "ShowParts", m_bShowParts ? 1 : 0  );
 	pApp->WriteProfileInt( "Settings", "PrintFullSize", m_bPrintFullSize ? 1 : 0 );
 	GetSetGroundDimensionVisbility( true );
+	pApp->WriteProfileInt( "Settings", "EditLayers", (int)m_SelectedEditLayers  );
+	pApp->WriteProfileInt( "Settings", "ViewLayers", (int)m_SelectedViewLayers );
 }
 
 CLinkageView::~CLinkageView()
@@ -1282,7 +1287,7 @@ CFRect CLinkageView::GetDocumentArea( bool bWithDimensions, bool bSelectedOnly )
 				if( pLink != 0 && !pLink->IsMeasurementElement() )
 				{
 					pLink->ComputeHull();
-					DocumentArea += DrawDimensions( &NullRenderer, pDoc->GetGearConnections(), pDoc->GetViewLayers(), pLink, true, true );
+					DocumentArea += DrawDimensions( &NullRenderer, pDoc->GetGearConnections(), m_SelectedViewLayers, pLink, true, true );
 				}
 			}
 
@@ -1292,10 +1297,10 @@ CFRect CLinkageView::GetDocumentArea( bool bWithDimensions, bool bSelectedOnly )
 			{
 				CConnector* pConnector = pConnectors->GetNext( Position );
 				if( pConnector != 0 )
-					DocumentArea += DrawDimensions( &NullRenderer, pDoc->GetViewLayers(), pConnector, true, true );
+					DocumentArea += DrawDimensions( &NullRenderer, m_SelectedViewLayers, pConnector, true, true );
 			}
 
-			DocumentArea += DrawGroundDimensions( &NullRenderer, pDoc, pDoc->GetViewLayers(), 0, true, true );
+			DocumentArea += DrawGroundDimensions( &NullRenderer, pDoc, m_SelectedViewLayers, 0, true, true );
 		}
 	}
 	DocumentArea.InflateRect( Unscale( m_ConnectorRadius * 2 ), Unscale( m_ConnectorRadius * 2 ) );
@@ -1541,7 +1546,7 @@ CFArea CLinkageView::DrawMechanism( CRenderer* pRenderer )
 		CConnector* pConnector = pConnectors->GetNext( Position );
 		if( pConnector == 0 )
 			continue;
-		DebugDrawConnector( pRenderer, pDoc->GetViewLayers(), pConnector, m_bShowLabels );
+		DebugDrawConnector( pRenderer, m_SelectedViewLayers, pConnector, m_bShowLabels );
 	}
 
 	static const int Steps = 2;
@@ -1555,7 +1560,7 @@ CFArea CLinkageView::DrawMechanism( CRenderer* pRenderer )
 		{
 			CLink* pLink = pLinkList->GetNext( Position );
 			if( pLink != 0  && ( pLink->GetLayers() & StepLayers ) != 0 )
-				DrawLink( pRenderer, pDoc->GetGearConnections(), pDoc->GetViewLayers(), pLink, false, false, true );
+				DrawLink( pRenderer, pDoc->GetGearConnections(), m_SelectedViewLayers, pLink, false, false, true );
 		}
 	}
 
@@ -1564,7 +1569,7 @@ CFArea CLinkageView::DrawMechanism( CRenderer* pRenderer )
 	{
 		CLink* pLink = pLinkList->GetNext( Position );
 		if( pLink != 0  )
-			DebugDrawLink( pRenderer, pDoc->GetViewLayers(), pLink, false, true, true );
+			DebugDrawLink( pRenderer, m_SelectedViewLayers, pLink, false, true, true );
 	}
 
 	for( int Step = 0; Step < 2; ++Step )
@@ -1576,7 +1581,7 @@ CFArea CLinkageView::DrawMechanism( CRenderer* pRenderer )
 		{
 			CLink* pLink = pLinkList->GetNext( Position );
 			if( pLink != 0 && ( pLink->GetLayers() & StepLayers ) != 0 )
-				DrawLink( pRenderer, pDoc->GetGearConnections(), pDoc->GetViewLayers(), pLink, m_bShowLabels, true, false );
+				DrawLink( pRenderer, pDoc->GetGearConnections(), m_SelectedViewLayers, pLink, m_bShowLabels, true, false );
 		}
 
 		if( m_MouseAction == ACTION_STRETCH && Step == 1 )
@@ -1615,7 +1620,7 @@ CFArea CLinkageView::DrawMechanism( CRenderer* pRenderer )
 		{
 			CConnector* pConnector = pConnectors->GetNext( Position );
 			if( pConnector != 0 && ( pConnector->GetLayers() & StepLayers ) != 0 )
-				DrawSliderTrack( pRenderer, pDoc->GetViewLayers(), pConnector );
+				DrawSliderTrack( pRenderer, m_SelectedViewLayers, pConnector );
 		}
 
 		Position = pLinkList->GetHeadPosition();
@@ -1623,7 +1628,7 @@ CFArea CLinkageView::DrawMechanism( CRenderer* pRenderer )
 		{
 			CLink* pLink = pLinkList->GetNext( Position );
 			if( pLink != 0 && ( pLink->GetLayers() & StepLayers ) != 0 )
-				DrawLink( pRenderer, pDoc->GetGearConnections(), pDoc->GetViewLayers(), pLink, m_bShowLabels, false, false );
+				DrawLink( pRenderer, pDoc->GetGearConnections(), m_SelectedViewLayers, pLink, m_bShowLabels, false, false );
 		}
 
 		Position = pConnectors->GetHeadPosition();
@@ -1631,7 +1636,7 @@ CFArea CLinkageView::DrawMechanism( CRenderer* pRenderer )
 		{
 			CConnector* pConnector = pConnectors->GetNext( Position );
 			if( pConnector != 0 && ( pConnector->GetLayers() & StepLayers ) != 0 )
-				DrawConnector( pRenderer, pDoc->GetViewLayers(), pConnector, m_bShowLabels );
+				DrawConnector( pRenderer, m_SelectedViewLayers, pConnector, m_bShowLabels );
 		}
 	}
 
@@ -1643,7 +1648,7 @@ CFArea CLinkageView::DrawMechanism( CRenderer* pRenderer )
 			continue;
 
 		if( pGearConnection->m_ConnectionType == pGearConnection->CHAIN )
-			DrawChain( pRenderer, pDoc->GetViewLayers(), pGearConnection );
+			DrawChain( pRenderer, m_SelectedViewLayers, pGearConnection );
 	}
 
 	Position = pLinkList->GetHeadPosition();
@@ -1654,18 +1659,18 @@ CFArea CLinkageView::DrawMechanism( CRenderer* pRenderer )
 		{
 			CConnector *pConnector = pLink->GetStrokeConnector( 0 );
 			if( pConnector != 0 )
-				DrawConnector( pRenderer, pDoc->GetViewLayers(), pConnector, m_bShowLabels, false, false, false, true );
+				DrawConnector( pRenderer, m_SelectedViewLayers, pConnector, m_bShowLabels, false, false, false, true );
 		}
 	}
 
-	DrawStackedConnectors( pRenderer, pDoc->GetViewLayers() );
+	DrawStackedConnectors( pRenderer, m_SelectedViewLayers );
 
 	Position = pLinkList->GetHeadPosition();
 	while( Position != NULL )
 	{
 		CLink* pLink = pLinkList->GetNext( Position );
 		if( pLink != 0 && !pLink->IsMeasurementElement() )
-			DrawDimensions( pRenderer, pDoc->GetGearConnections(), pDoc->GetViewLayers(), pLink, true, true );
+			DrawDimensions( pRenderer, pDoc->GetGearConnections(), m_SelectedViewLayers, pLink, true, true );
 	}
 
 	Position = pConnectors->GetHeadPosition();
@@ -1673,10 +1678,10 @@ CFArea CLinkageView::DrawMechanism( CRenderer* pRenderer )
 	{
 		CConnector* pConnector = pConnectors->GetNext( Position );
 		if( pConnector != 0 )
-			DrawDimensions( pRenderer, pDoc->GetViewLayers(), pConnector, true, true );
+			DrawDimensions( pRenderer, m_SelectedViewLayers, pConnector, true, true );
 	}
 
-	DrawGroundDimensions( pRenderer, pDoc, pDoc->GetViewLayers(), 0, true, true );
+	DrawGroundDimensions( pRenderer, pDoc, m_SelectedViewLayers, 0, true, true );
 
 	if( m_bSnapOn || m_bGridSnap )
 		DrawSnapLines( pRenderer );
@@ -1926,26 +1931,26 @@ CFArea CLinkageView::DrawPartsList( CRenderer* pRenderer )
 
 		ConnectorList* pConnectors = pPartsLink->GetConnectorList();
 
-		DrawLink( pRenderer, pGearConnections, pDoc->GetViewLayers(), pPartsLink, false, false, true );
-		DrawLink( pRenderer, pGearConnections, pDoc->GetViewLayers(), pPartsLink, m_bShowLabels, true, false );
+		DrawLink( pRenderer, pGearConnections, m_SelectedViewLayers, pPartsLink, false, false, true );
+		DrawLink( pRenderer, pGearConnections, m_SelectedViewLayers, pPartsLink, m_bShowLabels, true, false );
 
 		//POSITION Position2 = pConnectors->GetHeadPosition();
 		//while( Position2 != NULL )
 		//{
 		//	CConnector* pConnector = pConnectors->GetNext( Position2 );
 		//	if( pConnector != 0 )
-		//		DrawSliderTrack( pRenderer, pDoc->GetViewLayers(), pConnector );
+		//		DrawSliderTrack( pRenderer, m_SelectedViewLayers, pConnector );
 		//}
 
-		DrawLink( pRenderer, pGearConnections, pDoc->GetViewLayers(), pPartsLink, m_bShowLabels, false, false );
+		DrawLink( pRenderer, pGearConnections, m_SelectedViewLayers, pPartsLink, m_bShowLabels, false, false );
 		POSITION Position2 = pConnectors->GetHeadPosition();
 		while( Position2 != NULL )
 		{
 			CConnector* pConnector = pConnectors->GetNext( Position2 );
 			if( pConnector != 0 )
 			{
-				DrawConnector( pRenderer, pDoc->GetViewLayers(), pConnector, m_bShowLabels );
-				// DrawConnector( pRenderer, pDoc->GetViewLayers(), pConnector, m_bShowLabels, false, false, false, true );
+				DrawConnector( pRenderer, m_SelectedViewLayers, pConnector, m_bShowLabels );
+				// DrawConnector( pRenderer, m_SelectedViewLayers, pConnector, m_bShowLabels, false, false, false, true );
 			}
 		}
 
@@ -1953,15 +1958,15 @@ CFArea CLinkageView::DrawPartsList( CRenderer* pRenderer )
 		pPartsLink->GetArea( *pGearConnections, PartArea );
 
 		if( bGroundLink )
-			PartArea += DrawGroundDimensions( pRenderer, pDoc, pDoc->GetViewLayers(), pPartsLink, true, true );
+			PartArea += DrawGroundDimensions( pRenderer, pDoc, m_SelectedViewLayers, pPartsLink, true, true );
 		else
-			PartArea += DrawDimensions( pRenderer, pGearConnections, pDoc->GetViewLayers(), pPartsLink, true, true );
+			PartArea += DrawDimensions( pRenderer, pGearConnections, m_SelectedViewLayers, pPartsLink, true, true );
 		Position2 = pConnectors->GetHeadPosition();
 		while( Position2 != NULL )
 		{
 			CConnector* pConnector = pConnectors->GetNext( Position2 );
 			if( pConnector != 0 )
-			PartArea += DrawDimensions( pRenderer, pDoc->GetViewLayers(), pConnector, true, true );
+			PartArea += DrawDimensions( pRenderer, m_SelectedViewLayers, pConnector, true, true );
 		}
 
 		DocumentArea += PartArea;
@@ -4347,18 +4352,11 @@ void CLinkageView::OnViewDrawing()
 	CLinkageDoc* pDoc = GetDocument();
 	ASSERT_VALID(pDoc);
 
-	unsigned int CurrentViewLayers = pDoc->GetViewLayers();
-
-	if( pDoc->GetViewLayers() & CLinkageDoc::DRAWINGLAYER )
-		CurrentViewLayers &= ~CLinkageDoc::DRAWINGLAYER;
+	if( m_SelectedViewLayers & CLinkageDoc::DRAWINGLAYER )
+		m_SelectedViewLayers &= ~CLinkageDoc::DRAWINGLAYER;
 	else
-		CurrentViewLayers |= CLinkageDoc::DRAWINGLAYER;
-
-	if( CurrentViewLayers == 0 )
-		CurrentViewLayers = CLinkageDoc::MECHANISMLAYERS;
-
-	pDoc->SetViewLayers( CurrentViewLayers );
-	pDoc->SetEditLayers( CurrentViewLayers & m_SelectedEditLayers );
+		m_SelectedViewLayers |= CLinkageDoc::DRAWINGLAYER;
+	SaveSettings();
 
 	InvalidateRect( 0 );
 }
@@ -4368,7 +4366,7 @@ void CLinkageView::OnUpdateViewDrawing(CCmdUI *pCmdUI)
 	CLinkageDoc* pDoc = GetDocument();
 	ASSERT_VALID(pDoc);
 
-	pCmdUI->SetCheck( ( pDoc->GetViewLayers() & CLinkageDoc::DRAWINGLAYER ) != 0 ? 1 : 0 );
+	pCmdUI->SetCheck( ( m_SelectedViewLayers & CLinkageDoc::DRAWINGLAYER ) != 0 ? 1 : 0 );
 	pCmdUI->Enable( !m_bSimulating );
 }
 
@@ -4377,18 +4375,11 @@ void CLinkageView::OnViewMechanism()
 	CLinkageDoc* pDoc = GetDocument();
 	ASSERT_VALID(pDoc);
 
-	unsigned int CurrentViewLayers = pDoc->GetViewLayers();
-
-	if( pDoc->GetViewLayers() & CLinkageDoc::MECHANISMLAYERS )
-		CurrentViewLayers &= ~CLinkageDoc::MECHANISMLAYERS;
+	if( m_SelectedViewLayers & CLinkageDoc::MECHANISMLAYERS )
+		m_SelectedViewLayers &= ~CLinkageDoc::MECHANISMLAYERS;
 	else
-		CurrentViewLayers |= CLinkageDoc::MECHANISMLAYERS;
-
-	if( CurrentViewLayers == 0 )
-		CurrentViewLayers = CLinkageDoc::DRAWINGLAYER;
-
-	pDoc->SetViewLayers( CurrentViewLayers );
-	pDoc->SetEditLayers( CurrentViewLayers & m_SelectedEditLayers );
+		m_SelectedViewLayers |= CLinkageDoc::MECHANISMLAYERS;
+	SaveSettings();
 
 	InvalidateRect( 0 );
 }
@@ -4398,7 +4389,7 @@ void CLinkageView::OnUpdateViewMechanism(CCmdUI *pCmdUI)
 	CLinkageDoc* pDoc = GetDocument();
 	ASSERT_VALID(pDoc);
 
-	pCmdUI->SetCheck( ( pDoc->GetViewLayers() & CLinkageDoc::MECHANISMLAYERS ) != 0 ? 1 : 0 );
+	pCmdUI->SetCheck( ( m_SelectedViewLayers & CLinkageDoc::MECHANISMLAYERS ) != 0 ? 1 : 0 );
 	pCmdUI->Enable( !m_bSimulating );
 }
 
@@ -4407,19 +4398,11 @@ void CLinkageView::OnEditDrawing()
 	CLinkageDoc* pDoc = GetDocument();
 	ASSERT_VALID(pDoc);
 
-	unsigned int CurrentEditLayers = m_SelectedEditLayers; //pDoc->GetEditLayers();
-
-	if( pDoc->GetEditLayers() & CLinkageDoc::DRAWINGLAYER )
-		CurrentEditLayers &= ~CLinkageDoc::DRAWINGLAYER;
+	if( m_SelectedEditLayers & CLinkageDoc::DRAWINGLAYER )
+		m_SelectedEditLayers &= ~CLinkageDoc::DRAWINGLAYER;
 	else
-		CurrentEditLayers |= CLinkageDoc::DRAWINGLAYER;
-
-	if( CurrentEditLayers == 0 )
-		CurrentEditLayers = CLinkageDoc::MECHANISMLAYERS;
-
-	m_SelectedEditLayers = CurrentEditLayers;
-
-	pDoc->SetEditLayers( CurrentEditLayers );
+		m_SelectedEditLayers |= CLinkageDoc::DRAWINGLAYER;
+	SaveSettings();
 
 	InvalidateRect( 0 );
 }
@@ -4429,8 +4412,8 @@ void CLinkageView::OnUpdateEditDrawing(CCmdUI *pCmdUI)
 	CLinkageDoc* pDoc = GetDocument();
 	ASSERT_VALID(pDoc);
 
-	pCmdUI->SetCheck( ( pDoc->GetViewLayers() & CLinkageDoc::DRAWINGLAYER ) != 0 && ( m_SelectedEditLayers & CLinkageDoc::DRAWINGLAYER ) != 0 ? 1 : 0 );
-	pCmdUI->Enable( !m_bSimulating && ( pDoc->GetViewLayers() & CLinkageDoc::DRAWINGLAYER ) != 0 );
+	pCmdUI->SetCheck( ( m_SelectedViewLayers & CLinkageDoc::DRAWINGLAYER ) != 0 && ( m_SelectedEditLayers & CLinkageDoc::DRAWINGLAYER ) != 0 ? 1 : 0 );
+	pCmdUI->Enable( !m_bSimulating && ( m_SelectedViewLayers & CLinkageDoc::DRAWINGLAYER ) != 0 );
 }
 
 void CLinkageView::OnEditMechanism()
@@ -4440,17 +4423,11 @@ void CLinkageView::OnEditMechanism()
 
 	unsigned int CurrentEditLayers = m_SelectedEditLayers; //pDoc->GetEditLayers();
 
-	if( pDoc->GetEditLayers() & CLinkageDoc::MECHANISMLAYERS )
-		CurrentEditLayers &= ~CLinkageDoc::MECHANISMLAYERS;
+	if( m_SelectedEditLayers & CLinkageDoc::MECHANISMLAYERS )
+		m_SelectedEditLayers &= ~CLinkageDoc::MECHANISMLAYERS;
 	else
-		CurrentEditLayers |= CLinkageDoc::MECHANISMLAYERS;
-
-	if( CurrentEditLayers == 0 )
-		CurrentEditLayers = CLinkageDoc::DRAWINGLAYER;
-
-	m_SelectedEditLayers = CurrentEditLayers;
-
-	pDoc->SetEditLayers( CurrentEditLayers );
+		m_SelectedEditLayers |= CLinkageDoc::MECHANISMLAYERS;
+	SaveSettings();
 
 	InvalidateRect( 0 );
 }
@@ -4460,8 +4437,8 @@ void CLinkageView::OnUpdateEditMechanism(CCmdUI *pCmdUI)
 	CLinkageDoc* pDoc = GetDocument();
 	ASSERT_VALID(pDoc);
 
-	pCmdUI->SetCheck( ( pDoc->GetViewLayers() & CLinkageDoc::MECHANISMLAYERS ) != 0 && ( m_SelectedEditLayers & CLinkageDoc::MECHANISMLAYERS ) != 0 ? 1 : 0 );
-	pCmdUI->Enable( !m_bSimulating && ( pDoc->GetViewLayers() & CLinkageDoc::MECHANISMLAYERS ) != 0 );
+	pCmdUI->SetCheck( ( m_SelectedViewLayers & CLinkageDoc::MECHANISMLAYERS ) != 0 && ( m_SelectedEditLayers & CLinkageDoc::MECHANISMLAYERS ) != 0 ? 1 : 0 );
+	pCmdUI->Enable( !m_bSimulating && ( m_SelectedViewLayers & CLinkageDoc::MECHANISMLAYERS ) != 0 );
 }
 
 void CLinkageView::OnViewDebug()
@@ -4771,11 +4748,6 @@ void CLinkageView::OnUpdate( CView* pSender, LPARAM lHint, CObject* pHint )
 	CLinkageDoc::_Units Units = pDoc->GetUnits();
 
 	pComboBox->SelectItem( (DWORD_PTR)Units );
-
-	//pDoc->SetViewLayers( CLinkageDoc::ALLLAYERS );
-	//pDoc->SetEditLayers( CLinkageDoc::ALLLAYERS );
-
-	m_SelectedEditLayers = pDoc->GetEditLayers();
 
 	UpdateForDocumentChange();
 

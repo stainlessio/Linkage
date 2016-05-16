@@ -1588,19 +1588,19 @@
 #define PISTON_XML "\
 <linkage2>\
 	<program zoom=\"1.300000\" xoffset=\"-292\" yoffset=\"-69\" scalefactor=\"1.000000\" units=\"Millimeters\" viewlayers=\"15\" editlayers=\"15\"/>\
-	<connector id=\"0\" name=\" \" layer=\"16\" anchor=\"true\" x=\"-235.102041\" y=\"297.000098\"/>\
-	<connector id=\"1\" name=\" \" layer=\"16\" anchor=\"true\" x=\"-235.102041\" y=\"163.999739\"/>\
-	<connector id=\"2\" name=\" \" layer=\"16\" x=\"-235.102041\" y=\"243.779998\" slider=\"true\" >\
+	<connector id=\"0\" name=\" \" layer=\"16\" color=\"15000804\" anchor=\"true\" x=\"-235.102041\" y=\"297.000098\"/>\
+	<connector id=\"1\" name=\" \" layer=\"16\" color=\"15000804\" anchor=\"true\" x=\"-235.102041\" y=\"163.999739\"/>\
+	<connector id=\"2\" name=\" \" layer=\"16\" color=\"15000804\" x=\"-235.102041\" y=\"243.779998\" slider=\"true\" >\
 		<slidelimit id=\"0\"/>\
 		<slidelimit id=\"1\"/>\
 	</connector>\
-	<connector id=\"3\" name=\" \" layer=\"16\" x=\"-235.102041\" y=\"219.209763\" slider=\"true\" >\
+	<connector id=\"3\" name=\" \" layer=\"16\" color=\"15000804\" x=\"-235.102041\" y=\"219.209763\" slider=\"true\" >\
 		<slidelimit id=\"0\"/>\
 		<slidelimit id=\"1\"/>\
 	</connector>\
-	<connector id=\"4\" name=\" \" layer=\"16\" x=\"-235.102041\" y=\"231.999935\"/>\
-	<connector id=\"5\" name=\" \" layer=\"16\" anchor=\"true\" input=\"true\" rpm=\"-15.000000\" x=\"-235.102041\" y=\"-65.000163\"/>\
-	<connector id=\"6\" name=\" \" layer=\"16\" x=\"-203.384550\" y=\"-65.000163\"/>\
+	<connector id=\"4\" name=\" \" layer=\"16\" color=\"15000804\" x=\"-235.102041\" y=\"231.999935\"/>\
+	<connector id=\"5\" name=\" \" layer=\"16\" color=\"15000804\" anchor=\"true\" input=\"true\" rpm=\"-15.000000\" x=\"-235.102041\" y=\"-65.000163\"/>\
+	<connector id=\"6\" name=\" \" layer=\"16\" color=\"15000804\" x=\"-203.384550\" y=\"-65.000163\"/>\
 	<connector id=\"8\" layer=\"1\" x=\"-249.949932\" y=\"248.961653\"/>\
 	<connector id=\"9\" layer=\"1\" x=\"-219.949932\" y=\"214.500115\"/>\
 	<connector id=\"10\" layer=\"1\" x=\"-219.949932\" y=\"248.961653\"/>\
@@ -1612,11 +1612,11 @@
 	<connector id=\"15\" layer=\"1\" x=\"-235.102041\" y=\"231.999935\"/>\
 	<connector id=\"16\" layer=\"1\" x=\"-203.384550\" y=\"-65.000163\"/>\
 	<connector id=\"18\" layer=\"1\" x=\"-235.102041\" y=\"-65.000163\"/>\
-	<Link id=\"0\" name=\" \" layer=\"16\" linesize=\"1\"  >\
+	<Link id=\"0\" name=\" \" layer=\"16\" color=\"15000804\" linesize=\"1\"  >\
 		<connector id=\"0\"/>\
 		<connector id=\"1\"/>\
 	</Link>\
-	<Link id=\"1\" name=\" \" layer=\"16\" linesize=\"3\"  >\
+	<Link id=\"1\" name=\" \" layer=\"16\" color=\"15000804\" linesize=\"3\"  >\
 		<connector id=\"2\"/>\
 		<connector id=\"3\"/>\
 		<connector id=\"4\"/>\
@@ -1625,13 +1625,13 @@
 		<fastenconnector id=\"10\"/>\
 		<fastenconnector id=\"12\"/>\
 	</Link>\
-	<Link id=\"2\" name=\" \" layer=\"16\" linesize=\"1\"  >\
+	<Link id=\"2\" name=\" \" layer=\"16\" color=\"15000804\" linesize=\"1\"  >\
 		<connector id=\"5\"/>\
 		<connector id=\"6\"/>\
 		<fastenconnector id=\"17\"/>\
 		<fastenconnector id=\"18\"/>\
 	</Link>\
-	<Link id=\"3\" name=\" \" layer=\"16\" linesize=\"1\"  >\
+	<Link id=\"3\" name=\" \" layer=\"16\" color=\"15000804\" linesize=\"1\"  >\
 		<connector id=\"4\"/>\
 		<connector id=\"6\"/>\
 		<fastenconnector id=\"15\"/>\

@@ -299,16 +299,6 @@ bool CLinkageDoc::ReadIn( CArchive& ar, bool bSelectAll, bool bObeyUnscaleOffset
 			ScaleFactor = atoi( Value );
 			if( Value.IsEmpty() || ScaleFactor == 0.0 )
 				ScaleFactor = 1.0;
-			Value = pNode->GetAttribute( "viewlayers" );
-			if( atoi( Value ) == 0 )
-				m_ViewLayers = ALLLAYERS;
-			else
-				m_ViewLayers = atoi( Value );
-			Value = pNode->GetAttribute( "editlayers" );
-			if( atoi( Value ) == 0 )
-				m_EditLayers = ALLLAYERS;
-			else
-				m_EditLayers = atoi( Value );
 		}
 
 		if( pNode->GetText() == "selected" )
@@ -769,8 +759,6 @@ bool CLinkageDoc::WriteOut( CArchive& ar, bool bSelectedOnly )
 		AppendXMLAttribute( TempString, "yoffset", (int)Point.y );
 		AppendXMLAttribute( TempString, "scalefactor", m_ScaleFactor );
 		AppendXMLAttribute( TempString, "units", (const char*)Units );
-		AppendXMLAttribute( TempString, "viewlayers", m_ViewLayers );
-		AppendXMLAttribute( TempString, "editlayers", m_EditLayers );
 		TempString += "/>";
 
 //		TempString.Format( "\t<program zoom=\"%lf\" xoffset=\"%d\" yoffset=\"%d\" scalefactor=\"%lf\" units=\"%s\" viewlayers=\"%u\" editlayers=\"%u\"/>",

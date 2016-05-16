@@ -82,8 +82,6 @@ public:
 
 	static double GetBaseUnitsPerInch( void ) { return 96.0; }
 
-	unsigned int GetViewLayers( void ) { return m_ViewLayers; }
-	unsigned int GetEditLayers( void ) { return m_EditLayers; }
 	void SetViewLayers( unsigned int Layers );
 	void SetEditLayers( unsigned int Layers );
 
@@ -301,6 +299,9 @@ private:
 	void RemoveConnector( CConnector *pConnector );
 	CConnector *FindConnector( int ID );
 	CLink *CLinkageDoc::FindLink( int ID );
+
+	unsigned int GetViewLayers( void ) { return m_ViewLayers; }
+	unsigned int GetEditLayers( void ) { return m_EditLayers; }
 
 	// void DeleteConnector( POSITION Position, CConnector *pConnector );
 	// CGearConnection * GetSelectedGearLinks( CLink *&pLink1, CLink *&pLink2 );

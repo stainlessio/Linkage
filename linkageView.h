@@ -175,6 +175,7 @@ private:
 	CRect m_DrawingRect;
 	int m_YUpDirection;
 	unsigned int m_SelectedEditLayers;
+	unsigned int m_SelectedViewLayers;
 	bool m_bAllowEdit;
 
 	bool m_bPrintFullSize;
