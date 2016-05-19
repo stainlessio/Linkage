@@ -802,7 +802,7 @@ bool CLinkageDoc::WriteOut( CArchive& ar, bool bSelectedOnly )
 		AppendXMLAttribute( TempString, "drawcircle", pConnector->GetDrawCircleRadius(), pConnector->GetDrawCircleRadius() > 0 );
 		AppendXMLAttribute( TempString, "fastenlink", pConnector->GetFastenedToLink() == 0 ? 0 : pConnector->GetFastenedToLink()->GetIdentifier(), pConnector->GetFastenedToLink() != 0 );
 		AppendXMLAttribute( TempString, "fastenconnector", pConnector->GetFastenedToConnector() == 0 ? 0 : pConnector->GetFastenedToConnector()->GetIdentifier(), pConnector->GetFastenedToConnector() != 0 );
-		AppendXMLAttribute( TempString, "slideradius", pConnector->GetSlideRadius(), pConnector->GetSlideRadius() > 0 && pConnector->IsSlider() );
+		AppendXMLAttribute( TempString, "slideradius", pConnector->GetSlideRadius(), pConnector->GetSlideRadius() != 0 && pConnector->IsSlider() );
 		AppendXMLAttribute( TempString, "color", (unsigned int)(COLORREF)pConnector->GetColor() );
 		TempString += bSlideLimits ? ">" : "/>";
 

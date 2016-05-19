@@ -146,6 +146,10 @@ BOOL CLinkageApp::InitInstance()
 	EnableShellOpen();
 	RegisterShellFileTypes(TRUE);
 
+	#if defined( LINKAGE_USE_DIRECT2D )
+		EnableD2DSupport();
+	#endif
+
 	// Parse command line for standard shell commands, DDE, file open
 	CCommandLineInfo cmdInfo;
 

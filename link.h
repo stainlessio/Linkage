@@ -167,7 +167,7 @@ class CLink : public CElement
 	private:
 	
 	ConnectorList m_Connectors;
-	ConnectorList m_ConnectedSliders;	// Sliders that slide between other connectors on this link, not sliders that are part of this link. This is only used for the simulation and nothing else.
+	ConnectorList m_ConnectedSliders;	// Sliders that slide between connectors on this link, not sliders that are part of this link.
 	
 	bool m_bGear;
 	bool m_bTempFixed;

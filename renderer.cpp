@@ -1,7 +1,11 @@
 #include "stdafx.h"
 #include "Renderer.h"
 #include "DXFFile.h"
-//#include <d2d1.h>
+
+#if defined( LINKAGE_USE_DIRECT2D )
+#pragma comment( lib, "d2d1" )
+#include <d2d1.h>
+#endif
 
 //using namespace Gdiplus;
 
@@ -151,6 +155,8 @@ class CRendererImplementation
 	virtual bool DrawRect( const CFRect &Rect ) = 0;
 	virtual void FillRect( CFRect* pRect, CBrush* pBrush ) = 0;
 	virtual COLORREF SetPixel( double x, double y, COLORREF crColor ) = 0;
+	virtual void BeginDraw( void ) {}
+	virtual void EndDraw( void ) {}
 
 	virtual int ExpandPolygonCorner( CFPoint &Point, CFPoint &PreviousPoint, CFPoint &NextPoint, double Distance, CFPoint &NewPoint1, CFPoint &NewPoint2 )
 	{
@@ -184,7 +190,7 @@ class CRendererImplementation
 		return bChangeDirection ? 1 : -1;
 	}
 
-	virtual void LinkageDrawExpandedPolygon( CFPoint *pPoints, int PointCount, COLORREF Color, bool bFill, double ExpansionDistance )
+	virtual void LinkageDrawExpandedPolygon( CFPoint *pPoints, double *pLineRadii, int PointCount, COLORREF Color, bool bFill, double ExpansionDistance )
 	{
 		// WARNING, THIS CODE ASSUMES A 100% CONVEX POLYGON. IT WILL NOT
 		// WORK PROPERLY ON A POLYGON WITH ANY CONCAVE-NESS.
@@ -250,18 +256,11 @@ class CRendererImplementation
 		}
 		else
 		{
-			// The first arc is drawn invisible so that the MoveTo doesn't
-			// cause a glitch in the drawing. Windows is calculating the first
-			// point in the arc and we don't know where that is for setting the
-			// current drawing point beforehand. This arc is drawn properly
-			// after the loop.
 			if( ArcDirection == 0 )
 				MoveTo( FirstPoint1 );
 			else
 			{
 				CPen *pOldPen = (CPen*)SelectStockObject( NULL_PEN );
-				//MoveTo( FirstPoint1 );
-				//Arc( pPoints[0].x, pPoints[0].y, ExpansionDistance, FirstPoint1.x, FirstPoint1.y, FirstPoint2.x, FirstPoint2.y, false );
 				MoveTo( FirstPoint2 );
 				SelectObject( pOldPen );
 			}
@@ -294,10 +293,35 @@ class CRendererImplementation
 					Pie( pPoints[Counter].x, pPoints[Counter].y, ExpansionDistance, TempPoint1.x, TempPoint1.y, TempPoint1.x, TempPoint1.y, true );
 				Scale( TempPoint1.x, TempPoint1.y );
 				pIntegerPoints[FillPoint++].SetPoint( (int)TempPoint1.x, (int)TempPoint1.y );
+				int BackPoints = 1;
 				if( ArcDirection != 0 )
 				{
+					++BackPoints;
 					Scale( TempPoint2.x, TempPoint2.y );
 					pIntegerPoints[FillPoint++].SetPoint( (int)TempPoint2.x, (int)TempPoint2.y );
+				}
+				if( 0 && pLineRadii != 0 && pLineRadii[Counter-1] != 0 && ExpansionDistance == 0 )
+				{
+					double ChordHalf = Distance( pIntegerPoints[FillPoint-2], pIntegerPoints[FillPoint-3] ) / 2;
+					double ToCenter = sqrt( pLineRadii[Counter-1] * pLineRadii[Counter-1] / ChordHalf * ChordHalf );
+					CFLine Line( pIntegerPoints[FillPoint-BackPoints], pIntegerPoints[FillPoint-BackPoints-1] );
+					CFLine Perp;
+					Line.PerpendicularLine( Perp, 0 );
+					Line.SetDistance( ChordHalf );
+					Perp -= Line.GetEnd() - Line.GetStart();
+					Perp.SetDistance( ToCenter );
+
+					CPen Derf( PS_SOLID, 6, RGB( 255, 0, 0 ) );
+					CPen *pDerf = SelectObject( &Derf );
+					DrawLine( Perp );
+
+					Pie( pIntegerPoints[FillPoint-BackPoints].x, pIntegerPoints[FillPoint-BackPoints].y, 10, pIntegerPoints[FillPoint-BackPoints].x+10, pIntegerPoints[FillPoint-BackPoints].y, pIntegerPoints[FillPoint-BackPoints].x+10, pIntegerPoints[FillPoint-BackPoints].y, false );
+					Pie( pIntegerPoints[FillPoint-BackPoints-1].x, pIntegerPoints[FillPoint-BackPoints-1].y, 10, pIntegerPoints[FillPoint-BackPoints-1].x+10, pIntegerPoints[FillPoint-BackPoints-1].y, pIntegerPoints[FillPoint-BackPoints-1].x+10, pIntegerPoints[FillPoint-BackPoints-1].y, false );
+
+
+
+					//Pie( Line.GetEnd().x, Line.GetEnd().y, pLineRadii[Counter-1], pIntegerPoints[FillPoint-2].x, pIntegerPoints[FillPoint-2].y, pIntegerPoints[FillPoint-3].x, pIntegerPoints[FillPoint-3].y, false );
+					SelectObject( pDerf );
 				}
 			}
 			else
@@ -314,17 +338,15 @@ class CRendererImplementation
 
 		if( bFill )
 		{
-			//if( FirstDirection != 0 )
-			//{
 			if( ExpansionDistance > 0 )
 				Pie( pPoints[0].x, pPoints[0].y, ExpansionDistance, FirstPoint1.x, FirstPoint1.y, FirstPoint1.x, FirstPoint1.y, true );
 
-				CRgn Region;
-				Region.CreatePolygonRgn( pIntegerPoints, FillPoint, ALTERNATE );
-				delete [] pIntegerPoints;
+			CRgn Region;
+			Region.CreatePolygonRgn( pIntegerPoints, FillPoint, ALTERNATE );
+			delete [] pIntegerPoints;
 
-				FillRgn( &Region, &Brush );
-			//}
+			FillRgn( &Region, &Brush );
+
 			SelectObject( pOldPen );
 			SelectObject( pOldBrush );
 		}
@@ -345,7 +367,7 @@ class CRendererImplementation
 		SetArcDirection( AD_COUNTERCLOCKWISE );
 	}
 
-	//virtual void LinkageDrawExpandedPolygon( CFPoint *pPoints, int PointCount, COLORREF Color, bool bFill, double ExpansionDistance ) = 0;
+	//virtual void LinkageDrawExpandedPolygon( CFPoint *pPoints, double *pLineRadii, int PointCount, COLORREF Color, bool bFill, double ExpansionDistance ) = 0;
 	virtual CPen* SelectObject( CPen* pPen ) = 0;
 	virtual CFont* SelectObject( CFont* pFont, double FontHeight ) = 0;
 	virtual CBitmap* SelectObject( CBitmap* pBitmap ) = 0;
@@ -556,14 +578,6 @@ class CGDIRenderer : public CRendererImplementation
 	{
 		Scale( x, y );
 
-//		if( m_pGDIPlusGraphics != 0 )
-//		{
-//			CPoint CurrentPoint = GetCurrentPosition();
-//			CFLine Line( CurrentPoint.x, CurrentPoint.y, (int)x, (int)y );
-//			DrawLine( Line );
-//			MoveTo( (int)x, (int)y );
-//		}
-
 		CFPoint Result = m_pDC->LineTo( (int)x, (int)y );
 		CPen* pPen = m_pDC->GetCurrentPen();
 		if( pPen != 0 )
@@ -582,27 +596,6 @@ class CGDIRenderer : public CRendererImplementation
 
 	CFPoint DrawLine( CFLine Line )
 	{
-//		if( m_pGDIPlusGraphics != 0 )
-//		{
-//			CPen* pPen = GetCurrentPen();
-//			if( pPen == 0 )
-//				return CFPoint();
-//			LOGPEN LogPen;
-//			if( pPen->GetLogPen( &LogPen ) == 0 )
-//				return CFPoint();
-//
-//			COLORREF PenColor = LogPen.lopnColor;
-//
-//			Gdiplus::Color TheColor( 255, GetRValue( PenColor ), GetGValue( PenColor ), GetBValue( PenColor ) );
-//			Gdiplus::REAL PenWidth = (Gdiplus::REAL)LogPen.lopnWidth.x;
-//			PenWidth *= (Gdiplus::REAL)0.2;
-//			Gdiplus::Pen ThePen( TheColor, PenWidth );
-//			Gdiplus::Status Result = m_pGDIPlusGraphics->DrawLine( &ThePen, (int)Line.GetStart().x, (int)Line.GetStart().y, (int)Line.GetEnd().x, (int)Line.GetEnd().y );
-//
-//			return CFPoint();
-//		}
-//		else
-
 		MoveTo( Line.GetStart() );
 		return LineTo( Line.GetEnd() );
 	}
@@ -1858,14 +1851,6 @@ class CGDIPlusRenderer : public CRendererImplementation
 	{
 		Scale( x, y );
 
-//		if( m_pGDIPlusGraphics != 0 )
-//		{
-//			CPoint CurrentPoint = GetCurrentPosition();
-//			CFLine Line( CurrentPoint.x, CurrentPoint.y, (int)x, (int)y );
-//			DrawLine( Line );
-//			MoveTo( (int)x, (int)y );
-//		}
-
 		CFPoint Result = m_pDC->LineTo( (int)x, (int)y );
 		CPen* pPen = m_pDC->GetCurrentPen();
 		if( pPen != 0 )
@@ -1884,27 +1869,6 @@ class CGDIPlusRenderer : public CRendererImplementation
 
 	CFPoint DrawLine( CFLine Line )
 	{
-//		if( m_pGDIPlusGraphics != 0 )
-//		{
-//			CPen* pPen = GetCurrentPen();
-//			if( pPen == 0 )
-//				return CFPoint();
-//			LOGPEN LogPen;
-//			if( pPen->GetLogPen( &LogPen ) == 0 )
-//				return CFPoint();
-//
-//			COLORREF PenColor = LogPen.lopnColor;
-//
-//			Gdiplus::Color TheColor( 255, GetRValue( PenColor ), GetGValue( PenColor ), GetBValue( PenColor ) );
-//			Gdiplus::REAL PenWidth = (Gdiplus::REAL)LogPen.lopnWidth.x;
-//			PenWidth *= (Gdiplus::REAL)0.2;
-//			Gdiplus::Pen ThePen( TheColor, PenWidth );
-//			Gdiplus::Status Result = m_pGDIPlusGraphics->DrawLine( &ThePen, (int)Line.GetStart().x, (int)Line.GetStart().y, (int)Line.GetEnd().x, (int)Line.GetEnd().y );
-//
-//			return CFPoint();
-//		}
-//		else
-
 		MoveTo( Line.GetStart() );
 		return LineTo( Line.GetEnd() );
 	}
@@ -2215,8 +2179,22 @@ class CGDIPlusRenderer : public CRendererImplementation
 	}
 };
 
+#if defined( LINKAGE_USE_DIRECT2D )
+
 class CD2DRenderer : public CRendererImplementation
 {
+	private:
+
+	static ID2D1Factory* GetD2D1Factory( void )
+	{
+		static ID2D1Factory* pD2DFactory = 0;
+		if( pD2DFactory == 0 )
+		{
+			HRESULT hr = D2D1CreateFactory( D2D1_FACTORY_TYPE_SINGLE_THREADED, &pD2DFactory );
+		}
+		return pD2DFactory;
+	}
+
 	public:
 
 	CList<CPen*,CPen*> m_CreatedPens;
@@ -2226,9 +2204,9 @@ class CD2DRenderer : public CRendererImplementation
 	LOGFONT m_ScaledLogFont;
 	CFont m_ScaledFont;
 	CPen m_ScaledPen;
-//    ID2D1Factory            *pFactory;
-//	ID2D1DCRenderTarget		*pRenderTarget;
 	CFPoint m_CurrentPosition;
+	ID2D1DCRenderTarget * m_pRenderTarget;
+	CRect m_Rect;
 
 	CD2DRenderer( bool bIsPrinting )
 	{
@@ -2237,6 +2215,7 @@ class CD2DRenderer : public CRendererImplementation
 		m_Scale = 1.0;
 		m_bCreatedFont = false;
 		m_pDC = 0;
+		m_pRenderTarget = 0;
 		memset( &m_ScaledLogFont, 0, sizeof( m_ScaledLogFont ) );
 	}
 
@@ -2255,6 +2234,20 @@ class CD2DRenderer : public CRendererImplementation
 		m_CreatedPens.RemoveAll();
 		if( m_pDC != 0 )
 			delete m_pDC;
+	}
+
+	virtual void BeginDraw( void ) 
+	{
+		if( m_pRenderTarget == 0 )
+			return;
+		m_pRenderTarget->BeginDraw();
+	}
+
+	virtual void EndDraw( void )
+	{
+		if( m_pRenderTarget == 0 )
+			return;
+		m_pRenderTarget->EndDraw();
 	}
 
 	int GetYOrientation( void )
@@ -2394,6 +2387,8 @@ class CD2DRenderer : public CRendererImplementation
 		if( !bResult || pRect == 0 )
 			return false;
 
+		m_Rect.SetRect( pRect->left, pRect->top, pRect->right, pRect->bottom );
+
 /*		D2D1CreateFactory( D2D1_FACTORY_TYPE_SINGLE_THREADED, &pFactory);
 
 		D2D1_RENDER_TARGET_PROPERTIES props = D2D1::RenderTargetProperties(
@@ -2441,79 +2436,28 @@ class CD2DRenderer : public CRendererImplementation
 
 	CFPoint LineTo( double x, double y )
 	{
-		Scale( x, y );
-
-//		if( m_pGDIPlusGraphics != 0 )
-//		{
-//			CPoint CurrentPoint = GetCurrentPosition();
-//			CFLine Line( CurrentPoint.x, CurrentPoint.y, (int)x, (int)y );
-//			DrawLine( Line );
-//			MoveTo( (int)x, (int)y );
-//		}
-
-/*		pRenderTarget->BeginDraw();
+		double x1 = x;
+		double y1 = y;
+		Scale( x1, y1 );
 
 		CComPtr<ID2D1SolidColorBrush> pTempBrush = NULL;
 
-		pRenderTarget->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::Black), &pTempBrush);
+		m_pRenderTarget->CreateSolidColorBrush( D2D1::ColorF(D2D1::ColorF::Black), &pTempBrush );
 
-		pRenderTarget->DrawLine(
+		m_pRenderTarget->DrawLine(
             D2D1::Point2F( (float)m_CurrentPosition.x, (float)m_CurrentPosition.y ),
-            D2D1::Point2F( (float)x, (float)y ),
+            D2D1::Point2F( (float)x1, (float)y1 ),
             pTempBrush,
-            0.5f
+            1.0f
             );
 
-		pRenderTarget->DrawLine(
-            D2D1::Point2F( (float)0, (float)0 ),
-            D2D1::Point2F( (float)1000, (float)1000 ),
-            pTempBrush,
-            0.5f
-            );
+		m_CurrentPosition.SetPoint( x, y );
 
-		pRenderTarget->EndDraw();
-
-		return CFPoint( 0, 0 );*/
-
-		CFPoint Result = m_pDC->LineTo( (int)x, (int)y );
-		CPen* pPen = m_pDC->GetCurrentPen();
-		if( pPen != 0 )
-		{
-			LOGPEN LogPen;
-			if( pPen->GetLogPen( &LogPen ) != 0 )
-			{
-				COLORREF PenColor = LogPen.lopnColor;
-				m_pDC->SetPixel( (int)x, (int)y, PenColor );
-			}
-		}
-		Unscale( Result.x, Result.y );
-
-		return Result;
+		return CFPoint( x, y );
 	}
 
 	CFPoint DrawLine( CFLine Line )
 	{
-//		if( m_pGDIPlusGraphics != 0 )
-//		{
-//			CPen* pPen = GetCurrentPen();
-//			if( pPen == 0 )
-//				return CFPoint();
-//			LOGPEN LogPen;
-//			if( pPen->GetLogPen( &LogPen ) == 0 )
-//				return CFPoint();
-//
-//			COLORREF PenColor = LogPen.lopnColor;
-//
-//			Gdiplus::Color TheColor( 255, GetRValue( PenColor ), GetGValue( PenColor ), GetBValue( PenColor ) );
-//			Gdiplus::REAL PenWidth = (Gdiplus::REAL)LogPen.lopnWidth.x;
-//			PenWidth *= (Gdiplus::REAL)0.2;
-//			Gdiplus::Pen ThePen( TheColor, PenWidth );
-//			Gdiplus::Status Result = m_pGDIPlusGraphics->DrawLine( &ThePen, (int)Line.GetStart().x, (int)Line.GetStart().y, (int)Line.GetEnd().x, (int)Line.GetEnd().y );
-//
-//			return CFPoint();
-//		}
-//		else
-
 		MoveTo( Line.GetStart() );
 		return LineTo( Line.GetEnd() );
 	}
@@ -2737,7 +2681,35 @@ class CD2DRenderer : public CRendererImplementation
 	}
 
 	CBitmap* SelectObject( CBitmap* pBitmap )
-		{ return m_pDC->SelectObject( pBitmap ); }
+	{
+		// Create the Direct2D render target here so that he device context has a bitmap to draw into.
+		// Maybe this can be done earlier but there may be a requirement to have the bitmap selected before
+		// doig the Direct2D stuff.
+
+		CBitmap *pOldBitmap = m_pDC->SelectObject( pBitmap );
+
+		ID2D1Factory* pD2D1Factory = GetD2D1Factory();
+		if( pD2D1Factory == 0 )
+			return pOldBitmap;
+
+		D2D1_RENDER_TARGET_PROPERTIES props = D2D1::RenderTargetProperties(
+			D2D1_RENDER_TARGET_TYPE_DEFAULT,
+			D2D1::PixelFormat(
+				DXGI_FORMAT_B8G8R8A8_UNORM,
+				D2D1_ALPHA_MODE_IGNORE),
+			0,
+			0,
+			D2D1_RENDER_TARGET_USAGE_NONE,
+			D2D1_FEATURE_LEVEL_DEFAULT
+			);
+
+		HRESULT hr = pD2D1Factory->CreateDCRenderTarget( &props, &m_pRenderTarget );
+
+		hr = m_pRenderTarget->BindDC( m_pDC->GetSafeHdc(), &m_Rect );
+		m_pRenderTarget->SetTransform(D2D1::Matrix3x2F::Identity());
+
+		return pOldBitmap; 
+	}
 
 	int SelectObject( CRgn* pRgn )
 		{ return m_pDC->SelectObject( pRgn ); }
@@ -2823,6 +2795,8 @@ class CD2DRenderer : public CRendererImplementation
 		return TRUE;
 	}
 };
+
+#endif
 
 ///////////////////////////////////////////////////////////////////////////////////
 // The external CRenderer class used outside of this module!
@@ -2955,12 +2929,12 @@ COLORREF CRenderer::SetPixel( double x, double y, COLORREF crColor )
 	return m_pImplementation->SetPixel( x, y, crColor );
 }
 
-void CRenderer::LinkageDrawExpandedPolygon( CFPoint *pPoints, int PointCount, COLORREF Color, bool bFill, double ExpansionDistance )
+void CRenderer::LinkageDrawExpandedPolygon( CFPoint *pPoints, double *pLineRadii, int PointCount, COLORREF Color, bool bFill, double ExpansionDistance )
 {
 	if( m_pImplementation == 0 )
 		return;
 
-	m_pImplementation->LinkageDrawExpandedPolygon( pPoints, PointCount, Color, bFill, ExpansionDistance );
+	m_pImplementation->LinkageDrawExpandedPolygon( pPoints, pLineRadii, PointCount, Color, bFill, ExpansionDistance );
 }
 
 CPen* CRenderer::SelectObject( CPen* pPen )
@@ -3220,142 +3194,21 @@ int CRenderer::GetYOrientation( void )
 	return m_pImplementation->GetYOrientation();
 }
 
-	#if 0
+void CRenderer::BeginDraw( void )
+{
+	if( m_pImplementation == 0 )
+		return;
 
-	void WriteToDXF( void )
-	{
-		CDxfFileWrite dxffile;
-		dxffile.Create( "c:\\users\\dave\\test.dxf" );
-		//Begin and end the HEADER section. It's here for compatibility with some CAD programs. Others work without having HEADER section.
-		  //Collapse | Copy Code
-		// Header Section ------------------------------------------
-		dxffile.BeginSection(SEC_HEADER);
-		dxffile.EndSection();
-		// close HEADER section ------------------------------------
-		//Begin the TABLES section and put the LAYER, LTYPE, STYLE, DIMSTYLE table-types as many as you want and then close the section
-		  //Collapse | Copy Code
-		// Tables Section ------------------------------------------
-		dxffile.BeginSection(SEC_TABLES);
+	m_pImplementation->BeginDraw();
+}
 
-		// LTYPE table type -------------------------
-		dxffile.BeginTableType(TAB_LTYPE);
+void CRenderer::EndDraw( void )
+{
+	if( m_pImplementation == 0 )
+		return;
 
-		DXFLTYPE ltype;
-		double elem[4] = { 0, 0, 0, 0 };
-
-		// Continuous
-		ZeroMemory(&ltype, sizeof(ltype));
-		strcpy_s( ltype.Name, sizeof( ltype.Name ), "Continuous" );
-		strcpy_s( ltype.DescriptiveText, sizeof( ltype.DescriptiveText ), "Solid line" );
-		dxffile.AddLinetype(&ltype);
-
-		// DASHDOT2
-		ZeroMemory(&ltype, sizeof(ltype));
-		strcpy_s( ltype.Name, sizeof( ltype.Name ), "DASHDOT2" );
-		strcpy_s( ltype.DescriptiveText, sizeof( ltype.DescriptiveText ), "Dash dot (.5x) _._._._._._._._._._._._._._._." );
-		ltype.ElementsNumber = 4;
-		ltype.TotalPatternLength = 0.5;
-		elem[0] = 0.25;
-		elem[1] = -0.125;
-		elem[2] = 0.0;
-		elem[3] = -0.125;
-		memset( ltype.Elements, 0, sizeof( ltype.Elements ) );
-		memcpy( ltype.Elements, elem, sizeof( elem ) );
-		dxffile.AddLinetype(&ltype);
-
-		dxffile.EndTableType();
-		// close LTYPE table type -------------------
-
-		// LAYER table type -------------------------
-		unsigned int result = 0;
-		result &= dxffile.BeginTableType(TAB_LAYER);
-		result &= dxffile.AddLayer("Layer1", 1, "Continuous");
-		result &= dxffile.AddLayer("Layer2", 2, "Continuous");
-		result &= dxffile.AddLayer("Layer3", 3, "Continuous");
-		result &= dxffile.AddLayer("Layer4", 4, "Continuous");
-		result &= dxffile.EndTableType();
-		// close LAYER table type -------------------
-
-		// STYLE table type -------------------------
-		dxffile.BeginTableType(TAB_STYLE);
-
-		DXFSTYLE tstyle;
-		ZeroMemory(&tstyle, sizeof(tstyle));
-		strcpy_s( tstyle.Name, sizeof( tstyle.Name ), "Style1" );
-		strcpy_s( tstyle.PrimaryFontFilename, sizeof( tstyle.PrimaryFontFilename ), "TIMES.TTF" );
-		tstyle.Height = 0.3;
-		tstyle.WidthFactor = 1;
-		dxffile.AddTextStyle(&tstyle);
-
-		dxffile.EndTableType();
-		// close STYLE table type -------------------
-
-		// DIMSTYLE table type ----------------------
-		dxffile.BeginTableType(TAB_DIMSTYLE);
-
-		DXFDIMSTYLE dimstyle;
-
-		// DIM1
-		ZeroMemory(&dimstyle, sizeof(dimstyle));
-		strcpy_s( dimstyle.Name, sizeof( dimstyle.Name ), "DIM1" );
-		dimstyle.DIMCLRD = 2; // Dimension line & Arrow heads color
-		dimstyle.DIMDLE = 0.0000; // Dimension line size after Extensionline
-		dimstyle.DIMCLRE = 2; // Extension line color
-		dimstyle.DIMEXE = 0.1800; // Extension line size after Dimline
-		dimstyle.DIMEXO = 0.0625; // Offset from origin
-		strcpy_s( dimstyle.DIMBLK1, sizeof( dimstyle.DIMBLK1 ), "ClosedFilled" );
-		strcpy_s( dimstyle.DIMBLK2, sizeof( dimstyle.DIMBLK2 ), "ClosedFilled" );
-		dimstyle.DIMASZ = 0.1800; // Arrow size
-		strcpy_s( dimstyle.DIMTXSTY, sizeof( dimstyle.DIMTXSTY ), "Style1" );
-		dimstyle.DIMCLRT = 3; // Text color
-		dimstyle.DIMTXT = 0.1800; // Text height
-		dimstyle.DIMTAD = 1; // Vertical Text Placement
-		dimstyle.DIMGAP = 0.0900; // Offset from dimension line
-		dxffile.AddDimStyle(&dimstyle);
-
-		dxffile.EndTableType();
-		// close DIMSTYLE table type ----------------
-
-		dxffile.EndSection();
-		// close TABLES section ------------------------------------
-		//Begin ENTITIES section and put entities data (LINE, CIRCLE, SOLID, TEXT, ARC, POINT, DIMLINEAR) and finally close the section
-		  //Collapse | Copy Code
-		// Entities Section ------------------------------------------
-		dxffile.BeginSection(SEC_ENTITIES);
-
-		// set current layer to Layer2
-		dxffile.SetCurrentLayer("Layer2");
-		// draw a line
-		dxffile.Line(1.2, 3.3, 7.5, 7.7);
-		// draw a circle
-		dxffile.Circle(7.8, 4.3, 1.75);
-		// set current layer to Layer4
-		dxffile.SetCurrentLayer("Layer4");
-
-		// draw a solid
-		REALPOINT points[4];
-		points[0].x = 10.4; points[0].y = 7.2;
-		points[1].x = 13.6; points[1].y = 7.4;
-		points[2].x = 13.1; points[2].y = 4.9;
-		points[3].x = 10.9; points[3].y = 5.9;
-		dxffile.Solid(4, points);
-
-		// set current textstyle to Style1
-		dxffile.SetCurrentTextStyle("Style1");
-		// draw text
-		dxffile.Text("Sample Text", 5.9, 6.7, 0.3, 35);
-		// draw a dimension line
-		dxffile.SetCurrentDimStyle("DIM1");
-		dxffile.DimLinear(6.05, 3, 9.55, 3, 9.55, 2, 0, "3.50");
-
-		dxffile.EndSection();
-		// close ENTITIES section ----------------------------------
-		//Close the DXF file
-		//  Collapse | Copy Code
-		dxffile.Close();
-	}
-
-	#endif
+	m_pImplementation->EndDraw();
+}
 
 CRenderer::CRenderer( enum _RenderDestination RendererDestination )
 {
@@ -3376,7 +3229,9 @@ CRenderer::CRenderer( enum _RenderDestination RendererDestination )
 			m_pImplementation = new CDXFRenderer();
 			break;
 		case WINDOWS_D2D:
-			m_pImplementation = new CD2DRenderer( false );
+			#if defined( LINKAGE_USE_DIRECT2D )
+				m_pImplementation = new CD2DRenderer( false );
+			#endif
 			break;
 		case NULL_RENDERER:
 		default:

@@ -14,6 +14,9 @@ class CRenderer// : public CDC
 	CRenderer( enum _RenderDestination RendererDestination );
 	virtual ~CRenderer();
 
+	void BeginDraw( void );
+	void EndDraw( void );
+
 	//CDC *GetScreenDevice( void );
 
 	void Attach( HDC hDeviceContext );
@@ -79,7 +82,7 @@ class CRenderer// : public CDC
 	int SelectObject( CRgn* pRgn );
 	
 	void FillRect( CFRect* pRect, CBrush* pBrush );
-	void LinkageDrawExpandedPolygon( CFPoint *pPoints, int PointCount, COLORREF Color, bool bFill, double ExpansionDistance );
+	void LinkageDrawExpandedPolygon( CFPoint *pPoints, double *pLineRadii, int PointCount, COLORREF Color, bool bFill, double ExpansionDistance );
 	
 	//CFPoint ScalePoint( CPoint PixelPoint );
 	//CFRect ScaleRect( CRect PixelRect );

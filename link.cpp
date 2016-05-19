@@ -195,6 +195,12 @@ bool CLink::PointOnLink( const GearConnectionList &GearConnections, CFPoint Poin
 	if( IsPointInPoly( PointCount, Points, Point ) )
 		return true;
 
+	if( m_ConnectedSliders.GetCount() > 0 )
+	{
+		// Someday, links may get drawn with curves for teh hull slider paths instead of the dotted lines.
+		// When that day comes, check for a point being inside of the arc.
+	}
+
 	if( IsSolid() )
 		TestDistance *= 1.5; // Just a guess - might help the user interface.
 

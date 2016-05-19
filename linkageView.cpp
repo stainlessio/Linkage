@@ -1683,8 +1683,7 @@ CFArea CLinkageView::DrawMechanism( CRenderer* pRenderer )
 
 	DrawGroundDimensions( pRenderer, pDoc, m_SelectedViewLayers, 0, true, true );
 
-	if( m_bSnapOn || m_bGridSnap )
-		DrawSnapLines( pRenderer );
+	DrawSnapLines( pRenderer );
 
 	if( m_bShowAngles )
 		DrawAlignmentLines( pRenderer );
@@ -2071,7 +2070,11 @@ void CLinkageView::OnDraw( CDC* pDC, CPrintInfo *pPrintInfo )
    	CLinkageDoc* pDoc = GetDocument();
 	ASSERT_VALID(pDoc);
 
-    CRenderer Renderer( pDC->IsPrinting() ? CRenderer::WINDOWS_PRINTER_GDI : CRenderer::WINDOWS_GDI );
+	#if defined( LINKAGE_USE_DIRECT2D )
+		CRenderer Renderer( pDC->IsPrinting() ? CRenderer::WINDOWS_PRINTER_GDI : CRenderer::WINDOWS_D2D );
+	#else
+		CRenderer Renderer( pDC->IsPrinting() ? CRenderer::WINDOWS_PRINTER_GDI : CRenderer::WINDOWS_GDI );
+	#endif
     CBitmap Bitmap;
 
 	/*
@@ -2081,6 +2084,8 @@ void CLinkageView::OnDraw( CDC* pDC, CPrintInfo *pPrintInfo )
 	 */
 
     PrepareRenderer( Renderer, 0, &Bitmap, pDC, 1.0, false, 0.0, 1.0, !pDC->IsPrinting(), false, m_bPrintFullSize, pPrintInfo == 0 ? 0 : pPrintInfo->m_nCurPage - 1 );
+
+	Renderer.BeginDraw();
 
 	DoDraw( &Renderer );
 
@@ -2112,6 +2117,9 @@ void CLinkageView::OnDraw( CDC* pDC, CPrintInfo *pPrintInfo )
 		DrawAnicrop( &Renderer );
 
 	DrawRuler( &Renderer );
+
+	Renderer.EndDraw();
+
 
 	/*
 	 * Copy the image to the window.
@@ -4911,12 +4919,12 @@ void CLinkageView::DrawSliderTrack( CRenderer* pRenderer, unsigned int OnLayers,
 	CConnector *Limit1;
 	CConnector *Limit2;
 
-	// Sort the points so that other sliders on these same points draw from the same location.
 	if( !pConnector->GetSlideLimits( Limit1, Limit2 ) )
 		return;
 
 	COLORREF Color = RGB( 190, 165, 165 );
 
+	// Sort the points so that other sliders on these same points draw from the same location.
 	CLink * pCommon = Limit1->GetSharingLink( Limit2 );
 	if( pCommon != 0 )
 	{
@@ -4939,12 +4947,12 @@ void CLinkageView::DrawSliderTrack( CRenderer* pRenderer, unsigned int OnLayers,
 			    || ( Found1 == 0 && Found2 == PointCount - 1 )
 			    || ( Found2 == 0 && Found1 == PointCount - 1 ) )
 			{
-				// The points are along the hull of a non-solid link so there is already a line being drawn betwen them.
+				// The points are along the hull of a non-solid link so there is already a line being drawn between them.
 				return;
 			}
 		}
 
-		Color = pCommon->GetColor(); //Colors[pCommon->GetIdentifier() % COLORS_COUNT];
+		Color = pCommon->GetColor();
 	}
 
 	CFPoint Point1 = Limit1->GetPoint();
@@ -5429,7 +5437,7 @@ void CLinkageView::DrawActuator( CRenderer* pRenderer, unsigned int OnLayers, CL
 		TempPoints[0] = Scale( Points[0] );
 		TempPoints[1] = Scale( StrokePoint );
 
-		pRenderer->LinkageDrawExpandedPolygon( TempPoints, 2, Color, bDrawFill, pLink->IsSolid() ? m_ConnectorRadius + 3 : 1 );
+		pRenderer->LinkageDrawExpandedPolygon( TempPoints, 0, 2, Color, bDrawFill, pLink->IsSolid() ? m_ConnectorRadius + 3 : 1 );
 
 		StrokeLineSize = 3;
 	}
@@ -6528,11 +6536,41 @@ void CLinkageView::DrawLink( CRenderer* pRenderer, const GearConnectionList *pGe
 			int PointCount = 0;
 			CFPoint* Points = pLink->GetHull( PointCount );
 			CFPoint* PixelPoints = new CFPoint[PointCount];
+			double *pHullRadii = new double[PointCount];
 			// reverse the points because the -y change causes the hull to be in the wrong direction.
 			for( int Index = 0; Index < PointCount; ++Index )
+			{
 				PixelPoints[PointCount-1-Index] = Scale( Points[Index] );
-			pRenderer->LinkageDrawExpandedPolygon( PixelPoints, PointCount, Color, bDrawFill, pLink->IsSolid() ? ( m_ConnectorRadius + UnscaledUnits( 3 ) ) : UnscaledUnits( 0 ) );
+				pHullRadii[Index] = 0;
+			}
+			if( pLink->GetConnectedSliderCount() > 0 )
+			{
+				for( int Index = 0; Index < PointCount; ++Index )
+				{
+					for( int Counter = 0; Counter < pLink->GetConnectedSliderCount(); ++Counter )
+					{
+						CConnector *pSlider = pLink->GetConnectedSlider( Counter );
+						if( pSlider == 0 || pSlider->GetSlideRadius() == 0 )
+							continue;
+						CFPoint Limit1;
+						CFPoint Limit2;
+						pSlider->GetSlideLimits( Limit1, Limit2 );
+						Limit1 = Scale( Limit1 );
+						Limit2 = Scale( Limit2 );
+						CFPoint NextPixelPoint = Index == PointCount - 1 ? PixelPoints[0] : PixelPoints[Index+1];
+						if( ( PixelPoints[Index] == Limit1 && NextPixelPoint == Limit2 ) 
+						    || ( PixelPoints[Index] == Limit2 && NextPixelPoint == Limit1 ) )
+						{
+							pHullRadii[Index] = pSlider->GetSlideRadius();
+							break;
+						}
+					}
+				}
+			}
+			
+			pRenderer->LinkageDrawExpandedPolygon( PixelPoints, pHullRadii, PointCount, Color, bDrawFill, pLink->IsSolid() ? ( m_ConnectorRadius + UnscaledUnits( 3 ) ) : UnscaledUnits( 0 ) );
 			delete [] PixelPoints;
+			delete [] pHullRadii;
 			PixelPoints = 0;
 		}
 
