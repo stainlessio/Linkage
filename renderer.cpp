@@ -47,25 +47,27 @@ class CRendererImplementation
 
 	CFPoint m_ScrollPosition;
 	double m_Scale;
+	double m_DPIScale;
 
 	CRendererImplementation()
 	{
 		m_ScrollPosition.SetPoint( 0, 0 );
 		m_Scale = 1.0;
+		m_DPIScale = 1.0;
 	}
 
 	virtual ~CRendererImplementation() {}
 
 	double Scale( double &length )
 	{
-		length *= m_Scale;
+		length *= m_Scale * m_DPIScale;
 		return length;
 	}
 
 	void Scale( double &x, double &y )
 	{
-		x *= m_Scale;
-		y *= m_Scale;
+		x *= m_Scale * m_DPIScale;
+		y *= m_Scale * m_DPIScale;
 		if( m_Scale > 1 )
 		{
 			/*
@@ -84,8 +86,8 @@ class CRendererImplementation
 	{
 		x += m_ScrollPosition.x;
 		y += m_ScrollPosition.y;
-		x /= m_Scale;
-		y /= m_Scale;
+		x /= m_Scale * m_DPIScale;
+		y /= m_Scale * m_DPIScale;
 	}
 
 	CFPoint Unscale( CPoint PixelPoint )
@@ -217,7 +219,7 @@ class CRendererImplementation
 		NewColor = RGB( (int)( Red * 255 ), (int)( Green * 255 ), (int)( Blue * 255 ) );
 		CBrush Brush;
 		Brush.CreateSolidBrush( NewColor );
-		CPen Pen( PS_SOLID, (int)min( 1.0 * m_Scale, 1.0 ), NewColor );
+		CPen Pen( PS_SOLID, (int)min( 1.0 * m_Scale * m_DPIScale, 1.0 ), NewColor );
 
 		int ArcDirection = 0;
 
@@ -377,7 +379,7 @@ class CRendererImplementation
 
 	int GetPenSize( int UnscaledSize )
 	{
-		return (int)max( UnscaledSize * m_Scale, 1.0 );
+		return (int)max( UnscaledSize * m_Scale * m_DPIScale, 1.0 );
 	}
 
 	virtual bool DrawArrow( CFPoint FromPoint, CFPoint ToPoint, double Width, double Length ) = 0;
@@ -771,16 +773,16 @@ class CGDIRenderer : public CRendererImplementation
 				LogBrush.lbColor = LogPen.elpColor;
 				LogBrush.lbStyle = PS_SOLID;
 
-				const DWORD DashStyle[2] = { (DWORD)( 4 * m_Scale ), (DWORD)( 4 * m_Scale ) };
+				const DWORD DashStyle[2] = { (DWORD)( 4 * m_Scale * m_DPIScale ), (DWORD)( 4 * m_Scale * m_DPIScale ) };
 
-				CPen *pPen = new CPen( PS_GEOMETRIC | PS_USERSTYLE, (int)( LogPen.elpWidth * m_Scale ), &LogBrush, 2, DashStyle );
+				CPen *pPen = new CPen( PS_GEOMETRIC | PS_USERSTYLE, (int)( LogPen.elpWidth * m_Scale * m_DPIScale ), &LogBrush, 2, DashStyle );
 
 				m_CreatedPens.AddTail( pPen );
 
 				return m_pDC->SelectObject( pPen );
 			}
 
-			LogPen.elpWidth = (int)( LogPen.elpWidth * m_Scale );
+			LogPen.elpWidth = (int)( LogPen.elpWidth * m_Scale * m_DPIScale );
 
 			CPen *pPen = new CPen( LogPen.elpPenStyle, LogPen.elpWidth, LogPen.elpColor );
 			if( pPen == 0 )
@@ -808,8 +810,8 @@ class CGDIRenderer : public CRendererImplementation
 			if( !m_bCreatedFont || memcmp( &LogFont, &m_ScaledLogFont, sizeof( LOGFONT ) ) != 0 )
 			{
 				m_ScaledFont.DeleteObject();
-				LogFont.lfHeight = (int)( LogFont.lfHeight * m_Scale );
-				LogFont.lfWidth = (int)( LogFont.lfWidth * m_Scale );
+				LogFont.lfHeight = (int)( LogFont.lfHeight * m_Scale * m_DPIScale );
+				LogFont.lfWidth = (int)( LogFont.lfWidth * m_Scale * m_DPIScale );
 				m_ScaledFont.CreateFontIndirect( &LogFont );
 				m_bCreatedFont = true;
 				memcpy( &m_ScaledLogFont, &LogFont, sizeof( LOGFONT ) );
@@ -832,14 +834,14 @@ class CGDIRenderer : public CRendererImplementation
 		CSize Size = m_pDC->GetTextExtent( pString, Count );
 		CFPoint Result( Size.cx, Size.cy );
 		// Only adjust the scaling and not the position.
-		Result.x /= m_Scale;
-		Result.y /= m_Scale;
+		Result.x /= m_Scale * m_DPIScale;
+		Result.y /= m_Scale * m_DPIScale;
 		return Result;
 	}
 
 	int GetPenSize( int UnscaledSize )
 	{
-		return max( (int)( UnscaledSize * m_Scale ), 1 );
+		return max( (int)( UnscaledSize * m_Scale * m_DPIScale ), 1 );
 	}
 
 	bool DrawArrow( CFPoint FromPoint, CFPoint ToPoint, double Width, double Length )
@@ -1562,16 +1564,16 @@ class CDXFRenderer : public CRendererImplementation
 				LogBrush.lbColor = LogPen.elpColor;
 				LogBrush.lbStyle = PS_SOLID;
 
-				const DWORD DashStyle[2] = { (DWORD)( 4 * m_Scale ), (DWORD)( 4 * m_Scale ) };
+				const DWORD DashStyle[2] = { (DWORD)( 4 * m_Scale * m_DPIScale ), (DWORD)( 4 * m_Scale * m_DPIScale ) };
 
-				CPen *pPen = new CPen( PS_GEOMETRIC | PS_USERSTYLE, (int)( LogPen.elpWidth * m_Scale ), &LogBrush, 2, DashStyle );
+				CPen *pPen = new CPen( PS_GEOMETRIC | PS_USERSTYLE, (int)( LogPen.elpWidth * m_Scale * m_DPIScale ), &LogBrush, 2, DashStyle );
 
 				m_CreatedPens.AddTail( pPen );
 
 				return m_pDC->SelectObject( pPen );
 			}
 
-			LogPen.elpWidth = (int)( LogPen.elpWidth * m_Scale );
+			LogPen.elpWidth = (int)( LogPen.elpWidth * m_Scale * m_DPIScale );
 
 			CPen *pPen = new CPen( LogPen.elpPenStyle, LogPen.elpWidth, LogPen.elpColor );
 			if( pPen == 0 )
@@ -1587,7 +1589,7 @@ class CDXFRenderer : public CRendererImplementation
 	CFont* SelectObject( CFont* pFont, double FontHeight )
 	{
 		// Not using GDI renderer so ignore pFont.
-		m_FontHeight = FontHeight * m_Scale;
+		m_FontHeight = FontHeight * m_Scale * m_DPIScale;
 		return 0;
 	}
 
@@ -1605,14 +1607,14 @@ class CDXFRenderer : public CRendererImplementation
 		CSize Size = m_pDC->GetTextExtent( pString, Count );
 		CFPoint Result( Size.cx, Size.cy );
 		// Only adjust the scaling and not the position.
-		Result.x /= m_Scale;
-		Result.y /= m_Scale;
+		Result.x /= m_Scale * m_DPIScale;
+		Result.y /= m_Scale * m_DPIScale;
 		return Result;
 	}
 
 	int GetPenSize( int UnscaledSize )
 	{
-		return max( (int)( UnscaledSize * m_Scale ), 1 );
+		return max( (int)( UnscaledSize * m_Scale * m_DPIScale ), 1 );
 	}
 
 	bool DrawArrow( CFPoint FromPoint, CFPoint ToPoint, double Width, double Length )
@@ -2044,16 +2046,16 @@ class CGDIPlusRenderer : public CRendererImplementation
 				LogBrush.lbColor = LogPen.elpColor;
 				LogBrush.lbStyle = PS_SOLID;
 
-				const DWORD DashStyle[2] = { (DWORD)( 4 * m_Scale ), (DWORD)( 4 * m_Scale ) };
+				const DWORD DashStyle[2] = { (DWORD)( 4 * m_Scale * m_DPIScale ), (DWORD)( 4 * m_Scale * m_DPIScale ) };
 
-				CPen *pPen = new CPen( PS_GEOMETRIC | PS_USERSTYLE, (int)( LogPen.elpWidth * m_Scale ), &LogBrush, 2, DashStyle );
+				CPen *pPen = new CPen( PS_GEOMETRIC | PS_USERSTYLE, (int)( LogPen.elpWidth * m_Scale * m_DPIScale ), &LogBrush, 2, DashStyle );
 
 				m_CreatedPens.AddTail( pPen );
 
 				return m_pDC->SelectObject( pPen );
 			}
 
-			LogPen.elpWidth = (int)( LogPen.elpWidth * m_Scale );
+			LogPen.elpWidth = (int)( LogPen.elpWidth * m_Scale * m_DPIScale );
 
 			CPen *pPen = new CPen( LogPen.elpPenStyle, LogPen.elpWidth, LogPen.elpColor );
 			if( pPen == 0 )
@@ -2081,8 +2083,8 @@ class CGDIPlusRenderer : public CRendererImplementation
 			if( !m_bCreatedFont || memcmp( &LogFont, &m_ScaledLogFont, sizeof( LOGFONT ) ) != 0 )
 			{
 				m_ScaledFont.DeleteObject();
-				LogFont.lfHeight = (int)( LogFont.lfHeight * m_Scale );
-				LogFont.lfWidth = (int)( LogFont.lfWidth * m_Scale );
+				LogFont.lfHeight = (int)( LogFont.lfHeight * m_Scale * m_DPIScale );
+				LogFont.lfWidth = (int)( LogFont.lfWidth * m_Scale * m_DPIScale );
 				m_ScaledFont.CreateFontIndirect( &LogFont );
 				m_bCreatedFont = true;
 				memcpy( &m_ScaledLogFont, &LogFont, sizeof( LOGFONT ) );
@@ -2105,14 +2107,14 @@ class CGDIPlusRenderer : public CRendererImplementation
 		CSize Size = m_pDC->GetTextExtent( pString, Count );
 		CFPoint Result( Size.cx, Size.cy );
 		// Only adjust the scaling and not the position.
-		Result.x /= m_Scale;
-		Result.y /= m_Scale;
+		Result.x /= m_Scale * m_DPIScale;
+		Result.y /= m_Scale * m_DPIScale;
 		return Result;
 	}
 
 	int GetPenSize( int UnscaledSize )
 	{
-		return max( (int)( UnscaledSize * m_Scale ), 1 );
+		return max( (int)( UnscaledSize * m_Scale * m_DPIScale ), 1 );
 	}
 
 	bool DrawArrow( CFPoint FromPoint, CFPoint ToPoint, double Width, double Length )
@@ -2387,27 +2389,11 @@ class CD2DRenderer : public CRendererImplementation
 		if( !bResult || pRect == 0 )
 			return false;
 
+
+		int PPI = m_pDC->GetDeviceCaps( LOGPIXELSX );
+		m_DPIScale = (double)PPI / 96.0;
+
 		m_Rect.SetRect( pRect->left, pRect->top, pRect->right, pRect->bottom );
-
-/*		D2D1CreateFactory( D2D1_FACTORY_TYPE_SINGLE_THREADED, &pFactory);
-
-		D2D1_RENDER_TARGET_PROPERTIES props = D2D1::RenderTargetProperties(
-			D2D1_RENDER_TARGET_TYPE_DEFAULT,
-			D2D1::PixelFormat(
-				DXGI_FORMAT_B8G8R8A8_UNORM,
-				D2D1_ALPHA_MODE_IGNORE),
-			0,
-			0,
-			D2D1_RENDER_TARGET_USAGE_NONE,
-			D2D1_FEATURE_LEVEL_DEFAULT
-			);
-
-		HRESULT hr = pFactory->CreateDCRenderTarget(&props, &pRenderTarget);
-
-		hr = pRenderTarget->BindDC( m_pDC->GetSafeHdc(), pRect );
-		pRenderTarget->SetTransform(D2D1::Matrix3x2F::Identity());
-
-		return hr == S_OK;*/
 
 		return true;
 	}
@@ -2440,18 +2426,43 @@ class CD2DRenderer : public CRendererImplementation
 		double y1 = y;
 		Scale( x1, y1 );
 
+		CPen* pPen = m_pDC->GetCurrentPen();
+		LOGPEN LogPen;
+		if( pPen->GetLogPen( &LogPen ) == 0 )
+			return FALSE;
+		COLORREF PenColor = LogPen.lopnColor;
+		float Red = GetRValue( PenColor ) / 255.0f;
+		float Green = GetGValue( PenColor ) / 255.0f;
+		float Blue = GetBValue( PenColor ) / 255.0f;
+
+		D2D1_COLOR_F UseColor;
+		UseColor.r = Red;
+		UseColor.g = Green;
+		UseColor.b = Blue;
+		UseColor.a = 1;  // Opaque.
+
 		CComPtr<ID2D1SolidColorBrush> pTempBrush = NULL;
 
-		m_pRenderTarget->CreateSolidColorBrush( D2D1::ColorF(D2D1::ColorF::Black), &pTempBrush );
+		m_pRenderTarget->CreateSolidColorBrush( UseColor, &pTempBrush );
 
-		m_pRenderTarget->DrawLine(
+		ID2D1StrokeStyle *pStroke = 0;
+		ID2D1Factory* pD2D1Factory = GetD2D1Factory();
+		pD2D1Factory->CreateStrokeStyle( D2D1::StrokeStyleProperties( D2D1_CAP_STYLE_SQUARE, D2D1_CAP_STYLE_SQUARE), 0, 0, &pStroke );
+ //                                        dashes,
+//        ARRAYSIZE(dashes),
+//        &m_pStrokeStyleCustomOffsetZero
+//        );
+
+			m_pRenderTarget->DrawLine(
             D2D1::Point2F( (float)m_CurrentPosition.x, (float)m_CurrentPosition.y ),
             D2D1::Point2F( (float)x1, (float)y1 ),
             pTempBrush,
-            1.0f
-            );
+            (float)( LogPen.lopnWidth.x * 1.5 ),
+			pStroke );
 
-		m_CurrentPosition.SetPoint( x, y );
+		pStroke->Release();
+
+		m_CurrentPosition.SetPoint( x1, y1 );
 
 		return CFPoint( x, y );
 	}
@@ -2633,16 +2644,16 @@ class CD2DRenderer : public CRendererImplementation
 				LogBrush.lbColor = LogPen.elpColor;
 				LogBrush.lbStyle = PS_SOLID;
 
-				const DWORD DashStyle[2] = { (DWORD)( 4 * m_Scale ), (DWORD)( 4 * m_Scale ) };
+				const DWORD DashStyle[2] = { (DWORD)( 4 * m_Scale * m_DPIScale ), (DWORD)( 4 * m_Scale * m_DPIScale ) };
 
-				CPen *pPen = new CPen( PS_GEOMETRIC | PS_USERSTYLE, (int)( LogPen.elpWidth * m_Scale ), &LogBrush, 2, DashStyle );
+				CPen *pPen = new CPen( PS_GEOMETRIC | PS_USERSTYLE, (int)( LogPen.elpWidth * m_Scale * m_DPIScale ), &LogBrush, 2, DashStyle );
 
 				m_CreatedPens.AddTail( pPen );
 
 				return m_pDC->SelectObject( pPen );
 			}
 
-			LogPen.elpWidth = (int)( LogPen.elpWidth * m_Scale );
+			LogPen.elpWidth = (int)( LogPen.elpWidth * m_Scale * m_DPIScale );
 
 			CPen *pPen = new CPen( LogPen.elpPenStyle, LogPen.elpWidth, LogPen.elpColor );
 			if( pPen == 0 )
@@ -2670,8 +2681,8 @@ class CD2DRenderer : public CRendererImplementation
 			if( !m_bCreatedFont || memcmp( &LogFont, &m_ScaledLogFont, sizeof( LOGFONT ) ) != 0 )
 			{
 				m_ScaledFont.DeleteObject();
-				LogFont.lfHeight = (int)( LogFont.lfHeight * m_Scale );
-				LogFont.lfWidth = (int)( LogFont.lfWidth * m_Scale );
+				LogFont.lfHeight = (int)( LogFont.lfHeight * m_Scale * m_DPIScale );
+				LogFont.lfWidth = (int)( LogFont.lfWidth * m_Scale * m_DPIScale );
 				m_ScaledFont.CreateFontIndirect( &LogFont );
 				m_bCreatedFont = true;
 				memcpy( &m_ScaledLogFont, &LogFont, sizeof( LOGFONT ) );
@@ -2722,14 +2733,14 @@ class CD2DRenderer : public CRendererImplementation
 		CSize Size = m_pDC->GetTextExtent( pString, Count );
 		CFPoint Result( Size.cx, Size.cy );
 		// Only adjust the scaling and not the position.
-		Result.x /= m_Scale;
-		Result.y /= m_Scale;
+		Result.x /= m_Scale * m_DPIScale;
+		Result.y /= m_Scale * m_DPIScale;
 		return Result;
 	}
 
 	int GetPenSize( int UnscaledSize )
 	{
-		return max( (int)( UnscaledSize * m_Scale ), 1 );
+		return max( (int)( UnscaledSize * m_Scale * m_DPIScale ), 1 );
 	}
 
 	bool DrawArrow( CFPoint FromPoint, CFPoint ToPoint, double Width, double Length )

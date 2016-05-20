@@ -469,7 +469,7 @@ void CLinkageView::GetSetGroundDimensionVisbility( bool bSave )
 	CString ShowDimensionsName = m_bShowParts ? "PartsShowdimensions" : "Showdimensions";
 	CString ShowGroundDimensionsName = m_bShowParts ? "PartsShowgrounddimensions" : "Showgrounddimensions";
 
-	// Not sure if I want to have separate dimension settings for the parts list while not haveing other settings be separate - it might be confusing to users.
+	// Not sure if I want to have separate dimension settings for the parts list while not having other settings be separate - it might be confusing to users.
 	// Just use the one set of settings for now - and think about this for a while.
 	ShowDimensionsName = "Showdimensions";
 	ShowGroundDimensionsName = "Showgrounddimensions";
@@ -886,7 +886,7 @@ CRect CLinkageView::PrepareRenderer( CRenderer &Renderer, CRect *pDrawRect, CBit
 		}
 
 		Renderer.SetOffset( 0, 0 );
-		Renderer.SetScale(ScalingValue);
+		Renderer.SetScale( ScalingValue );
 
 		if( bScaleToFit )
 		{
@@ -7585,6 +7585,14 @@ int CLinkageView::OnCreate(LPCREATESTRUCT lpCreateStruct)
 {
 	if (CView::OnCreate(lpCreateStruct) == -1)
 		return -1;
+
+	#if defined( LINKAGE_USE_DIRECT2D )
+		CWindowDC DC( this );
+		int PPI = DC.GetDeviceCaps( LOGPIXELSX );
+		m_DPIScale = (double)PPI / 96.0;
+	#else
+		m_DPIScale = 1.0;
+	#endif
 
 	CLinkageDoc* pDoc = GetDocument();
 	ASSERT_VALID(pDoc);

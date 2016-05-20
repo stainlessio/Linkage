@@ -116,6 +116,7 @@ private:
 
 	CSimulator m_Simulator;
 
+	double m_DPIScale;
 	ULONG_PTR m_gdiplusToken;
 	CPoint m_PreviousDragPoint;
 	bool m_bSimulating;

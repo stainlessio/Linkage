@@ -34,6 +34,7 @@
     <SccProvider>
     </SccProvider>
     <Keyword>MFCProj</Keyword>
+    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
@@ -78,14 +79,14 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
     <_ProjectFileVersion>10.0.30319.1</_ProjectFileVersion>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.\Debug\</OutDir>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='DebugDirect2D|Win32'">.\Debug\</OutDir>
-    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.\Debug\</IntDir>
-    <IntDir Condition="'$(Configuration)|$(Platform)'=='DebugDirect2D|Win32'">.\Debug\</IntDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(SolutionDir)$(Configuration)\</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='DebugDirect2D|Win32'">$(SolutionDir)$(Configuration)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(SolutionDir)$(Configuration)\</IntDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='DebugDirect2D|Win32'">$(SolutionDir)$(Configuration)\</IntDir>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</LinkIncremental>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='DebugDirect2D|Win32'">true</LinkIncremental>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.\Release\</OutDir>
-    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.\Release\</IntDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(SolutionDir)$(Configuration)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(SolutionDir)$(Configuration)\</IntDir>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</LinkIncremental>
     <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">AllRules.ruleset</CodeAnalysisRuleSet>
     <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='DebugDirect2D|Win32'">AllRules.ruleset</CodeAnalysisRuleSet>
@@ -103,7 +104,12 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugDirect2D|Win32'" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" />
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Template|Win32'" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Template|Win32'">
+    <IntDir>$(SolutionDir)$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseDirect2D|Win32'">
+    <IntDir>$(SolutionDir)$(Configuration)\</IntDir>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <Midl>
       <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -136,7 +142,7 @@
     </ResourceCompile>
     <Link>
       <AdditionalDependencies>vfw32.lib;Wmvcore.lib;Version.lib</AdditionalDependencies>
-      <OutputFile>.\Debug/linkage.exe</OutputFile>
+      <OutputFile>$(SolutionDir)$(Configuration)\$(ProjectName).exe</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>.\Debug/linkage.pdb</ProgramDatabaseFile>
@@ -187,7 +193,7 @@
     </ResourceCompile>
     <Link>
       <AdditionalDependencies>vfw32.lib;Wmvcore.lib;Version.lib</AdditionalDependencies>
-      <OutputFile>.\Debug/linkage.exe</OutputFile>
+      <OutputFile>$(SolutionDir)$(Configuration)\$(ProjectName).exe</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>.\Debug/linkage.pdb</ProgramDatabaseFile>
@@ -203,7 +209,7 @@
     </Bscmake>
     <Manifest>
       <AdditionalManifestFiles>res\linkage.xml;%(AdditionalManifestFiles)</AdditionalManifestFiles>
-      <EnableDpiAwareness>No</EnableDpiAwareness>
+      <EnableDpiAwareness>true</EnableDpiAwareness>
     </Manifest>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -245,7 +251,7 @@
     </ResourceCompile>
     <Link>
       <AdditionalDependencies>vfw32.lib;Wmvcore.lib;Version.lib</AdditionalDependencies>
-      <OutputFile>.\Release/linkage.exe</OutputFile>
+      <OutputFile>$(SolutionDir)$(Configuration)\$(ProjectName).exe</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <GenerateDebugInformation>false</GenerateDebugInformation>
       <ProgramDatabaseFile>.\Release/linkage.pdb</ProgramDatabaseFile>
@@ -287,11 +293,20 @@ exit 0
     <Manifest>
       <EnableDpiAwareness>No</EnableDpiAwareness>
     </Manifest>
+    <Link>
+      <OutputFile>$(SolutionDir)$(Configuration)\$(ProjectName).exe</OutputFile>
+    </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseDirect2D|Win32'">
     <ClCompile>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions);LINKAGE_USE_DIRECT2D</PreprocessorDefinitions>
     </ClCompile>
+    <Manifest>
+      <EnableDpiAwareness>true</EnableDpiAwareness>
+    </Manifest>
+    <Link>
+      <OutputFile>$(SolutionDir)$(Configuration)\$(ProjectName).exe</OutputFile>
+    </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="AboutDialog.h" />
