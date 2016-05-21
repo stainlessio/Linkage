@@ -187,6 +187,8 @@ class CFRect
 		{ this->top = TopLeft.y; this->left = TopLeft.x; this->bottom = BottomRight.y; this->right = BottomRight.x; }
 	_inline void SetRect( double x1, double y1, double x2, double y2 )
 		{ top = y1; bottom = y2; left = x1; right = x2; }
+	_inline void SetRect( CFPoint Point1, CFPoint Point2 )
+		{ top = Point1.y; bottom = Point2.y; left = Point1.x; right = Point2.x; }
 	_inline void InflateRect( double x, double y ) { top -= y; left -= x; bottom += y; right += x; }
 		
 	bool IsOverlapped( CFRect &Rect );

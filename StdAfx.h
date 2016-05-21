@@ -15,6 +15,8 @@
 
 #pragma once
 
+#define NO_WARN_MBCS_MFC_DEPRECATION
+
 #define _CRTDBG_MAPALLOC
 #include <stdlib.h>
 #include <crtdbg.h>

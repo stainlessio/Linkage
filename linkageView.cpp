@@ -2388,7 +2388,16 @@ bool CLinkageView::GrabAdjustmentControl( CFPoint Point, CFPoint GrabPoint, _Adj
 	return false;
 }
 
-bool CLinkageView::SelectAdjustmentControl( UINT nFlags, CPoint Point )
+CFPoint CLinkageView::AdjustClientAreaPoint( CPoint point )
+{
+	#if defined( LINKAGE_USE_DIRECT2D )
+		return CFPoint( point.x / m_DPIScale, point.y / m_DPIScale );
+	#else
+		return CFPoint( point.x, point.y );
+	#endif
+}
+
+bool CLinkageView::SelectAdjustmentControl( UINT nFlags, CFPoint Point )
 {
 	if( m_VisibleAdjustment == ADJUSTMENT_NONE || m_MouseAction != ACTION_NONE )
 		return false;
@@ -2472,7 +2481,7 @@ void CLinkageView::MarkSelection( bool bSelectionChanged )
 		m_VisibleAdjustment = ADJUSTMENT_NONE;
 }
 
-bool CLinkageView::FindDocumentItem( CPoint Point, CLink *&pFoundLink, CConnector *&pFoundConnector )
+bool CLinkageView::FindDocumentItem( CFPoint Point, CLink *&pFoundLink, CConnector *&pFoundConnector )
 {
 	CLinkageDoc* pDoc = GetDocument();
 	ASSERT_VALID(pDoc);
@@ -2484,7 +2493,7 @@ bool CLinkageView::FindDocumentItem( CPoint Point, CLink *&pFoundLink, CConnecto
 	return pDoc->FindElement( AdjustedPoint, GrabDistance, 0, pFoundLink, pFoundConnector );
 }
 
-bool CLinkageView::SelectDocumentItem( UINT nFlags, CPoint point )
+bool CLinkageView::SelectDocumentItem( UINT nFlags, CFPoint point )
 {
 	if( m_MouseAction != ACTION_NONE )
 		return false;
@@ -2513,7 +2522,7 @@ bool CLinkageView::SelectDocumentItem( UINT nFlags, CPoint point )
 	}
 }
 
-bool CLinkageView::DragSelectionBox( UINT nFlags, CPoint point )
+bool CLinkageView::DragSelectionBox( UINT nFlags, CFPoint point )
 {
 	if( m_MouseAction != ACTION_NONE )
 		return false;
@@ -2525,14 +2534,16 @@ bool CLinkageView::DragSelectionBox( UINT nFlags, CPoint point )
 	 */
 
 	m_MouseAction = ACTION_SELECT;
-	m_SelectRect.SetRect( point, point );
+	m_SelectRect.SetRect( point.x, point.y, point.x, point.y );
 	InvalidateRect( 0 );
 
 	return true;
 }
 
-void CLinkageView::OnLButtonDown(UINT nFlags, CPoint point)
+void CLinkageView::OnLButtonDown(UINT nFlags, CPoint MousePoint)
 {
+	CFPoint point = AdjustClientAreaPoint( MousePoint );
+
 	SetCapture();
 
 	if( m_bSimulating || !m_bAllowEdit )
@@ -2558,8 +2569,10 @@ void CLinkageView::OnLButtonDown(UINT nFlags, CPoint point)
 		return;
 }
 
-void CLinkageView::OnButtonUp(UINT nFlags, CPoint point)
+void CLinkageView::OnButtonUp(UINT nFlags, CPoint MousePoint)
 {
+	CFPoint point = AdjustClientAreaPoint( MousePoint );
+
 	ReleaseCapture();
 
     if( m_bChangeAdjusters )
@@ -2588,7 +2601,7 @@ void CLinkageView::OnLButtonUp(UINT nFlags, CPoint point)
 	OnButtonUp( nFlags, point );
 }
 
-void CLinkageView::OnMouseMoveSelect(UINT nFlags, CPoint point)
+void CLinkageView::OnMouseMoveSelect(UINT nFlags, CFPoint point)
 {
 	CLinkageDoc* pDoc = GetDocument();
 	ASSERT_VALID(pDoc);
@@ -2627,7 +2640,7 @@ double CLinkageView::CalculateDefaultGrid( void )
 	return GapDistance;
 }
 
-void CLinkageView::OnMouseMoveDrag(UINT nFlags, CPoint point)
+void CLinkageView::OnMouseMoveDrag(UINT nFlags, CFPoint point)
 {
 	CLinkageDoc* pDoc = GetDocument();
 	ASSERT_VALID(pDoc);
@@ -2675,14 +2688,14 @@ void CLinkageView::OnMouseMoveDrag(UINT nFlags, CPoint point)
 	SetLocationAsStatus( ReferencePoint );
 }
 
-void CLinkageView::OnMouseMovePan(UINT nFlags, CPoint point)
+void CLinkageView::OnMouseMovePan(UINT nFlags, CFPoint point)
 {
 	m_ScreenScrollPosition.x -= point.x - m_PreviousDragPoint.x;
 	m_ScreenScrollPosition.y -= point.y - m_PreviousDragPoint.y;
 	InvalidateRect( 0 );
 }
 
-void CLinkageView::OnMouseMoveRotate(UINT nFlags, CPoint point)
+void CLinkageView::OnMouseMoveRotate(UINT nFlags, CFPoint point)
 {
 	CFPoint DragStartPoint = Unscale( m_DragStartPoint );
 	CFPoint CurrentPoint = Unscale( point );
@@ -2717,7 +2730,7 @@ class CSnapConnector : public ConnectorListOperation
 	CConnector *GetConnector( void ) { return m_pSnapConnector; }
 };
 
-void CLinkageView::OnMouseMoveRecenter(UINT nFlags, CPoint point)
+void CLinkageView::OnMouseMoveRecenter(UINT nFlags, CFPoint point)
 {
 	// Snap to connectors
 
@@ -2739,7 +2752,7 @@ void CLinkageView::OnMouseMoveRecenter(UINT nFlags, CPoint point)
 	InvalidateRect( 0 );
 }
 
-void CLinkageView::OnMouseMoveStretch(UINT nFlags, CPoint point, bool bEndStretch )
+void CLinkageView::OnMouseMoveStretch(UINT nFlags, CFPoint point, bool bEndStretch )
 {
 	CLinkageDoc* pDoc = GetDocument();
 	ASSERT_VALID(pDoc);
@@ -2828,7 +2841,7 @@ void CLinkageView::OnMouseMoveStretch(UINT nFlags, CPoint point, bool bEndStretc
 	InvalidateRect( 0 );
 }
 
-void CLinkageView::OnMouseEndChangeAdjusters(UINT nFlags, CPoint point)
+void CLinkageView::OnMouseEndChangeAdjusters(UINT nFlags, CFPoint point)
 {
 	m_bChangeAdjusters = false;
 	if( m_bAllowEdit )
@@ -2840,7 +2853,7 @@ void CLinkageView::OnMouseEndChangeAdjusters(UINT nFlags, CPoint point)
 	}
 }
 
-void CLinkageView::OnMouseEndDrag(UINT nFlags, CPoint point)
+void CLinkageView::OnMouseEndDrag(UINT nFlags, CFPoint point)
 {
 	CLinkageDoc* pDoc = GetDocument();
 	ASSERT_VALID(pDoc);
@@ -2904,7 +2917,7 @@ void CLinkageView::ShowSelectedElementStatus( void )
 	SetStatusText( String );
 }
 
-void CLinkageView::OnMouseEndSelect(UINT nFlags, CPoint point)
+void CLinkageView::OnMouseEndSelect(UINT nFlags, CFPoint point)
 {
 	CLinkageDoc* pDoc = GetDocument();
 	ASSERT_VALID(pDoc);
@@ -2916,13 +2929,13 @@ void CLinkageView::OnMouseEndSelect(UINT nFlags, CPoint point)
 
 	if( m_SelectRect.left > m_SelectRect.right )
 	{
-		int Temp = m_SelectRect.left;
+		double Temp = m_SelectRect.left;
 		m_SelectRect.left = m_SelectRect.right;
 		m_SelectRect.right = Temp;
 	}
 	if( m_SelectRect.top > m_SelectRect.bottom )
 	{
-		int Temp = m_SelectRect.top;
+		double Temp = m_SelectRect.top;
 		m_SelectRect.top = m_SelectRect.bottom;
 		m_SelectRect.bottom = Temp;
 	}
@@ -2955,12 +2968,12 @@ void CLinkageView::OnMouseEndSelect(UINT nFlags, CPoint point)
 	InvalidateRect( 0 );
 }
 
-void CLinkageView::OnMouseEndPan(UINT nFlags, CPoint point)
+void CLinkageView::OnMouseEndPan(UINT nFlags, CFPoint point)
 {
 	InvalidateRect( 0 );
 }
 
-void CLinkageView::OnMouseEndRotate(UINT nFlags, CPoint point)
+void CLinkageView::OnMouseEndRotate(UINT nFlags, CFPoint point)
 {
 	CLinkageDoc* pDoc = GetDocument();
 	ASSERT_VALID(pDoc);
@@ -2970,12 +2983,12 @@ void CLinkageView::OnMouseEndRotate(UINT nFlags, CPoint point)
 	InvalidateRect( 0 );
 }
 
-void CLinkageView::OnMouseEndRecenter(UINT nFlags, CPoint point)
+void CLinkageView::OnMouseEndRecenter(UINT nFlags, CFPoint point)
 {
 	InvalidateRect( 0 );
 }
 
-void CLinkageView::OnMouseEndStretch(UINT nFlags, CPoint point)
+void CLinkageView::OnMouseEndStretch(UINT nFlags, CFPoint point)
 {
 	CLinkageDoc* pDoc = GetDocument();
 	ASSERT_VALID(pDoc);
@@ -2997,8 +3010,10 @@ void CLinkageView::SetLocationAsStatus( CFPoint &Point )
 	SetStatusText( Location );
 }
 
-void CLinkageView::OnMouseMove(UINT nFlags, CPoint point)
+void CLinkageView::OnMouseMove(UINT nFlags, CPoint MousePoint)
 {
+	CFPoint point = AdjustClientAreaPoint( MousePoint );
+
 	if( m_PreviousDragPoint == point )
 		return;
 
@@ -3744,7 +3759,7 @@ void CLinkageView::OnUpdateButtonPin(CCmdUI *pCmdUI)
 
 CFPoint CLinkageView::GetDocumentViewCenter( void )
 {
-	CPoint Point( ( m_DrawingRect.left + m_DrawingRect.right ) / 2, ( m_DrawingRect.top + m_DrawingRect.bottom ) / 2 );
+	CFPoint Point( ( m_DrawingRect.left + m_DrawingRect.right ) / 2, ( m_DrawingRect.top + m_DrawingRect.bottom ) / 2 );
 
 	return Unscale( Point );
 }
@@ -3957,8 +3972,10 @@ void CLinkageView::OnEditProperties()
 		EditProperties( pDoc->GetSelectedConnector( 0 ), 0, false );
 }
 
-void CLinkageView::OnLButtonDblClk(UINT nFlags, CPoint point)
+void CLinkageView::OnLButtonDblClk(UINT nFlags, CPoint MousePoint)
 {
+	CFPoint point = AdjustClientAreaPoint( MousePoint );
+
 	if( m_VisibleAdjustment == ADJUSTMENT_ROTATE )
 	{
 		// Must have been selected before double click - go back to
@@ -4573,8 +4590,10 @@ void CLinkageView::OnUpdateEditPaste(CCmdUI *pCmdUI)
 	pCmdUI->Enable( !m_bSimulating && ::IsClipboardFormatAvailable( CF_Linkage ) != 0 && m_bAllowEdit );
 }
 
-void CLinkageView::OnRButtonDown(UINT nFlags, CPoint point)
+void CLinkageView::OnRButtonDown(UINT nFlags, CPoint MousePoint)
 {
+	CFPoint point = AdjustClientAreaPoint( MousePoint );
+
 	SetCapture();
 	m_bSuperHighlight = 0;
 	m_MouseAction = ACTION_PAN;
@@ -4583,7 +4602,7 @@ void CLinkageView::OnRButtonDown(UINT nFlags, CPoint point)
 	m_bMouseMovedEnough	= false;
 }
 
-void CLinkageView::OnRButtonUp(UINT nFlags, CPoint point)
+void CLinkageView::OnRButtonUp(UINT nFlags, CPoint MousePoint)
 {
 	ReleaseCapture();
 	m_MouseAction = ACTION_NONE;
@@ -4598,6 +4617,7 @@ void CLinkageView::OnRButtonUp(UINT nFlags, CPoint point)
 		ASSERT_VALID(pDoc);
 		CLink *pLink = 0;
 		CConnector *pConnector = 0;
+		CFPoint point = AdjustClientAreaPoint( MousePoint );
 		if( FindDocumentItem( point, pLink, pConnector ) )
 		{
 			bool bResult = false;
@@ -4609,16 +4629,16 @@ void CLinkageView::OnRButtonUp(UINT nFlags, CPoint point)
 		else
 		{
 			m_PopupPoint = point;
-			ClientToScreen( &point );
+			ClientToScreen( &MousePoint );
 			if( m_pPopupGallery != 0 )
 			{
-				m_pPopupGallery->ShowGallery( this, point.x, point.y, 0 );
+				m_pPopupGallery->ShowGallery( this, MousePoint.x, MousePoint.y, 0 );
 			}
 		}
 	}
 }
 
-BOOL CLinkageView::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt)
+BOOL CLinkageView::OnMouseWheel(UINT nFlags, short zDelta, CPoint MousePoint)
 {
 	if( m_bSimulating )
 		return TRUE;
@@ -4630,7 +4650,8 @@ BOOL CLinkageView::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt)
 	else if( zDelta < 0 && m_ScreenZoom <= .0005 )
 		return TRUE;
 
-	ScreenToClient( &pt );
+	ScreenToClient( &MousePoint );
+	CFPoint pt = AdjustClientAreaPoint( MousePoint );
 
 	m_Zoom = m_ScreenZoom;
 	CFPoint AdjustedPoint = Unscale( pt );
@@ -7759,14 +7780,14 @@ void CLinkageView::Scale( double &x, double &y )
 	y *= m_Zoom;
 	x -= m_ScrollPosition.x;
 	y -= m_ScrollPosition.y;
-	x += m_DrawingRect.Width() / 2;
-	y += m_DrawingRect.Height() / 2;
+	x += m_DrawingRect.Width() / m_DPIScale / 2;
+	y += m_DrawingRect.Height() / m_DPIScale / 2;
 }
 
 void CLinkageView::Unscale( double &x, double &y )
 {
-	x -= m_DrawingRect.Width() / 2;
-	y -= m_DrawingRect.Height() / 2;
+	x -= m_DrawingRect.Width() / m_DPIScale / 2;
+	y -= m_DrawingRect.Height() / m_DPIScale / 2;
 	x += m_ScrollPosition.x;
 	y += m_ScrollPosition.y;
 	x /= m_Zoom;

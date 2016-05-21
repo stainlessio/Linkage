@@ -118,7 +118,7 @@ private:
 
 	double m_DPIScale;
 	ULONG_PTR m_gdiplusToken;
-	CPoint m_PreviousDragPoint;
+	CFPoint m_PreviousDragPoint;
 	bool m_bSimulating;
 	int m_SimulationSteps;
 	_SimulationControl m_SimulationControl;
@@ -154,7 +154,7 @@ private:
 	bool m_bChangeAdjusters;
 	CFPoint m_DragOffset;
 	bool m_bMouseMovedEnough;
-	CRect m_SelectRect;
+	CFRect m_SelectRect;
 	bool m_bSuperHighlight;
 	CControlWindow m_ControlWindow;
 	AdjustmentType m_VisibleAdjustment;
@@ -165,14 +165,14 @@ private:
 	HICON m_Rotate3;
 	HICON m_Rotate4;
 	bool m_bWasValid; // Simulation was valid (for purpose of error reporting).
-	CPoint m_ScrollOffsetAdjustment;
+	CFPoint m_ScrollOffsetAdjustment;
 	CFRect m_SelectionContainerRect;
 	CFRect m_SelectionAdjustmentRect;
 	CFPoint m_SelectionRotatePoint;
 	CFPoint GetDocumentViewCenter( void );
 	AdjustmentControl m_StretchingControl;
 	CPopupGallery * m_pPopupGallery;
-	CPoint m_PopupPoint;
+	CFPoint m_PopupPoint;
 	CRect m_DrawingRect;
 	int m_YUpDirection;
 	unsigned int m_SelectedEditLayers;
@@ -196,25 +196,26 @@ private:
 	bool m_bUseVideoCounters;
 	bool m_bShowSelection;
 	
+	CFPoint AdjustClientAreaPoint( CPoint );
 	void MarkSelection( bool bSelectionChanged );
 	CPoint GetDefaultUnscalePoint( void );
 	
 	double UnscaledUnits( double Count );
 
-	void OnMouseMoveSelect(UINT nFlags, CPoint point);
-	void OnMouseMoveDrag(UINT nFlags, CPoint point);
-	void OnMouseMovePan(UINT nFlags, CPoint point);
-	void OnMouseMoveRotate(UINT nFlags, CPoint point);
-	void OnMouseMoveRecenter(UINT nFlags, CPoint point);
-	void OnMouseMoveStretch(UINT nFlags, CPoint point,  bool bEndStretch);
+	void OnMouseMoveSelect(UINT nFlags, CFPoint point);
+	void OnMouseMoveDrag(UINT nFlags, CFPoint point);
+	void OnMouseMovePan(UINT nFlags, CFPoint point);
+	void OnMouseMoveRotate(UINT nFlags, CFPoint point);
+	void OnMouseMoveRecenter(UINT nFlags, CFPoint point);
+	void OnMouseMoveStretch(UINT nFlags, CFPoint point,  bool bEndStretch);
 
-	void OnMouseEndSelect(UINT nFlags, CPoint point);
-	void OnMouseEndDrag(UINT nFlags, CPoint point);
-	void OnMouseEndPan(UINT nFlags, CPoint point);
-	void OnMouseEndRotate(UINT nFlags, CPoint point);
-	void OnMouseEndRecenter(UINT nFlags, CPoint point);
-	void OnMouseEndStretch(UINT nFlags, CPoint point);
-	void OnMouseEndChangeAdjusters(UINT nFlags, CPoint point);
+	void OnMouseEndSelect(UINT nFlags, CFPoint point);
+	void OnMouseEndDrag(UINT nFlags, CFPoint point);
+	void OnMouseEndPan(UINT nFlags, CFPoint point);
+	void OnMouseEndRotate(UINT nFlags, CFPoint point);
+	void OnMouseEndRecenter(UINT nFlags, CFPoint point);
+	void OnMouseEndStretch(UINT nFlags, CFPoint point);
+	void OnMouseEndChangeAdjusters(UINT nFlags, CFPoint point);
 	
 	void OnButtonUp(UINT nFlags, CPoint point);
 	double ConvertToSeconds( const char *pHMSString );
@@ -229,10 +230,10 @@ private:
 		
 	bool SelectVideoBox( UINT nFlags, CPoint Point );
 	bool GrabAdjustmentControl( CFPoint Point, CFPoint GrabPoint, _AdjustmentControl CheckControl, MouseAction DoMouseAction, _AdjustmentControl *pSelectControl, CFPoint *pDragOffset, MouseAction *pMouseAction );
-	bool SelectAdjustmentControl( UINT nFlags, CPoint Point );
-	bool SelectDocumentItem( UINT nFlags, CPoint Point );
-	bool DragSelectionBox( UINT nFlags, CPoint point );
-	bool FindDocumentItem( CPoint Point, CLink *&pFoundLink, CConnector *&pFoundConnector );
+	bool SelectAdjustmentControl( UINT nFlags, CFPoint Point );
+	bool SelectDocumentItem( UINT nFlags, CFPoint Point );
+	bool DragSelectionBox( UINT nFlags, CFPoint point );
+	bool FindDocumentItem( CFPoint Point, CLink *&pFoundLink, CConnector *&pFoundConnector );
 
 	void SetLocationAsStatus( CFPoint &Point );
 	

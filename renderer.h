@@ -65,8 +65,8 @@ class CRenderer// : public CDC
 	bool Pie( double x, double y, double r, double x3, double y3, double x4, double y4, bool bDrawTo = false );
 	bool Arc( CFArc &TheArc );
 	bool Circle( CFCircle &Circle );
-	COLORREF SetPixel( double x, double y, COLORREF crColor );
-	COLORREF SetPixel( CFPoint Point, COLORREF crColor ) { return SetPixel( Point.x, Point.y, crColor ); }
+	//COLORREF SetPixel( double x, double y, COLORREF crColor );
+	//COLORREF SetPixel( CFPoint Point, COLORREF crColor ) { return SetPixel( Point.x, Point.y, crColor ); }
 	bool CreateCompatibleDC( CDC *pDC, CRect *prect = 0 );
 
 	bool DrawArrow( CFPoint FromPoint, CFPoint ToPoint, double Width, double Length );
