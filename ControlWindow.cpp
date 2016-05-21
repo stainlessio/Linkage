@@ -33,6 +33,14 @@ class CControlWindowImplementation
 	public:
 	CControlWindowImplementation()
 	{
+		#if defined( LINKAGE_USE_DIRECT2D )
+			CWindowDC DC( 0 );
+			int PPI = DC.GetDeviceCaps( LOGPIXELSX );
+			m_DPIScale = (double)PPI / 96.0;
+		#else
+			m_DPIScale = 1.0;
+		#endif
+
 		m_pCaptureControl = 0;
 		m_ControlCount = 0;
 		m_ControlWidth = MAXCONTROLWIDTH;
@@ -41,7 +49,7 @@ class CControlWindowImplementation
 		m_HandleSize = HANDLESIZE;
 		m_MaxTextWidth = 0;
 		m_CaptureControl = -1;
-		m_Font.CreateFont( -11, 0, 0, 0, FW_NORMAL, 0, 0, 0,
+		m_Font.CreateFont( (int)( -11 * m_DPIScale ), 0, 0, 0, FW_NORMAL, 0, 0, 0,
 							DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS,
 							ANTIALIASED_QUALITY | CLEARTYPE_QUALITY, VARIABLE_PITCH | FF_SWISS,
 							"arial" );
@@ -63,10 +71,11 @@ class CControlWindowImplementation
 	CFont m_Font;
 	CPoint m_CaptureOffset;
 	int m_CaptureControl;
+	double m_DPIScale;
 
 	int GetDesiredHeight( void )
 	{
-		return ( BORDER * 2 ) + ( m_ControlCount * CONTROLHEIGHT );
+		return (int)( ( BORDER * 2 ) + ( m_ControlCount * CONTROLHEIGHT * m_DPIScale ) );
 	}
 
 	bool GetCaptureRange( CWnd *pWnd, int ControlIndex, CRect &Rect )
@@ -265,7 +274,7 @@ void CControlWindow::OnPaint()
 
 	for( int Counter = 0; Counter < m_pImplementation->m_ControlCount && Counter < m_pImplementation->m_MAXCONTROLS; ++Counter )
 	{
-		MemoryDC.TextOut( x, y - HalfSize - 1, m_pImplementation->m_Controls[Counter].m_Description );
+		MemoryDC.TextOut( x, (int)( y - ( HalfSize * m_pImplementation->m_DPIScale ) - 1 ), m_pImplementation->m_Controls[Counter].m_Description );
 
 		MemoryDC.SelectObject( &BlackPen );
 		MemoryDC.MoveTo( x2, y );
@@ -280,7 +289,7 @@ void CControlWindow::OnPaint()
 			xTemp = x2 + ( m_pImplementation->m_ControlWidth / 2 ) + (int)( ( m_pImplementation->m_ControlWidth / 2 ) * m_pImplementation->m_Controls[Counter].m_Position );
 		else
 			xTemp = x2 + (int)( m_pImplementation->m_ControlWidth * m_pImplementation->m_Controls[Counter].m_Position );
-		int Offset = HalfSize;
+		int Offset = HalfSize * m_pImplementation->m_DPIScale;
 
 		CRect Box( xTemp - Offset, y - Offset, xTemp + Offset + 1, y + Offset + 1 );
 		MemoryDC.FrameRect( &Box, &BlackBrush );

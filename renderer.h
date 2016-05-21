@@ -9,7 +9,7 @@ class CRenderer// : public CDC
 {
 	public:
 
-	enum _RenderDestination { NULL_RENDERER, WINDOWS_PRINTER_GDI, WINDOWS_GDI, WINDOWS_GDIPLUS, DXF_FILE, WINDOWS_D2D };
+	enum _RenderDestination { NULL_RENDERER, WINDOWS_PRINTER_GDI, WINDOWS_GDI, DXF_FILE, WINDOWS_D2D };
 	
 	CRenderer( enum _RenderDestination RendererDestination );
 	virtual ~CRenderer();

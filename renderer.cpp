@@ -7,8 +7,6 @@
 #include <d2d1.h>
 #endif
 
-//using namespace Gdiplus;
-
 static int ExpandPolygonCornerx( CFPoint &Point, CFPoint &PreviousPoint, CFPoint &NextPoint, double Distance, CFPoint &NewPoint1, CFPoint &NewPoint2 )
 {
 	// Returns two points that are the proper distance from the original and
@@ -139,7 +137,7 @@ class CRendererImplementation
 	virtual bool PatBlt( int x, int y, int nWidth, int nHeight, DWORD dwRop ) = 0;
 	virtual bool CreateCompatibleDC( CDC *pDC, CRect *pRect = 0 ) = 0;
 	virtual int SetArcDirection(int Direction ) = 0;
-	virtual bool FillRgn( CRgn* pRgn, CBrush* pBrush ) = 0;
+	virtual bool FillRgn( CFPoint *pPoints, int Count, CBrush* pBrush ) = 0;
 	virtual CFPoint MoveTo( double x, double y ) = 0;
 	virtual CFPoint LineTo( double x, double y ) = 0;
 	CFPoint MoveTo( CFPoint Point ) { return MoveTo( Point.x, Point.y ); }
@@ -200,7 +198,7 @@ class CRendererImplementation
 		if( PointCount <= 1 )
 			return;
 
-		CPoint *pIntegerPoints = 0;
+		CFPoint *pRegionPoints = 0;
 		COLORREF NewColor;
 		CFPoint FirstPoint1;
 		CFPoint FirstPoint2;
@@ -244,16 +242,16 @@ class CRendererImplementation
 			pOldPen = SelectObject( &Pen );
 			pOldBrush = SelectObject( &Brush );
 
-			pIntegerPoints = new CPoint [PointCount*2];
-			if( pIntegerPoints == 0 )
+			pRegionPoints = new CFPoint[PointCount*2];
+			if( pRegionPoints == 0 )
 				return;
 
 			Scale( FirstPoint1.x, FirstPoint1.y );
-			pIntegerPoints[FillPoint++].SetPoint( (int)FirstPoint1.x, (int)FirstPoint1.y );
+			pRegionPoints[FillPoint++].SetPoint( (int)FirstPoint1.x, (int)FirstPoint1.y );
 			if( ArcDirection != 0 )
 			{
 				Scale( FirstPoint2.x, FirstPoint2.y );
-				pIntegerPoints[FillPoint++].SetPoint( (int)FirstPoint2.x, (int)FirstPoint2.y );
+				pRegionPoints[FillPoint++].SetPoint( (int)FirstPoint2.x, (int)FirstPoint2.y );
 			}
 		}
 		else
@@ -294,19 +292,20 @@ class CRendererImplementation
 				if( ArcDirection != 0 )
 					Pie( pPoints[Counter].x, pPoints[Counter].y, ExpansionDistance, TempPoint1.x, TempPoint1.y, TempPoint1.x, TempPoint1.y, true );
 				Scale( TempPoint1.x, TempPoint1.y );
-				pIntegerPoints[FillPoint++].SetPoint( (int)TempPoint1.x, (int)TempPoint1.y );
+				pRegionPoints[FillPoint++].SetPoint( (int)TempPoint1.x, (int)TempPoint1.y );
 				int BackPoints = 1;
 				if( ArcDirection != 0 )
 				{
 					++BackPoints;
 					Scale( TempPoint2.x, TempPoint2.y );
-					pIntegerPoints[FillPoint++].SetPoint( (int)TempPoint2.x, (int)TempPoint2.y );
+					pRegionPoints[FillPoint++].SetPoint( (int)TempPoint2.x, (int)TempPoint2.y );
 				}
+
 				if( 0 && pLineRadii != 0 && pLineRadii[Counter-1] != 0 && ExpansionDistance == 0 )
 				{
-					double ChordHalf = Distance( pIntegerPoints[FillPoint-2], pIntegerPoints[FillPoint-3] ) / 2;
+					double ChordHalf = Distance( pRegionPoints[FillPoint-2], pRegionPoints[FillPoint-3] ) / 2;
 					double ToCenter = sqrt( pLineRadii[Counter-1] * pLineRadii[Counter-1] / ChordHalf * ChordHalf );
-					CFLine Line( pIntegerPoints[FillPoint-BackPoints], pIntegerPoints[FillPoint-BackPoints-1] );
+					CFLine Line( pRegionPoints[FillPoint-BackPoints], pRegionPoints[FillPoint-BackPoints-1] );
 					CFLine Perp;
 					Line.PerpendicularLine( Perp, 0 );
 					Line.SetDistance( ChordHalf );
@@ -317,12 +316,12 @@ class CRendererImplementation
 					CPen *pDerf = SelectObject( &Derf );
 					DrawLine( Perp );
 
-					Pie( pIntegerPoints[FillPoint-BackPoints].x, pIntegerPoints[FillPoint-BackPoints].y, 10, pIntegerPoints[FillPoint-BackPoints].x+10, pIntegerPoints[FillPoint-BackPoints].y, pIntegerPoints[FillPoint-BackPoints].x+10, pIntegerPoints[FillPoint-BackPoints].y, false );
-					Pie( pIntegerPoints[FillPoint-BackPoints-1].x, pIntegerPoints[FillPoint-BackPoints-1].y, 10, pIntegerPoints[FillPoint-BackPoints-1].x+10, pIntegerPoints[FillPoint-BackPoints-1].y, pIntegerPoints[FillPoint-BackPoints-1].x+10, pIntegerPoints[FillPoint-BackPoints-1].y, false );
+					Pie( pRegionPoints[FillPoint-BackPoints].x, pRegionPoints[FillPoint-BackPoints].y, 10, pRegionPoints[FillPoint-BackPoints].x+10, pRegionPoints[FillPoint-BackPoints].y, pRegionPoints[FillPoint-BackPoints].x+10, pRegionPoints[FillPoint-BackPoints].y, false );
+					Pie( pRegionPoints[FillPoint-BackPoints-1].x, pRegionPoints[FillPoint-BackPoints-1].y, 10, pRegionPoints[FillPoint-BackPoints-1].x+10, pRegionPoints[FillPoint-BackPoints-1].y, pRegionPoints[FillPoint-BackPoints-1].x+10, pRegionPoints[FillPoint-BackPoints-1].y, false );
 
 
 
-					//Pie( Line.GetEnd().x, Line.GetEnd().y, pLineRadii[Counter-1], pIntegerPoints[FillPoint-2].x, pIntegerPoints[FillPoint-2].y, pIntegerPoints[FillPoint-3].x, pIntegerPoints[FillPoint-3].y, false );
+					//Pie( Line.GetEnd().x, Line.GetEnd().y, pLineRadii[Counter-1], pRegionPoints[FillPoint-2].x, pRegionPoints[FillPoint-2].y, pRegionPoints[FillPoint-3].x, pRegionPoints[FillPoint-3].y, false );
 					SelectObject( pDerf );
 				}
 			}
@@ -343,11 +342,9 @@ class CRendererImplementation
 			if( ExpansionDistance > 0 )
 				Pie( pPoints[0].x, pPoints[0].y, ExpansionDistance, FirstPoint1.x, FirstPoint1.y, FirstPoint1.x, FirstPoint1.y, true );
 
-			CRgn Region;
-			Region.CreatePolygonRgn( pIntegerPoints, FillPoint, ALTERNATE );
-			delete [] pIntegerPoints;
-
-			FillRgn( &Region, &Brush );
+			FillRgn( pRegionPoints, FillPoint, &Brush );
+			
+			delete [] pRegionPoints;
 
 			SelectObject( pOldPen );
 			SelectObject( pOldBrush );
@@ -561,9 +558,17 @@ class CGDIRenderer : public CRendererImplementation
 		return m_pDC->SetArcDirection( Direction );
 	}
 
-	bool FillRgn( CRgn* pRgn, CBrush* pBrush )
+	bool FillRgn( CFPoint *pPoints, int Count, CBrush* pBrush )
 	{
-		return m_pDC->FillRgn( pRgn, pBrush ) != 0;
+		CRgn Region;
+		CPoint *pIntegerPoints = new CPoint[Count];
+		if( pIntegerPoints == 0 )
+			return false;
+		for( int Index = 0; Index < Count; ++Index )
+			pIntegerPoints[Index].SetPoint( (int)pPoints[Index].x, (int)pPoints[Index].y );
+		Region.CreatePolygonRgn( pIntegerPoints, Count, ALTERNATE );
+		delete [] pIntegerPoints;
+		return m_pDC->FillRgn( &Region, pBrush ) != 0;
 	}
 
 	void SaveToFile( const char *pFileName ) {}
@@ -1019,7 +1024,7 @@ class CNullRenderer : public CRendererImplementation
 		return 0;
 	}
 
-	bool FillRgn( CRgn* pRgn, CBrush* pBrush )
+	bool FillRgn( CFPoint *pPoints, int Count, CBrush* pBrush )
 	{
 		return false;
 	}
@@ -1303,7 +1308,7 @@ class CDXFRenderer : public CRendererImplementation
 		return Old;
 	}
 
-	bool FillRgn( CRgn* pRgn, CBrush* pBrush )
+	bool FillRgn( CFPoint *pPoints, int Count, CBrush* pBrush )
 	{
 		return false;
 		//return m_pDC->FillRgn( pRgn, pBrush ) != 0;
@@ -1659,528 +1664,6 @@ class CDXFRenderer : public CRendererImplementation
 		return TRUE;
 	}
 };
-
-class CGDIPlusRenderer : public CRendererImplementation
-{
-	public:
-
-	CList<CPen*,CPen*> m_CreatedPens;
-	CDC *m_pDC;
-	bool m_bIsPrinting;
-	bool m_bCreatedFont;
-	LOGFONT m_ScaledLogFont;
-	CFont m_ScaledFont;
-	CPen m_ScaledPen;
-
-	CGDIPlusRenderer( bool bIsPrinting )
-	{
-		m_bIsPrinting = bIsPrinting;
-		m_ScrollPosition.SetPoint( 0, 0 );
-		m_Scale = 1.0;
-		m_bCreatedFont = false;
-		m_pDC = 0;
-		memset( &m_ScaledLogFont, 0, sizeof( m_ScaledLogFont ) );
-	}
-
-	virtual ~CGDIPlusRenderer()
-	{
-		POSITION Position = m_CreatedPens.GetHeadPosition();
-		while( Position )
-		{
-			CPen *pPen = m_CreatedPens.GetNext( Position );
-			if( pPen != 0 )
-				delete pPen;
-		}
-		m_CreatedPens.RemoveAll();
-		if( m_pDC != 0 )
-			delete m_pDC;
-	}
-
-	int GetYOrientation( void )
-	{
-		return -1;
-	}
-
-	void SaveDXF( const char *pFileName ) {}
-
-	CFPoint MoveTo( CFPoint Point ) { return MoveTo( Point.x, Point.y ); }
-	CFPoint LineTo( CFPoint Point ) { return LineTo( Point.x, Point.y ); }
-
-	unsigned int SetTextAlign( unsigned int nFlags )
-	{
-		if( m_pDC == 0 )
-			return 0;
-
-		return m_pDC->SetTextAlign( nFlags );
-	}
-
-	virtual void FillRect( LPCRECT lpRect, CBrush* pBrush )
-	{
-		if( m_pDC == 0 )
-			return;
-
-		m_pDC->FillRect( lpRect, pBrush );
-	}
-
-	COLORREF GetTextColor( void )
-	{
-		if( m_pDC == 0 )
-			return RGB( 0, 0, 0 );
-
-		return m_pDC->GetTextColor();
-	}
-
-	COLORREF SetTextColor( COLORREF crColor )
-	{
-		if( m_pDC == 0 )
-			return RGB( 0, 0, 0 );
-
-		return m_pDC->SetTextColor( crColor );
-	}
-
-	CGdiObject* SelectStockObject( int nIndex )
-	{
-		if( m_pDC == 0 )
-			return 0;
-
-		return m_pDC->SelectStockObject( nIndex );
-	}
-
-	bool IsPrinting( void )
-	{
-		return m_bIsPrinting;
-	}
-
-	int GetColorCount( void )
-	{
-		if( m_pDC != 0 )
-			return 0;
-
-		return m_pDC->GetDeviceCaps( NUMCOLORS );
-	}
-
-	void Attach( HDC hDeviceContext )
-	{
-		if( m_pDC != 0 )
-			return;
-
-		m_pDC = new CDC;
-		m_pDC->Attach( hDeviceContext );
-	}
-
-	void Detach( void )
-	{
-		if( m_pDC == 0 )
-			return;
-
-		m_pDC->Detach();
-	}
-
-	void SetAttribDC( HDC hDeviceContext )
-	{
-		if( m_pDC == 0 )
-			return;
-
-		m_pDC->SetAttribDC( hDeviceContext );
-	}
-
-	virtual HDC GetSafeHdc( void )
-	{
-		if( m_pDC == 0 )
-			return (HDC)INVALID_HANDLE_VALUE;
-
-		return m_pDC->GetSafeHdc();
-	}
-
-	virtual CDC *GetDC( void )
-	{
-		return m_pDC;
-	}
-
-	virtual int SetBkMode( int nBkMode )
-	{
-		if( m_pDC == 0 )
-			return 0;
-
-		return m_pDC->SetBkMode( nBkMode );
-	}
-
-	virtual COLORREF SetBkColor( COLORREF crColor )
-	{
-		if( m_pDC == 0 )
-			return RGB( 0, 0, 0 );
-
-		return m_pDC->SetBkColor( crColor );
-	}
-
-	bool PatBlt( int x, int y, int nWidth, int nHeight, DWORD dwRop )
-	{
-		if( m_pDC == 0 )
-			return false;
-
-		return m_pDC->PatBlt( x, y, nWidth, nHeight, dwRop ) != 0;
-	}
-
-	bool CreateCompatibleDC( CDC *pDC, CRect *pRect )
-	{
-		m_pDC = new CDC;
-		if( m_pDC == 0 )
-			return false;
-		return m_pDC->CreateCompatibleDC( pDC ) != 0;
-	}
-
-	int SetArcDirection( int Direction )
-	{
-		return m_pDC->SetArcDirection( Direction );
-	}
-
-	bool FillRgn( CRgn* pRgn, CBrush* pBrush )
-	{
-		return m_pDC->FillRgn( pRgn, pBrush ) != 0;
-	}
-
-	void SaveToFile( const char *pFileName ) {}
-
-	CFPoint MoveTo( double x, double y )
-	{
-		Scale( x, y );
-		CFPoint Result = m_pDC->MoveTo( (int)x, (int)y );
-		Unscale( Result.x, Result.y );
-		return Result;
-	}
-
-	CFPoint LineTo( double x, double y )
-	{
-		Scale( x, y );
-
-		CFPoint Result = m_pDC->LineTo( (int)x, (int)y );
-		CPen* pPen = m_pDC->GetCurrentPen();
-		if( pPen != 0 )
-		{
-			LOGPEN LogPen;
-			if( pPen->GetLogPen( &LogPen ) != 0 )
-			{
-				COLORREF PenColor = LogPen.lopnColor;
-				m_pDC->SetPixel( (int)x, (int)y, PenColor );
-			}
-		}
-		Unscale( Result.x, Result.y );
-
-		return Result;
-	}
-
-	CFPoint DrawLine( CFLine Line )
-	{
-		MoveTo( Line.GetStart() );
-		return LineTo( Line.GetEnd() );
-	}
-
-	CFPoint DrawLine( CFPoint Point1, CFPoint Point2 )
-	{
-		return DrawLine( CFLine( Point1, Point2 ) );
-	}
-
-	bool TextOut( double x, double y, const CString& str )
-	{
-		Scale( x, y );
-		return m_pDC->TextOut( (int)x, (int)y, str ) != 0;
-	}
-
-	bool Circle( CFCircle &Circle )
-	{
-		double x1 = Circle.x - Circle.r;
-		double y1 = Circle.y - Circle.r;
-		double x2 = Circle.x + Circle.r;
-		double y2 = Circle.y + Circle.r;
-
-		Scale( x1, y1 );
-		Scale( x2, y2 );
-
-		return m_pDC->Ellipse( (int)( x1 ), (int)( y1 ), (int)( x2 ) + 1, (int)( y2 ) + 1 ) != 0;
-	}
-
-	bool Arc( CFArc &TheArc )
-	{
-		return Arc( TheArc.x, TheArc.y, TheArc.r, TheArc.m_Start.x, TheArc.m_Start.y, TheArc.m_End.x, TheArc.m_End.y );
-	}
-
-	bool Arc( double x1, double y1, double x2, double y2, double x3, double y3, double x4, double y4, bool bDrawTo = false )
-	{
-		Scale( x1, y1 );
-		Scale( x2, y2 );
-		Scale( x3, y3 );
-		Scale( x4, y4 );
-
-		if( bDrawTo )
-			return m_pDC->ArcTo( (int)x1, (int)y1, (int)x2+1, (int)y2+1, (int)x3, (int)y3, (int)x4, (int)y4 ) != 0;
-		else
-			return m_pDC->Arc( (int)x1, (int)y1, (int)x2+1, (int)y2+1, (int)x3, (int)y3, (int)x4, (int)y4 ) != 0;
-	}
-
-	bool Arc( double x, double y, double r, double x3, double y3, double x4, double y4, bool bDrawTo = false )
-	{
-		double x2 = x + r;
-		double y2 = y + r;
-		x -= r;
-		y -= r;
-		return Arc( x, y, x2, y2, x3, y3, x4, y4, bDrawTo );
-	}
-
-	bool Pie( double x, double y, double r, double x3, double y3, double x4, double y4, bool bDrawTo )
-	{
-		double x2 = x + r;
-		double y2 = y + r;
-		x -= r;
-		y -= r;
-
-		Scale( x, y );
-		Scale( x2, y2 );
-		Scale( x3, y3 );
-		Scale( x4, y4 );
-
-		return m_pDC->Pie( (int)x, (int)y, (int)x2+1, (int)y2+1, (int)x3, (int)y3, (int)x4, (int)y4 ) != 0;
-	}
-
-	bool DrawRect( double RotationAngle, double x1, double y1, double x2, double y2 )
-	{
-		double Deviation = RotationAngle;
-		while( Deviation > 89 )
-			Deviation -= 90;
-		if( fabs( Deviation ) < .1 )
-	//	if( RotationAngle == 0 || RotationAngle == 90 || RotationAngle == 180 || RotationAngle == 270 )
-			return DrawRect( x1, y1, x2, y2 );
-
-		CFPoint Center( ( x1 + x2 ) / 2.0, ( y1 + y2 ) / 2.0 );
-
-		// The addition of .1 causes the display to look better when rounding to
-		// individual pixels. Without this, the rectange appears to rotate sooner
-		// than expected in comparison to other things.
-
-		CFPoint Point1( x1 + .1, y1 + .1 );
-		CFPoint Point2( x2 + .1, y1 + .1 );
-		CFPoint Point3( x2 + .1, y2 + .1 );
-		CFPoint Point4( x1 + .1, y2 + .1 );
-
-		Point1.RotateAround( Center, RotationAngle );
-		Point2.RotateAround( Center, RotationAngle );
-		Point3.RotateAround( Center, RotationAngle );
-		Point4.RotateAround( Center, RotationAngle );
-
-		MoveTo( Point1 );
-		LineTo( Point2 );
-		LineTo( Point3 );
-		LineTo( Point4 );
-		LineTo( Point1 );
-
-		return TRUE;
-	}
-
-	bool DrawRect( double x1, double y1, double x2, double y2 )
-	{
-		Scale( x1, y1 );
-		Scale( x2, y2 );
-		CBrush *pOldBrush = (CBrush*)m_pDC->SelectStockObject( NULL_BRUSH );
-		bool bResult =  m_pDC->Rectangle( (int)x1, (int)y1, (int)x2+1, (int)y2+1 ) != 0;
-		m_pDC->SelectObject( pOldBrush );
-		return bResult;
-	}
-
-	bool DrawRect( const CFRect &Rect )
-	{
-		CFRect NewRect = Scale( Rect );
-		CBrush *pOldBrush = (CBrush*)m_pDC->SelectStockObject( NULL_BRUSH );
-		bool bResult =  m_pDC->Rectangle( (int)NewRect.left, (int)NewRect.top, (int)NewRect.right+1, (int)NewRect.bottom+1 ) != 0;
-		m_pDC->SelectObject( pOldBrush );
-		return bResult;
-	}
-
-	void FillRect( CFRect* pRect, CBrush* pBrush )
-	{
-		CFRect UseRect = *pRect;
-		Scale( UseRect.left, UseRect.top );
-		Scale( UseRect.right, UseRect.bottom );
-		UseRect.right++;
-		UseRect.bottom++;
-		CRect PixelRect( (int)UseRect.left, (int)UseRect.top, (int)UseRect.right, (int)UseRect.bottom );
-		m_pDC->FillRect( &PixelRect, pBrush );
-	}
-
-	//COLORREF SetPixel( double x, double y, COLORREF crColor )
-	//{
-	//	Scale( x, y );
-	//	return m_pDC->SetPixel( (int)x, (int)y, crColor );
-	//}
-
-	CPen* SelectObject( CPen* pPen )
-	{
-		if( m_Scale <= 1 )
-			return m_pDC->SelectObject( pPen );
-
-		EXTLOGPEN LogPen;
-		if( pPen == 0 || pPen->GetExtLogPen( &LogPen ) == 0 )
-			return m_pDC->SelectObject( pPen );
-		else
-		{
-			/*
-			 * Check for a pen that we created.
-			 */
-
-			POSITION Position = m_CreatedPens.GetHeadPosition();
-			while( Position )
-			{
-				if( pPen == m_CreatedPens.GetNext( Position ) )
-					return m_pDC->SelectObject( pPen );
-			}
-
-			/*
-			 * Check for non-solid pens and don't scale their width since
-			 * larger pens cannot be non-solid at this time.
-			 */
-			if( LogPen.elpPenStyle != PS_SOLID )
-			{
-				double Viewport = m_pDC->GetViewportExt().cx;
-				double Window = m_pDC->GetWindowExt().cx;
-				double ExtraScale = Window / Viewport;
-
-				LOGBRUSH LogBrush;
-				LogBrush.lbColor = LogPen.elpColor;
-				LogBrush.lbStyle = PS_SOLID;
-
-				const DWORD DashStyle[2] = { (DWORD)( 4 * m_Scale * m_DPIScale ), (DWORD)( 4 * m_Scale * m_DPIScale ) };
-
-				CPen *pPen = new CPen( PS_GEOMETRIC | PS_USERSTYLE, (int)( LogPen.elpWidth * m_Scale * m_DPIScale ), &LogBrush, 2, DashStyle );
-
-				m_CreatedPens.AddTail( pPen );
-
-				return m_pDC->SelectObject( pPen );
-			}
-
-			LogPen.elpWidth = (int)( LogPen.elpWidth * m_Scale * m_DPIScale );
-
-			CPen *pPen = new CPen( LogPen.elpPenStyle, LogPen.elpWidth, LogPen.elpColor );
-			if( pPen == 0 )
-				return m_pDC->SelectObject( pPen );
-
-			m_CreatedPens.AddTail( pPen );
-
-			return m_pDC->SelectObject( pPen );
-		}
-		return 0;
-	}
-
-	CFont* SelectObject( CFont* pFont, double FontHeight )
-	{
-		// Using GDI rendering so ignore font height.
-
-		if( m_Scale <= 1 )
-			return m_pDC->SelectObject( pFont );
-
-		LOGFONT LogFont;
-		if( pFont->GetLogFont( &LogFont ) == 0 )
-			return m_pDC->SelectObject( pFont );
-		else
-		{
-			if( !m_bCreatedFont || memcmp( &LogFont, &m_ScaledLogFont, sizeof( LOGFONT ) ) != 0 )
-			{
-				m_ScaledFont.DeleteObject();
-				LogFont.lfHeight = (int)( LogFont.lfHeight * m_Scale * m_DPIScale );
-				LogFont.lfWidth = (int)( LogFont.lfWidth * m_Scale * m_DPIScale );
-				m_ScaledFont.CreateFontIndirect( &LogFont );
-				m_bCreatedFont = true;
-				memcpy( &m_ScaledLogFont, &LogFont, sizeof( LOGFONT ) );
-			}
-			return m_pDC->SelectObject( &m_ScaledFont );
-		}
-	}
-
-	CBitmap* SelectObject( CBitmap* pBitmap )
-		{ return m_pDC->SelectObject( pBitmap ); }
-
-	int SelectObject( CRgn* pRgn )
-		{ return m_pDC->SelectObject( pRgn ); }
-
-	CBrush* SelectObject( CBrush *pBrush )
-		{ return m_pDC->SelectObject( pBrush ); }
-
-	CFPoint GetTextExtent( const char *pString, int Count )
-	{
-		CSize Size = m_pDC->GetTextExtent( pString, Count );
-		CFPoint Result( Size.cx, Size.cy );
-		// Only adjust the scaling and not the position.
-		Result.x /= m_Scale * m_DPIScale;
-		Result.y /= m_Scale * m_DPIScale;
-		return Result;
-	}
-
-	int GetPenSize( int UnscaledSize )
-	{
-		return max( (int)( UnscaledSize * m_Scale * m_DPIScale ), 1 );
-	}
-
-	bool DrawArrow( CFPoint FromPoint, CFPoint ToPoint, double Width, double Length )
-	{
-		CPen* pPen = m_pDC->GetCurrentPen();
-		LOGPEN LogPen;
-		if( pPen->GetLogPen( &LogPen ) == 0 )
-			return FALSE;
-		COLORREF PenColor = LogPen.lopnColor;
-		double Red = GetRValue( PenColor ) / 255.0;
-		double Green = GetGValue( PenColor ) / 255.0;
-		double Blue = GetBValue( PenColor ) / 255.0;
-
-		CFLine Line( ToPoint, FromPoint );
-		Line.SetDistance( Length );
-
-		if( m_Scale <= 1.0 )
-		{
-			// Darken the color of the pen for the fake arrow.
-			Red *= 0.3;
-			Green *= 0.3;
-			Blue *= 0.3;
-
-			COLORREF NewColor = RGB( (int)( Red * 255 ), (int)( Green * 255 ), (int)( Blue * 255 ) );
-			CPen Pen( LogPen.lopnStyle, LogPen.lopnWidth.x, NewColor );
-
-			CPen *pOldPen = (CPen*)m_pDC->SelectObject( &Pen );
-
-			MoveTo( Line.GetStart() );
-			LineTo( Line.GetEnd() );
-
-			m_pDC->SelectObject( pOldPen );
-		}
-		else
-		{
-			CBrush Brush;
-			Red *= 0.85;
-			Green *= 0.85;
-			Blue *= 0.85;
-			COLORREF NewColor = RGB( (int)( Red * 255.0 ), (int)( Green * 255.0 ), (int)( Blue * 255.0 ) );
-			Brush.CreateSolidBrush( NewColor );
-
-			CFLine CrossLine;
-			Line.PerpendicularLine( CrossLine, Width / 2, 1 );
-			CrossLine.ReverseDirection();
-			CrossLine.SetDistance( Width );
-			CPen *pOldPen = (CPen*)m_pDC->SelectStockObject( NULL_PEN );
-
-			POINT Points[3];
-			Points[0].x = (int)Scale( CrossLine.GetStart() ).x;
-			Points[0].y = (int)Scale( CrossLine.GetStart() ).y;
-			Points[1].x = (int)Scale( CrossLine.GetEnd() ).x;
-			Points[1].y = (int)Scale( CrossLine.GetEnd() ).y;
-			Points[2].x = (int)Scale( ToPoint ).x;
-			Points[2].y = (int)Scale( ToPoint ).y;
-
-			CRgn Region;
-			Region.CreatePolygonRgn( Points, 3, ALTERNATE );
-			m_pDC->FillRgn( &Region, &Brush );
-			m_pDC->SelectObject( pOldPen );
-		}
-
-		return TRUE;
-	}
-};
-
 #if defined( LINKAGE_USE_DIRECT2D )
 
 class CD2DRenderer : public CRendererImplementation
@@ -2412,9 +1895,50 @@ class CD2DRenderer : public CRendererImplementation
 		return Old;
 	}
 
-	bool FillRgn( CRgn* pRgn, CBrush* pBrush )
+	bool FillRgn( CFPoint *pPoints, int Count, CBrush* pBrush )
 	{
-		return m_pDC->FillRgn( pRgn, pBrush ) != 0;
+		if( Count <= 0 || pPoints == 0 )
+			return false;
+
+		LOGBRUSH LogBrush;
+		if( pBrush->GetLogBrush( &LogBrush ) == 0 )
+			return FALSE;
+		COLORREF BrushColor = LogBrush.lbColor;
+		float Red = GetRValue( BrushColor ) / 255.0f;
+		float Green = GetGValue( BrushColor ) / 255.0f;
+		float Blue = GetBValue( BrushColor ) / 255.0f;
+
+		D2D1_COLOR_F UseColor;
+		UseColor.r = Red;
+		UseColor.g = Green;
+		UseColor.b = Blue;
+		UseColor.a = 1;  // Opaque.
+
+		CComPtr<ID2D1SolidColorBrush> pTempBrush = NULL;
+		m_pRenderTarget->CreateSolidColorBrush( UseColor, &pTempBrush );
+
+		ID2D1PathGeometry *pRegionGeometry = 0;
+		ID2D1Factory* pD2D1Factory = GetD2D1Factory();
+		pD2D1Factory->CreatePathGeometry( &pRegionGeometry ) ;
+
+	    ID2D1GeometrySink *pSink = NULL;
+		pRegionGeometry->Open(&pSink);
+        pSink->SetFillMode( D2D1_FILL_MODE_WINDING );
+
+        pSink->BeginFigure( D2D1::Point2F( (float)pPoints[0].x, (float)pPoints[0].y ), D2D1_FIGURE_BEGIN_FILLED );
+
+		for( int Index = 1; Index < Count; ++Index )
+			pSink->AddLine( D2D1::Point2F( (float)pPoints[Index].x, (float)pPoints[Index].y ) );
+
+		pSink->EndFigure( D2D1_FIGURE_END_CLOSED );
+		pSink->Close();
+
+		m_pRenderTarget->FillGeometry( pRegionGeometry, pTempBrush );
+
+		pSink->Release();
+		pRegionGeometry->Release();
+
+		return true;
 	}
 
 	void SaveToFile( const char *pFileName ) {}
@@ -2490,10 +2014,7 @@ class CD2DRenderer : public CRendererImplementation
 		double x2 = Circle.x + Circle.r;
 		double y2 = Circle.y + Circle.r;
 
-		Scale( x1, y1 );
-		Scale( x2, y2 );
-
-		return m_pDC->Ellipse( (int)( x1 ), (int)( y1 ), (int)( x2 ) + 1, (int)( y2 ) + 1 ) != 0;
+		return Arc( x1, y1, x2, y2, y1, x1, y1, x1, false );
 	}
 
 	bool Arc( CFArc &TheArc )
@@ -2503,6 +2024,9 @@ class CD2DRenderer : public CRendererImplementation
 
 	bool Arc( double x1, double y1, double x2, double y2, double x3, double y3, double x4, double y4, bool bDrawTo = false )
 	{
+		if( bDrawTo )
+			LineTo( x3, y3 );
+
 		Scale( x1, y1 );
 		Scale( x2, y2 );
 		Scale( x3, y3 );
@@ -2623,17 +2147,116 @@ class CD2DRenderer : public CRendererImplementation
 
 	bool Pie( double x, double y, double r, double x3, double y3, double x4, double y4, bool bDrawTo )
 	{
-		double x2 = x + r;
-		double y2 = y + r;
-		x -= r;
-		y -= r;
+		if( bDrawTo )
+			LineTo( x3, y3 );
 
 		Scale( x, y );
-		Scale( x2, y2 );
+		Scale( r );
 		Scale( x3, y3 );
 		Scale( x4, y4 );
 
-		return m_pDC->Pie( (int)x, (int)y, (int)x2+1, (int)y2+1, (int)x3, (int)y3, (int)x4, (int)y4 ) != 0;
+		// Convert the box-type arc drawing of GDI into the start/end info for the Direct2D ArcSegment.
+		CFPoint Center( x, y );
+		double Radius = r;
+		double StartAngle = GetAngle( Center, CFPoint( x3, y3 ) );
+		double EndAngle = GetAngle( Center, CFPoint( x4, y4 ) );
+
+		CBrush *pBrush = m_pDC->GetCurrentBrush();
+		LOGBRUSH LogBrush;
+		if( pBrush->GetLogBrush( &LogBrush ) == 0 )
+			return FALSE;
+		COLORREF BrushColor = LogBrush.lbColor;
+		float Red = GetRValue( BrushColor ) / 255.0f;
+		float Green = GetGValue( BrushColor ) / 255.0f;
+		float Blue = GetBValue( BrushColor ) / 255.0f;
+
+		D2D1_COLOR_F UseColor;
+		UseColor.r = Red;
+		UseColor.g = Green;
+		UseColor.b = Blue;
+		UseColor.a = 1;  // Opaque.
+
+		CComPtr<ID2D1SolidColorBrush> pTempBrush = NULL;
+		m_pRenderTarget->CreateSolidColorBrush( UseColor, &pTempBrush );
+
+		ID2D1PathGeometry *pCircleGeometry = 0;
+		ID2D1Factory* pD2D1Factory = GetD2D1Factory();
+		pD2D1Factory->CreatePathGeometry( &pCircleGeometry ) ;
+
+	    ID2D1GeometrySink *pSink = NULL;
+		pCircleGeometry->Open(&pSink);
+        pSink->SetFillMode( D2D1_FILL_MODE_WINDING );
+
+		if( StartAngle == EndAngle )
+		{
+	        pSink->BeginFigure( D2D1::Point2F( (float)( Center.x - Radius ), (float)Center.y ), D2D1_FIGURE_BEGIN_FILLED );
+
+			// Add the top half circle
+			pSink->AddArc(
+				D2D1::ArcSegment(
+				D2D1::Point2F( (float)( Center.x + Radius ), (float)Center.y ), // end point of the top half circle, also the start point of the bottom half circle
+				D2D1::SizeF((float)Radius, (float)Radius), // radius
+				0.0f, // rotation angle
+				D2D1_SWEEP_DIRECTION_CLOCKWISE,
+				D2D1_ARC_SIZE_SMALL
+				));            
+
+			// Add the bottom half circle
+			pSink->AddArc(
+				D2D1::ArcSegment(
+				D2D1::Point2F( (float)( Center.x - Radius ), (float)Center.y ), // end point of the bottom half circle
+				D2D1::SizeF((float)Radius, (float)Radius),   // radius of the bottom half circle, same as previous one.
+				0.0f, // rotation angle
+				D2D1_SWEEP_DIRECTION_CLOCKWISE,
+				D2D1_ARC_SIZE_SMALL
+				));       
+
+			pSink->EndFigure( D2D1_FIGURE_END_CLOSED );
+		}
+		else
+		{
+			D2D1_SWEEP_DIRECTION SweepDirection = m_ArcDirection == AD_CLOCKWISE ? D2D1_SWEEP_DIRECTION_CLOCKWISE : D2D1_SWEEP_DIRECTION_COUNTER_CLOCKWISE;
+
+			double TotalAngle = 0;
+			if( m_ArcDirection == AD_CLOCKWISE )
+			{
+				if( StartAngle > EndAngle )
+					TotalAngle = ( 360 - StartAngle ) + EndAngle;
+				else
+					TotalAngle = EndAngle - StartAngle;
+			}
+			else
+			{
+				if( StartAngle > EndAngle )
+					TotalAngle = StartAngle - EndAngle;
+				else
+					TotalAngle = ( 360 - EndAngle ) + StartAngle;
+			}
+
+
+	        pSink->BeginFigure( D2D1::Point2F( (float)x3, (float)y3 ), D2D1_FIGURE_BEGIN_FILLED );
+			pSink->AddArc(
+				D2D1::ArcSegment(
+				D2D1::Point2F( (float)x4, (float)y4 ), // end point of the top half circle, also the start point of the bottom half circle
+				D2D1::SizeF((float)Radius, (float)Radius), // radius
+				0.0f, // rotation angle
+				SweepDirection,
+				TotalAngle >= 180 ? D2D1_ARC_SIZE_LARGE : D2D1_ARC_SIZE_SMALL
+				));            
+
+			pSink->EndFigure( D2D1_FIGURE_END_CLOSED );
+		}
+
+		pSink->Close();
+
+		m_pRenderTarget->FillGeometry( pCircleGeometry, pTempBrush );
+
+		pSink->Release();
+		pCircleGeometry->Release();
+
+		m_CurrentPosition.SetPoint( x4, y4 );
+
+		return true;
 	}
 
 	bool DrawRect( double RotationAngle, double x1, double y1, double x2, double y2 )
@@ -2704,12 +2327,6 @@ class CD2DRenderer : public CRendererImplementation
 		CRect PixelRect( (int)UseRect.left, (int)UseRect.top, (int)UseRect.right, (int)UseRect.bottom );
 		m_pDC->FillRect( &PixelRect, pBrush );
 	}
-
-	//COLORREF SetPixel( double x, double y, COLORREF crColor )
-	//{
-	//	Scale( x, y );
-	//	return m_pDC->SetPixel( (int)x, (int)y, crColor );
-	//}
 
 	CPen* SelectObject( CPen* pPen )
 	{
@@ -2795,9 +2412,9 @@ class CD2DRenderer : public CRendererImplementation
 
 	CBitmap* SelectObject( CBitmap* pBitmap )
 	{
-		// Create the Direct2D render target here so that he device context has a bitmap to draw into.
+		// Create the Direct2D render target here so that the device context has a bitmap to draw into.
 		// Maybe this can be done earlier but there may be a requirement to have the bitmap selected before
-		// doig the Direct2D stuff.
+		// doing the Direct2D stuff.
 
 		CBitmap *pOldBitmap = m_pDC->SelectObject( pBitmap );
 
@@ -3333,9 +2950,6 @@ CRenderer::CRenderer( enum _RenderDestination RendererDestination )
 			break;
 		case WINDOWS_GDI:
 			m_pImplementation = new CGDIRenderer( false );
-			break;
-		case WINDOWS_GDIPLUS:
-			m_pImplementation = new CGDIPlusRenderer( false );
 			break;
 		case DXF_FILE:
 			m_pImplementation = new CDXFRenderer();
