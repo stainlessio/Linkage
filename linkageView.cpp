@@ -54,6 +54,7 @@ static const int OFFSET_INCREMENT = 25;
 static const int RADIUS_MEASUREMENT_OFFSET = 9;
 
 static COLORREF COLOR_ADJUSTMENTKNOBS = RGB( 0, 0, 0 );
+static COLORREF COLOR_BLACK = RGB( 0, 0, 0 );
 static COLORREF COLOR_NONADJUSTMENTKNOBS = RGB( 170, 170, 170 );
 static COLORREF COLOR_ALIGNMENTHINT = RGB( 170, 220, 170 );
 static COLORREF COLOR_SNAPHINT = RGB( 170, 170, 240 );
@@ -68,6 +69,7 @@ static COLORREF COLOR_DRAWINGDARK = RGB( 70, 70, 70 );
 static COLORREF COLOR_GRID = RGB( 200, 240, 240 );
 static COLORREF COLOR_GROUND = RGB( 100, 100, 100 );
 static COLORREF COLOR_MINORSELECTION = RGB( 170, 170, 170 );
+static COLORREF COLOR_LASTSELECTION = RGB( 196, 96, 96 );
 
 static const int CONNECTORRADIUS = 5;
 static const int CONNECTORTRIANGLE = 6;
@@ -1525,7 +1527,7 @@ CFArea CLinkageView::DrawMechanism( CRenderer* pRenderer )
 		pRenderer->FillRect( &RealRect, &Brush );
 	}
 
-	pRenderer->SelectObject( m_pUsingFont, UnscaledUnits( SMALL_FONT_SIZE ) );
+	pRenderer->SelectObject( m_pUsingFont, UnscaledUnits( m_UsingFontHeight ) );
 	pRenderer->SetTextColor( COLOR_TEXT );
 
 	POSITION Position = 0;
@@ -1885,7 +1887,7 @@ CFArea CLinkageView::DrawPartsList( CRenderer* pRenderer )
 	if( m_bShowGrid )
 		DrawGrid( pRenderer );
 
-	pRenderer->SelectObject( m_pUsingFont, UnscaledUnits( SMALL_FONT_SIZE ) );
+	pRenderer->SelectObject( m_pUsingFont, UnscaledUnits( m_UsingFontHeight ) );
 	pRenderer->SetTextColor( COLOR_TEXT );
 
 	CFPoint StartPoint = Area.TopLeft();
@@ -2110,7 +2112,9 @@ void CLinkageView::OnDraw( CDC* pDC, CPrintInfo *pPrintInfo )
 		 * capture area.
 		 */
 
+		Renderer.EndDraw();
 		SaveVideoFrame( &Renderer, m_DrawingRect );
+		Renderer.BeginDraw();
 	}
 
 	if( m_bShowAnicrop )
@@ -4502,7 +4506,6 @@ void CLinkageView::OnUpdateViewLargeFont(CCmdUI *pCmdUI)
 void CLinkageView::OnViewLargeFont()
 {
 	m_bShowLargeFont = !m_bShowLargeFont;
-	m_pUsingFont = m_bShowLargeFont ? &m_MediumFont : &m_SmallFont;
 	SetupFont();
 	SaveSettings();
 	InvalidateRect( 0 );
@@ -5284,7 +5287,7 @@ void CLinkageView::DrawConnector( CRenderer* pRenderer, unsigned int OnLayers, C
 		{
 			CLinkageDoc* pDoc = GetDocument();
 			ASSERT_VALID(pDoc);
-			CBrush Brush( pDoc->GetLastSelectedConnector() == pConnector ? RGB( 196, 96, 96 ) : RGB( 0, 0, 0 ) );
+			CBrush Brush( pDoc->GetLastSelectedConnector() == pConnector ? COLOR_LASTSELECTION : COLOR_BLACK );
 			static const int BOX_SIZE = 5;
 			int Adjustment = ( BOX_SIZE - 1 ) / 2;
 			CFRect Rect( Point.x - Adjustment,  Point.y + AdjustYCoordinate( Adjustment ),  Point.x + Adjustment,  Point.y - AdjustYCoordinate( Adjustment ) );
@@ -5792,8 +5795,9 @@ CFArea CLinkageView::DrawMeasurementLine( CRenderer* pRenderer, CFLine &InputLin
 	if( bDrawLines )
 	{
 		CFLine Temp = MeasurementLine;
-		if( pRenderer->GetScale() > 1.0 )
-			Temp.MoveEnds( UnscaledUnits( 4 ), -UnscaledUnits( 4 ) );
+		Temp.MoveEnds( UnscaledUnits( 4 ), -UnscaledUnits( 4 ) );
+
+		MeasurementLine.MoveEnds( UnscaledUnits( 0.5 ), -UnscaledUnits( 0.5 ) );
 
 		pRenderer->DrawLine( Temp );
 		pRenderer->DrawArrow( MeasurementLine.GetEnd(), MeasurementLine.GetStart(), UnscaledUnits( 3 ), UnscaledUnits( 5 ) );
@@ -8159,9 +8163,14 @@ bool CLinkageView::DisplayAsImage( CDC *pOutputDC, int xOut, int yOut, int OutWi
 
 	double ScaleFactor = 4.0;
 
+	double SaveDPIScale = m_DPIScale;
+	m_DPIScale = 1.0;
+
 	PrepareRenderer( Renderer, &ImageRect, &MemoryBitmap, pDC, ScaleFactor, true, MarginScale, 1.0, false, true, false, 0 );
 
 	DoDraw( &Renderer );
+
+	m_DPIScale = SaveDPIScale;
 
 	CDC ShrunkDC;
 	CBitmap ShrunkBitmap;

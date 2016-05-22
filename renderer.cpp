@@ -4,7 +4,9 @@
 
 #if defined( LINKAGE_USE_DIRECT2D )
 #pragma comment( lib, "d2d1" )
+#pragma comment( lib, "Dwrite" )
 #include <d2d1.h>
+#include <dwrite.h>
 #endif
 
 static int ExpandPolygonCornerx( CFPoint &Point, CFPoint &PreviousPoint, CFPoint &NextPoint, double Distance, CFPoint &NewPoint1, CFPoint &NewPoint2 )
@@ -1680,6 +1682,16 @@ class CD2DRenderer : public CRendererImplementation
 		return pD2DFactory;
 	}
 
+	static IDWriteFactory* GetDWriteFactory( void )
+	{
+		static IDWriteFactory *pDWriteFactor = 0;
+		if( pDWriteFactor == 0 )
+		{
+			HRESULT hr = DWriteCreateFactory( DWRITE_FACTORY_TYPE_SHARED, __uuidof(pDWriteFactor), reinterpret_cast<IUnknown **>(&pDWriteFactor) );
+		}
+		return pDWriteFactor;
+	}
+
 	CList<CPen*,CPen*> m_CreatedPens;
 	ID2D1StrokeStyle *m_pSolidLineStroke = 0;
 	int m_ArcDirection;
@@ -1692,6 +1704,10 @@ class CD2DRenderer : public CRendererImplementation
 	CFPoint m_CurrentPosition;
 	ID2D1DCRenderTarget * m_pRenderTarget;
 	CRect m_Rect;
+	IDWriteTextFormat* m_pTextFormat;
+	double m_FontHeight;
+	unsigned int m_TextAlign;
+	CString m_FontName;
 
 	public:
 
@@ -1703,6 +1719,9 @@ class CD2DRenderer : public CRendererImplementation
 		m_bCreatedFont = false;
 		m_pDC = 0;
 		m_pRenderTarget = 0;
+		m_pTextFormat = 0;
+		m_FontHeight = 0;
+		m_TextAlign = TA_LEFT | TA_BOTTOM;
 		m_ArcDirection = AD_COUNTERCLOCKWISE;
 		memset( &m_ScaledLogFont, 0, sizeof( m_ScaledLogFont ) );
 
@@ -1754,10 +1773,8 @@ class CD2DRenderer : public CRendererImplementation
 
 	unsigned int SetTextAlign( unsigned int nFlags )
 	{
-		if( m_pDC == 0 )
-			return 0;
-
-		return m_pDC->SetTextAlign( nFlags );
+		m_TextAlign = nFlags;
+		return 0;
 	}
 
 	virtual void FillRect( LPCRECT lpRect, CBrush* pBrush )
@@ -1981,7 +1998,7 @@ class CD2DRenderer : public CRendererImplementation
         D2D1::Point2F( (float)m_CurrentPosition.x, (float)m_CurrentPosition.y ),
         D2D1::Point2F( (float)x1, (float)y1 ),
         pTempBrush,
-        (float)( LogPen.lopnWidth.x * 1.5 ),
+        (float)( LogPen.lopnWidth.x * m_DPIScale ),
 		m_pSolidLineStroke );
 
 		m_CurrentPosition.SetPoint( x1, y1 );
@@ -2004,7 +2021,95 @@ class CD2DRenderer : public CRendererImplementation
 	bool TextOut( double x, double y, const CString& str )
 	{
 		Scale( x, y );
-		return m_pDC->TextOut( (int)x, (int)y, str ) != 0;
+
+		COLORREF Color = m_pDC->GetTextColor();
+		float Red = GetRValue( Color ) / 255.0f;
+		float Green = GetGValue( Color ) / 255.0f;
+		float Blue = GetBValue( Color ) / 255.0f;
+
+		D2D1_COLOR_F UseColor;
+		UseColor.r = Red;
+		UseColor.g = Green;
+		UseColor.b = Blue;
+		UseColor.a = 1;  // Opaque.
+
+		CComPtr<ID2D1SolidColorBrush> pTempBrush = NULL;
+		m_pRenderTarget->CreateSolidColorBrush( UseColor, &pTempBrush );
+
+		// Convert to a wchar_t* from CStringA
+		const size_t newsizea = (str.GetLength() + 1);
+		size_t convertedCharsa = 0;
+		wchar_t *wcstring = new wchar_t[newsizea];
+		mbstowcs_s( &convertedCharsa, wcstring, newsizea, str, _TRUNCATE);
+
+		CFRect Rect( x, y, x, y );
+
+		DWRITE_TEXT_ALIGNMENT DWAlign = DWRITE_TEXT_ALIGNMENT_CENTER;
+		DWRITE_PARAGRAPH_ALIGNMENT DAPAlign = DWRITE_PARAGRAPH_ALIGNMENT_CENTER;
+
+		const unsigned int HORIZONTAL_MASK = TA_LEFT | TA_RIGHT | TA_CENTER;
+		const unsigned int VERTICAL_MASK = TA_TOP | TA_BOTTOM | TA_BASELINE;
+		
+		if( ( m_TextAlign & HORIZONTAL_MASK ) == TA_LEFT )
+		{
+			DWAlign = DWRITE_TEXT_ALIGNMENT_LEADING;
+			Rect.right += 1000;
+		}
+		else if( ( m_TextAlign & HORIZONTAL_MASK ) == TA_CENTER )
+		{
+			DWAlign = DWRITE_TEXT_ALIGNMENT_CENTER;
+			Rect.right += 500;
+			Rect.left -= 500;
+		}
+		else if( ( m_TextAlign & HORIZONTAL_MASK ) == TA_RIGHT )
+		{
+			DWAlign = DWRITE_TEXT_ALIGNMENT_TRAILING;
+			Rect.left -= 1000;
+		}
+
+		if( ( m_TextAlign & VERTICAL_MASK ) == TA_TOP )
+		{
+			DAPAlign = DWRITE_PARAGRAPH_ALIGNMENT_NEAR;
+			Rect.bottom += 1000;
+		}
+		else if( ( m_TextAlign & VERTICAL_MASK ) == TA_BASELINE )
+		{
+			DAPAlign = DWRITE_PARAGRAPH_ALIGNMENT_CENTER;
+			Rect.top -= 500;
+			Rect.bottom += 500;
+		}
+		else if( ( m_TextAlign & VERTICAL_MASK ) == TA_BOTTOM )
+		{
+			DAPAlign = DWRITE_PARAGRAPH_ALIGNMENT_FAR;
+			Rect.top -= 1000;
+		}
+
+		m_pTextFormat->SetTextAlignment( DWAlign );
+		m_pTextFormat->SetParagraphAlignment( DAPAlign );
+
+		D2D1_RECT_F layoutRect = D2D1::RectF( (float)Rect.left, (float)Rect.top, (float)Rect.right, (float)Rect.bottom );
+
+		D2D1_MATRIX_3X2_F Transform;
+		if( 0 )
+		{
+			m_pRenderTarget->GetTransform( &Transform );
+
+			// set a xxx degree rotation around the (100,100);
+			m_pRenderTarget->SetTransform( D2D1::Matrix3x2F::Rotation( 45, D2D1::Point2F((float)x,(float)y))); 
+		}
+
+		m_pRenderTarget->DrawText( 
+			wcstring,        // The string to render.
+			convertedCharsa,    // The string's length.
+			m_pTextFormat,    // The text format.
+			&layoutRect,       // The region of the window where the text will be rendered.
+			pTempBrush     // The brush used to draw the text.
+			);
+
+		if( 0 )
+			m_pRenderTarget->SetTransform( Transform); 
+
+		return true;
 	}
 
 	bool Circle( CFCircle &Circle )
@@ -2126,7 +2231,7 @@ class CD2DRenderer : public CRendererImplementation
 
 		pSink->Close();
 
-		m_pRenderTarget->DrawGeometry( pCircleGeometry, pTempBrush, (float)( LogPen.lopnWidth.x * 1.5 ), m_pSolidLineStroke );
+		m_pRenderTarget->DrawGeometry( pCircleGeometry, pTempBrush, (float)( LogPen.lopnWidth.x * m_DPIScale ), m_pSolidLineStroke );
 
 		pSink->Release();
 		pCircleGeometry->Release();
@@ -2319,13 +2424,19 @@ class CD2DRenderer : public CRendererImplementation
 
 	void FillRect( CFRect* pRect, CBrush* pBrush )
 	{
-		CFRect UseRect = *pRect;
-		Scale( UseRect.left, UseRect.top );
-		Scale( UseRect.right, UseRect.bottom );
-		UseRect.right++;
-		UseRect.bottom++;
-		CRect PixelRect( (int)UseRect.left, (int)UseRect.top, (int)UseRect.right, (int)UseRect.bottom );
-		m_pDC->FillRect( &PixelRect, pBrush );
+		*pRect = Scale( *pRect );
+
+		CFPoint Points[4];
+		Points[0].x = pRect->left;
+		Points[0].y = pRect->top;
+		Points[1].x = pRect->right;
+		Points[1].y = pRect->top;
+		Points[2].x = pRect->right;
+		Points[2].y = pRect->bottom;
+		Points[3].x = pRect->left;
+		Points[3].y = pRect->bottom;
+
+		FillRgn( Points, 4, pBrush );
 	}
 
 	CPen* SelectObject( CPen* pPen )
@@ -2387,27 +2498,40 @@ class CD2DRenderer : public CRendererImplementation
 
 	CFont* SelectObject( CFont* pFont, double FontHeight )
 	{
-		// Using GDI rendering so ignore font height.
-
-		if( m_Scale <= 1 )
-			return m_pDC->SelectObject( pFont );
+		if( pFont == 0 )
+			return 0;
 
 		LOGFONT LogFont;
 		if( pFont->GetLogFont( &LogFont ) == 0 )
-			return m_pDC->SelectObject( pFont );
-		else
-		{
-			if( !m_bCreatedFont || memcmp( &LogFont, &m_ScaledLogFont, sizeof( LOGFONT ) ) != 0 )
-			{
-				m_ScaledFont.DeleteObject();
-				LogFont.lfHeight = (int)( LogFont.lfHeight * m_Scale * m_DPIScale );
-				LogFont.lfWidth = (int)( LogFont.lfWidth * m_Scale * m_DPIScale );
-				m_ScaledFont.CreateFontIndirect( &LogFont );
-				m_bCreatedFont = true;
-				memcpy( &m_ScaledLogFont, &LogFont, sizeof( LOGFONT ) );
-			}
-			return m_pDC->SelectObject( &m_ScaledFont );
-		}
+			return 0;
+
+		if( m_pTextFormat != 0 && m_FontHeight == FontHeight && m_FontName == LogFont.lfFaceName )
+			return 0; // OK, we already have font stuff ready to go.
+
+		if( m_pTextFormat != 0 )
+			m_pTextFormat->Release();
+
+		m_pTextFormat = 0;
+
+		CStringW FontName( LogFont.lfFaceName );
+
+		IDWriteFactory *pDWriteFactory = GetDWriteFactory();
+
+		pDWriteFactory->CreateTextFormat(
+			(const wchar_t*)FontName,
+			0, 
+			DWRITE_FONT_WEIGHT_REGULAR,
+			DWRITE_FONT_STYLE_NORMAL,
+			DWRITE_FONT_STRETCH_NORMAL,
+			(float)( FontHeight * m_DPIScale ),
+			L"en-us",
+			&m_pTextFormat
+			);
+
+		m_FontHeight = FontHeight;
+		m_FontName = LogFont.lfFaceName;
+
+		return 0;
 	}
 
 	CBitmap* SelectObject( CBitmap* pBitmap )
@@ -2476,51 +2600,29 @@ class CD2DRenderer : public CRendererImplementation
 		CFLine Line( ToPoint, FromPoint );
 		Line.SetDistance( Length );
 
-		if( m_Scale <= 1.0 )
-		{
-			// Darken the color of the pen for the fake arrow.
-			Red *= 0.3;
-			Green *= 0.3;
-			Blue *= 0.3;
+		CBrush Brush;
+		Red *= 0.80;
+		Green *= 0.80;
+		Blue *= 0.80;
+		COLORREF NewColor = RGB( (int)( Red * 255.0 ), (int)( Green * 255.0 ), (int)( Blue * 255.0 ) );
+		Brush.CreateSolidBrush( NewColor );
 
-			COLORREF NewColor = RGB( (int)( Red * 255 ), (int)( Green * 255 ), (int)( Blue * 255 ) );
-			CPen Pen( LogPen.lopnStyle, LogPen.lopnWidth.x, NewColor );
+		CFLine CrossLine;
+		Line.PerpendicularLine( CrossLine, Width / 2, 1 );
+		CrossLine.ReverseDirection();
+		CrossLine.SetDistance( Width );
+		CPen *pOldPen = (CPen*)m_pDC->SelectStockObject( NULL_PEN );
 
-			CPen *pOldPen = (CPen*)m_pDC->SelectObject( &Pen );
+		CFPoint Points[3];
+		Points[0].x = Scale( CrossLine.GetStart() ).x;
+		Points[0].y = Scale( CrossLine.GetStart() ).y;
+		Points[1].x = Scale( CrossLine.GetEnd() ).x;
+		Points[1].y = Scale( CrossLine.GetEnd() ).y;
+		Points[2].x = Scale( ToPoint ).x;
+		Points[2].y = Scale( ToPoint ).y;
 
-			MoveTo( Line.GetStart() );
-			LineTo( Line.GetEnd() );
-
-			m_pDC->SelectObject( pOldPen );
-		}
-		else
-		{
-			CBrush Brush;
-			Red *= 0.85;
-			Green *= 0.85;
-			Blue *= 0.85;
-			COLORREF NewColor = RGB( (int)( Red * 255.0 ), (int)( Green * 255.0 ), (int)( Blue * 255.0 ) );
-			Brush.CreateSolidBrush( NewColor );
-
-			CFLine CrossLine;
-			Line.PerpendicularLine( CrossLine, Width / 2, 1 );
-			CrossLine.ReverseDirection();
-			CrossLine.SetDistance( Width );
-			CPen *pOldPen = (CPen*)m_pDC->SelectStockObject( NULL_PEN );
-
-			POINT Points[3];
-			Points[0].x = (int)Scale( CrossLine.GetStart() ).x;
-			Points[0].y = (int)Scale( CrossLine.GetStart() ).y;
-			Points[1].x = (int)Scale( CrossLine.GetEnd() ).x;
-			Points[1].y = (int)Scale( CrossLine.GetEnd() ).y;
-			Points[2].x = (int)Scale( ToPoint ).x;
-			Points[2].y = (int)Scale( ToPoint ).y;
-
-			CRgn Region;
-			Region.CreatePolygonRgn( Points, 3, ALTERNATE );
-			m_pDC->FillRgn( &Region, &Brush );
-			m_pDC->SelectObject( pOldPen );
-		}
+		FillRgn( Points, 3, &Brush );
+		m_pDC->SelectObject( pOldPen );
 
 		return TRUE;
 	}
