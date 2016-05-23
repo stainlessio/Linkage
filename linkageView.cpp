@@ -5367,7 +5367,8 @@ void CLinkageView::DrawConnector( CRenderer* pRenderer, unsigned int OnLayers, C
 		CBrush *pBrush = (CBrush*)pRenderer->SelectStockObject( NULL_BRUSH );
 		CPen CirclePen(  PS_SOLID, 1, pConnector->GetColor() );
 		CPen *pPen = pRenderer->SelectObject( &CirclePen );
-		pRenderer->Circle( Circle );
+		CFArc Arc( Circle.GetCenter(), Circle.r, Circle.GetCenter(), Circle.GetCenter() );
+		pRenderer->Arc( Arc );
 		pRenderer->SelectObject( pPen );
 		pRenderer->SelectObject( pBrush );
 	}
