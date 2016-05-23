@@ -289,7 +289,7 @@ void CControlWindow::OnPaint()
 			xTemp = x2 + ( m_pImplementation->m_ControlWidth / 2 ) + (int)( ( m_pImplementation->m_ControlWidth / 2 ) * m_pImplementation->m_Controls[Counter].m_Position );
 		else
 			xTemp = x2 + (int)( m_pImplementation->m_ControlWidth * m_pImplementation->m_Controls[Counter].m_Position );
-		int Offset = HalfSize * m_pImplementation->m_DPIScale;
+		int Offset = (int)( HalfSize * m_pImplementation->m_DPIScale );
 
 		CRect Box( xTemp - Offset, y - Offset, xTemp + Offset + 1, y + Offset + 1 );
 		MemoryDC.FrameRect( &Box, &BlackBrush );

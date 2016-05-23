@@ -68,8 +68,9 @@ static COLORREF COLOR_DRAWINGLIGHT = RGB( 200, 200, 200 );
 static COLORREF COLOR_DRAWINGDARK = RGB( 70, 70, 70 );
 static COLORREF COLOR_GRID = RGB( 200, 240, 240 );
 static COLORREF COLOR_GROUND = RGB( 100, 100, 100 );
-static COLORREF COLOR_MINORSELECTION = RGB( 170, 170, 170 );
+static COLORREF COLOR_MINORSELECTION = RGB( 190, 190, 190 );
 static COLORREF COLOR_LASTSELECTION = RGB( 196, 96, 96 );
+static COLORREF COLOR_MAJORSELECTION = RGB( 255, 200, 200 );
 
 static const int CONNECTORRADIUS = 5;
 static const int CONNECTORTRIANGLE = 6;
@@ -3477,10 +3478,6 @@ void CLinkageView::OnTimer(UINT_PTR nIDEvent)
 		m_bWasValid = false;
 	}
 
-	TickCount = GetTickCount() - TickCount;
-	if( TickCount > 15 )
-		TickCount = 15;
-
 	if( m_bRecordingVideo )
 	{
 		TickCount = 0;
@@ -3508,6 +3505,10 @@ void CLinkageView::OnTimer(UINT_PTR nIDEvent)
 
 	if( !m_bSimulating )
 		return;
+
+	TickCount = GetTickCount() - TickCount;
+	if( TickCount > 32 )
+		TickCount = 32;
 
 	m_TimerID = timeSetEvent( 33 - TickCount, 1, TimeProc, (DWORD_PTR)this, 0 );
 }
@@ -5047,7 +5048,7 @@ void CLinkageView::DrawConnector( CRenderer* pRenderer, unsigned int OnLayers, C
 	if( ( pConnector->GetLayers() & OnLayers ) == 0 )
 		return;
 
-	// Draw only the connector in the proper fashion
+	// Draw only the connector in the proper fashioni
 	CPen Pen;
 	CPen BlackPen( PS_SOLID, 1, RGB( 0, 0, 0 ) );
 	CPen* pOldPen = 0;
@@ -5292,7 +5293,21 @@ void CLinkageView::DrawConnector( CRenderer* pRenderer, unsigned int OnLayers, C
 			int Adjustment = ( BOX_SIZE - 1 ) / 2;
 			CFRect Rect( Point.x - Adjustment,  Point.y + AdjustYCoordinate( Adjustment ),  Point.x + Adjustment,  Point.y - AdjustYCoordinate( Adjustment ) );
 
+			#if defined( LINKAGE_USE_DIRECT2D )
+				// Selection is only shown on-screen and Direct2D makes the rectangle look too small. So enlarge it.
+				Rect.InflateRect( 1, 1 );
+			#endif
 			pRenderer->FillRect( &Rect, &Brush );
+
+			Rect.SetRect( Point.x,  Point.y,  Point.x,  Point.y );
+			//Rect = Scale( Rect );
+			Rect.InflateRect( 2 * m_ConnectorRadius, 2 * m_ConnectorRadius );
+
+			CPen GrayPen;
+			GrayPen.CreatePen( PS_SOLID, 1, pDoc->GetLastSelectedConnector() == pConnector ? COLOR_MAJORSELECTION : COLOR_MINORSELECTION ) ;
+			pRenderer->SelectObject( &GrayPen );
+
+			pRenderer->DrawRect( Rect );
 
 			DrawFasteners( pRenderer, OnLayers, pConnector );
 		}
@@ -6377,7 +6392,7 @@ void CLinkageView::DrawLink( CRenderer* pRenderer, const GearConnectionList *pGe
 				CLinkageDoc* pDoc = GetDocument();
 				ASSERT_VALID(pDoc);
 
-				GrayPen.CreatePen( PS_SOLID, 1, pDoc->GetLastSelectedLink() == pLink ? RGB( 255, 200, 200 ) : COLOR_MINORSELECTION ) ;
+				GrayPen.CreatePen( PS_SOLID, 1, pDoc->GetLastSelectedLink() == pLink ? COLOR_MAJORSELECTION : COLOR_MINORSELECTION ) ;
 				pOldPen = pRenderer->SelectObject( &GrayPen );
 
 				CFRect AreaRect;
@@ -6653,8 +6668,8 @@ void CLinkageView::DrawLink( CRenderer* pRenderer, const GearConnectionList *pGe
 						pRenderer->SelectObject( &GearPen );
 						for( std::list<double>::iterator it = RadiusList.begin(); it != RadiusList.end(); ++it )
 						{
-							CFCircle Circle( Scale( pGearConnector->GetPoint() ), Scale( *it ) );
-							pRenderer->Circle( Circle );
+							CFArc Arc( Scale( pGearConnector->GetPoint() ), Scale( *it ), pGearConnector->GetPoint(), pGearConnector->GetPoint() );
+							pRenderer->Arc( Arc );
 						}
 					}
 

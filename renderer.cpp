@@ -1988,7 +1988,7 @@ class CD2DRenderer : public CRendererImplementation
 		UseColor.b = Blue;
 		UseColor.a = 1;  // Opaque.
 
-		CComPtr<ID2D1SolidColorBrush> pTempBrush = NULL;
+		ID2D1SolidColorBrush* pTempBrush = NULL;
 		m_pRenderTarget->CreateSolidColorBrush( UseColor, &pTempBrush );
 
 		ID2D1PathGeometry *pRegionGeometry = 0;
@@ -2010,6 +2010,7 @@ class CD2DRenderer : public CRendererImplementation
 		m_pRenderTarget->FillGeometry( pRegionGeometry, pTempBrush );
 
 		pSink->Release();
+		pTempBrush->Release();
 		pRegionGeometry->Release();
 
 		return true;
@@ -2058,7 +2059,7 @@ class CD2DRenderer : public CRendererImplementation
 		else
 			return 0;
 
-		CComPtr<ID2D1SolidColorBrush> pTempBrush = 0;
+		ID2D1SolidColorBrush* pTempBrush = 0;
 		m_pRenderTarget->CreateSolidColorBrush( UseColor, &pTempBrush );
 
 		m_pRenderTarget->DrawLine(
@@ -2067,6 +2068,8 @@ class CD2DRenderer : public CRendererImplementation
         pTempBrush,
         (float)(PenWidth * m_DPIScale ),
 		pStrokeStyle );
+
+		pTempBrush->Release();
 
 		m_CurrentPosition.SetPoint( x1, y1 );
 
@@ -2100,7 +2103,7 @@ class CD2DRenderer : public CRendererImplementation
 		UseColor.b = Blue;
 		UseColor.a = 1;  // Opaque.
 
-		CComPtr<ID2D1SolidColorBrush> pTempBrush = NULL;
+		ID2D1SolidColorBrush* pTempBrush = NULL;
 		m_pRenderTarget->CreateSolidColorBrush( UseColor, &pTempBrush );
 
 		// Convert to a wchar_t* from CStringA
@@ -2173,8 +2176,10 @@ class CD2DRenderer : public CRendererImplementation
 			pTempBrush     // The brush used to draw the text.
 			);
 
+		pTempBrush->Release();
+
 		if( 0 )
-			m_pRenderTarget->SetTransform( Transform); 
+			m_pRenderTarget->SetTransform( Transform ); 
 
 		return true;
 	}
@@ -2186,7 +2191,7 @@ class CD2DRenderer : public CRendererImplementation
 		double x2 = Circle.x + Circle.r;
 		double y2 = Circle.y + Circle.r;
 
-		return Arc( x1, y1, x2, y2, y1, x1, y1, x1, false );
+		return Pie( Circle.x, Circle.y, Circle.r, y1, x1, y1, x1, false );
 	}
 
 	bool Arc( CFArc &TheArc )
@@ -2236,7 +2241,7 @@ class CD2DRenderer : public CRendererImplementation
 		else
 			return 0;
 
-		CComPtr<ID2D1SolidColorBrush> pTempBrush = 0;
+		ID2D1SolidColorBrush* pTempBrush = 0;
 		m_pRenderTarget->CreateSolidColorBrush( UseColor, &pTempBrush );
 
 		ID2D1PathGeometry *pCircleGeometry = 0;
@@ -2312,6 +2317,7 @@ class CD2DRenderer : public CRendererImplementation
 		m_pRenderTarget->DrawGeometry( pCircleGeometry, pTempBrush, (float)( LogPen.lopnWidth.x * m_DPIScale ), pStrokeStyle );
 
 		pSink->Release();
+		pTempBrush->Release();
 		pCircleGeometry->Release();
 
 		m_CurrentPosition.SetPoint( x4, y4 );
@@ -2359,7 +2365,7 @@ class CD2DRenderer : public CRendererImplementation
 		UseColor.b = Blue;
 		UseColor.a = 1;  // Opaque.
 
-		CComPtr<ID2D1SolidColorBrush> pTempBrush = NULL;
+		ID2D1SolidColorBrush* pTempBrush = NULL;
 		m_pRenderTarget->CreateSolidColorBrush( UseColor, &pTempBrush );
 
 		ID2D1PathGeometry *pCircleGeometry = 0;
@@ -2435,6 +2441,7 @@ class CD2DRenderer : public CRendererImplementation
 		m_pRenderTarget->FillGeometry( pCircleGeometry, pTempBrush );
 
 		pSink->Release();
+		pTempBrush->Release();
 		pCircleGeometry->Release();
 
 		m_CurrentPosition.SetPoint( x4, y4 );
