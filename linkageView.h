@@ -113,6 +113,7 @@ private:
 	typedef enum _AdjustmentType { ADJUSTMENT_NONE, ADJUSTMENT_ROTATE, ADJUSTMENT_STRETCH } AdjustmentType;
 	typedef enum _AdjustmentControl { AC_ROTATE, AC_TOP_LEFT, AC_TOP, AC_TOP_RIGHT, AC_RIGHT, AC_BOTTOM_RIGHT, AC_BOTTOM, AC_BOTTOM_LEFT, AC_LEFT } AdjustmentControl;
 	typedef enum _MouseAction { ACTION_NONE = 0, ACTION_SELECT, ACTION_DRAG, ACTION_ROTATE, ACTION_PAN, ACTION_RECENTER, ACTION_STRETCH } MouseAction;
+	typedef enum _ArrowDirection { ARROW_UP, ARROW_DOWN, ARROW_LEFT, ARROW_RIGHT } ArrowDirection;
 
 	CSimulator m_Simulator;
 
@@ -225,8 +226,9 @@ private:
 	CRect PrepareRenderer( CRenderer &Renderer, CRect *pDrawRect, CBitmap *pBitmap, CDC *pDC, double ForceScaling, bool bScaleToFit, double MarginScale, double UnscaledUnitSize, bool bForScreen, bool bAntiAlias, bool bActualSize, int PageNumber );
 	int GetPrintPageCount( CDC *pDC, CPrintInfo *pPrintInfo, bool bPrintActualSize );
 	void DrawAdjustmentControls( CRenderer *pRenderer );
-	void GetAdjustmentControlRect( AdjustmentControl Control, CFRect &Rect );
+	void DrawRotationControl( CRenderer *pRenderer, CFRect &Rect, enum CLinkageView::_AdjustmentControl AdjustmentControl );
 	void GetAdjustmentControlRect( AdjustmentControl Control, CRect &Rect );
+	void GetAdjustmentControlRect( AdjustmentControl Control, CFRect &Rect );
 		
 	bool SelectVideoBox( UINT nFlags, CPoint Point );
 	bool GrabAdjustmentControl( CFPoint Point, CFPoint GrabPoint, _AdjustmentControl CheckControl, MouseAction DoMouseAction, _AdjustmentControl *pSelectControl, CFPoint *pDragOffset, MouseAction *pMouseAction );

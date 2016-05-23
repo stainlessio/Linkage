@@ -32,11 +32,11 @@ Global
 		{1507094B-5BDC-469C-9CA2-C88F1ACD6703}.ReleaseDirect2D|x86.ActiveCfg = ReleaseDirect2D|Win32
 		{1507094B-5BDC-469C-9CA2-C88F1ACD6703}.ReleaseDirect2D|x86.Build.0 = ReleaseDirect2D|Win32
 		{D90E0EB0-73C1-43C8-91CC-4DE3C9177F55}.Debug|x86.ActiveCfg = Debug|x86
-		{D90E0EB0-73C1-43C8-91CC-4DE3C9177F55}.DebugDirect2D|x86.ActiveCfg = Debug|x86
+		{D90E0EB0-73C1-43C8-91CC-4DE3C9177F55}.DebugDirect2D|x86.ActiveCfg = DebugDirect2D|x86
 		{D90E0EB0-73C1-43C8-91CC-4DE3C9177F55}.Release|x86.ActiveCfg = Release|x86
 		{D90E0EB0-73C1-43C8-91CC-4DE3C9177F55}.Release|x86.Build.0 = Release|x86
-		{D90E0EB0-73C1-43C8-91CC-4DE3C9177F55}.ReleaseDirect2D|x86.ActiveCfg = Release|x86
-		{D90E0EB0-73C1-43C8-91CC-4DE3C9177F55}.ReleaseDirect2D|x86.Build.0 = Release|x86
+		{D90E0EB0-73C1-43C8-91CC-4DE3C9177F55}.ReleaseDirect2D|x86.ActiveCfg = ReleaseDirect2D|x86
+		{D90E0EB0-73C1-43C8-91CC-4DE3C9177F55}.ReleaseDirect2D|x86.Build.0 = ReleaseDirect2D|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

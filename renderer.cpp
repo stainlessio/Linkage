@@ -3022,6 +3022,15 @@ CDC * CRenderer::GetDC( void )
 	return m_pImplementation->GetDC();
 }
 
+int CRenderer::SetArcDirection( int Direction )
+{
+	if( m_pImplementation == 0 )
+		return AD_CLOCKWISE;
+
+	return m_pImplementation->SetArcDirection( Direction );
+}
+
+
 bool CRenderer::PatBlt( int x, int y, int nWidth, int nHeight, DWORD dwRop )
 {
 	if( m_pImplementation == 0 )

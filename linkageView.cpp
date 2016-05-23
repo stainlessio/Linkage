@@ -604,7 +604,6 @@ void CLinkageView::GetAdjustmentControlRect( AdjustmentControl Control, CFRect &
 		{
 			case AC_ROTATE:
 			{
-				//CPoint PixelPoint = TempDC.UnscalePoint( m_SelectionRotatePoint );
 				CFPoint PixelPoint = Scale( m_SelectionRotatePoint );
 				Rect.SetRect( PixelPoint.x - 7, PixelPoint.y - 7, PixelPoint.x + 7, PixelPoint.y + 7 );
 				break;
@@ -669,76 +668,167 @@ void CLinkageView::GetAdjustmentControlRect( AdjustmentControl Control, CFRect &
 	}
 }
 
+void CLinkageView::DrawRotationControl( CRenderer *pRenderer, CFRect &Rect, enum CLinkageView::_AdjustmentControl AdjustmentControl )
+{
+	#if defined( LINKAGE_USE_DIRECT2D )
+		if( AdjustmentControl == AC_ROTATE )
+		{
+			double Radius = 6*m_DPIScale;
+			double SmallRadius = 4*m_DPIScale;
+			CFArc Arc( Rect.GetCenter(), Radius, Rect.TopLeft(), Rect.TopLeft() );
+			pRenderer->Arc( Arc );
+			pRenderer->Circle( CFCircle( Arc.x, Arc.y, 1.5 ) );
+			pRenderer->DrawLine( CFPoint( Arc.x-Radius-1, Arc.y ), CFPoint( Arc.x-SmallRadius, Arc.y ) );
+			pRenderer->DrawLine( CFPoint( Arc.x+Radius+1, Arc.y ), CFPoint( Arc.x+SmallRadius, Arc.y ) );
+			pRenderer->DrawLine( CFPoint( Arc.x, Arc.y-Radius-1 ), CFPoint( Arc.x, Arc.y-SmallRadius ) );
+			pRenderer->DrawLine( CFPoint( Arc.x, Arc.y+Radius+1 ), CFPoint( Arc.x, Arc.y+SmallRadius ) );
+		}
+		else
+		{
+			double Radius = Rect.Width()/3*m_DPIScale;
+			double ArrowLength = 3*m_DPIScale;
+			Rect.InflateRect( 1, 1 );
+			CFArc Arc( Rect.GetCenter(), 6*m_DPIScale, Rect.TopLeft(), Rect.TopLeft() );
+			pRenderer->SetArcDirection( AD_COUNTERCLOCKWISE );
+			switch( AdjustmentControl )
+			{
+				case AC_TOP_LEFT:
+					Arc.SetArc( Rect.BottomRight(), Radius, Rect.TopLeft(), Rect.TopLeft() );
+					Arc.m_Start.SetPoint( Arc.x, Arc.y-Radius );
+					Arc.m_End.SetPoint( Arc.x-Radius, Arc.y );
+					pRenderer->Arc( Arc );
+					pRenderer->DrawArrow( CFPoint( Arc.m_Start.x-ArrowLength, Arc.m_Start.y ), CFPoint( Arc.m_Start.x+ArrowLength, Arc.m_Start.y ), ArrowLength, ArrowLength );
+					pRenderer->DrawArrow( CFPoint( Arc.m_End.x, Arc.m_End.y-ArrowLength ), CFPoint( Arc.m_End.x, Arc.m_End.y+ArrowLength ), ArrowLength, ArrowLength );
+					break;
+				case AC_TOP_RIGHT:
+					Arc.SetArc( Rect.BottomLeft(), Radius, Rect.TopLeft(), Rect.TopLeft() );
+					Arc.m_Start.SetPoint( Arc.x+Radius, Arc.y );
+					Arc.m_End.SetPoint( Arc.x, Arc.y-Radius );
+					pRenderer->Arc( Arc );
+					pRenderer->DrawArrow( CFPoint( Arc.m_Start.x, Arc.m_Start.y-ArrowLength ), CFPoint( Arc.m_Start.x, Arc.m_Start.y+ArrowLength ), ArrowLength, ArrowLength );
+					pRenderer->DrawArrow( CFPoint( Arc.m_End.x+ArrowLength, Arc.m_End.y ), CFPoint( Arc.m_End.x-ArrowLength, Arc.m_End.y ), ArrowLength, ArrowLength );
+					break;
+				case AC_BOTTOM_LEFT:
+					Arc.SetArc( Rect.TopRight(), Radius, Rect.TopLeft(), Rect.TopLeft() );
+					Arc.m_Start.SetPoint( Arc.x-Radius, Arc.y );
+					Arc.m_End.SetPoint( Arc.x, Arc.y+Radius );
+					pRenderer->Arc( Arc );
+					pRenderer->DrawArrow( CFPoint( Arc.m_Start.x, Arc.m_Start.y+ArrowLength ), CFPoint( Arc.m_Start.x, Arc.m_Start.y-ArrowLength ), ArrowLength, ArrowLength );
+					pRenderer->DrawArrow( CFPoint( Arc.m_End.x-ArrowLength, Arc.m_End.y ), CFPoint( Arc.m_End.x+ArrowLength, Arc.m_End.y ), ArrowLength, ArrowLength );
+					break;
+				case AC_BOTTOM_RIGHT:
+					Arc.SetArc( Rect.TopLeft(), Radius, Rect.TopLeft(), Rect.TopLeft() );
+					Arc.m_Start.SetPoint( Arc.x, Arc.y+Radius );
+					Arc.m_End.SetPoint( Arc.x+Radius, Arc.y );
+					pRenderer->DrawArrow( CFPoint( Arc.m_Start.x+ArrowLength, Arc.m_Start.y ), CFPoint( Arc.m_Start.x-ArrowLength, Arc.m_Start.y ), ArrowLength, ArrowLength );
+					pRenderer->DrawArrow( CFPoint( Arc.m_End.x, Arc.m_End.y+ArrowLength ), CFPoint( Arc.m_End.x, Arc.m_End.y-ArrowLength ), ArrowLength, ArrowLength );
+					pRenderer->Arc( Arc );
+					break;
+			}
+		}
+	#else
+		CDC *pDC = pRenderer->GetDC();
+		switch( AdjustmentControl )
+		{
+			case AC_ROTATE:
+				::DrawIconEx( pDC->GetSafeHdc(), (int)Rect.left, (int)Rect.top, m_Rotate0, 32, 32, 0, 0, DI_NORMAL );
+				break;
+			case AC_TOP_LEFT:
+				::DrawIconEx(pDC->GetSafeHdc(), (int)Rect.left, (int)Rect.top, m_Rotate1, 32, 32, 0, 0, DI_NORMAL);
+				break;
+			case AC_TOP_RIGHT:
+				::DrawIconEx(pDC->GetSafeHdc(), (int)Rect.left, (int)Rect.top, m_Rotate2, 32, 32, 0, 0, DI_NORMAL);
+				break;
+			case AC_BOTTOM_LEFT:
+				::DrawIconEx(pDC->GetSafeHdc(), (int)Rect.left, (int)Rect.top, m_Rotate4, 32, 32, 0, 0, DI_NORMAL);
+				break;
+			case AC_BOTTOM_RIGHT:
+				::DrawIconEx(pDC->GetSafeHdc(), (int)Rect.left, (int)Rect.top, m_Rotate3, 32, 32, 0, 0, DI_NORMAL);
+				break;
+		}
+	#endif
+}
+
 void CLinkageView::DrawAdjustmentControls( CRenderer *pRenderer )
 {
 	if( !m_bAllowEdit )
 		return;
 
-	CDC *pDC = pRenderer->GetDC();
+	CPen Pen( PS_SOLID, 2, COLOR_BLACK );
+	CPen *pOldPen = pRenderer->SelectObject( &Pen );
+	CBrush Brush( m_bAllowEdit ? COLOR_ADJUSTMENTKNOBS : COLOR_NONADJUSTMENTKNOBS );
+	CBrush *pOldBrush = pRenderer->SelectObject( &Brush );
 
 	if( m_VisibleAdjustment == ADJUSTMENT_ROTATE )
 	{
 		if( m_MouseAction != ACTION_NONE && m_MouseAction != ACTION_RECENTER /*&& m_MouseAction != ACTION_ROTATE*/ )
+		{
+			pRenderer->SelectObject( pOldPen );
+			pRenderer->SelectObject( pOldBrush );
 			return;
+		}
 
 		CFRect Rect;
 		GetAdjustmentControlRect( AC_ROTATE, Rect );
-		::DrawIconEx( pDC->GetSafeHdc(), (int)Rect.left, (int)Rect.top, m_Rotate0, 32, 32, 0, 0, DI_NORMAL );
-		// pDC->DrawIcon( (int)Rect.left, (int)Rect.top, m_Rotate0 );
-
+		DrawRotationControl( pRenderer, Rect, AC_ROTATE );
 		if( m_MouseAction != ACTION_NONE )
+		{
+			pRenderer->SelectObject( pOldPen );
+			pRenderer->SelectObject( pOldBrush );
 			return;
+		}
 
 		GetAdjustmentControlRect( AC_TOP_LEFT, Rect );
-		::DrawIconEx(pDC->GetSafeHdc(), (int)Rect.left, (int)Rect.top, m_Rotate1, 32, 32, 0, 0, DI_NORMAL);
-		//pDC->DrawIcon( (int)Rect.left, (int)Rect.top, m_Rotate1 );
+		DrawRotationControl( pRenderer, Rect, AC_TOP_LEFT );
 		GetAdjustmentControlRect( AC_TOP_RIGHT, Rect );
-		::DrawIconEx(pDC->GetSafeHdc(), (int)Rect.left, (int)Rect.top, m_Rotate2, 32, 32, 0, 0, DI_NORMAL);
-		//pDC->DrawIcon( (int)Rect.left, (int)Rect.top, m_Rotate2 );
+		DrawRotationControl( pRenderer, Rect, AC_TOP_RIGHT );
 		GetAdjustmentControlRect( AC_BOTTOM_RIGHT, Rect );
-		::DrawIconEx(pDC->GetSafeHdc(), (int)Rect.left, (int)Rect.top, m_Rotate3, 32, 32, 0, 0, DI_NORMAL);
-		//pDC->DrawIcon( (int)Rect.left, (int)Rect.top, m_Rotate3 );
+		DrawRotationControl( pRenderer, Rect, AC_BOTTOM_RIGHT );
 		GetAdjustmentControlRect( AC_BOTTOM_LEFT, Rect );
-		::DrawIconEx(pDC->GetSafeHdc(), (int)Rect.left, (int)Rect.top, m_Rotate4, 32, 32, 0, 0, DI_NORMAL);
-		//pDC->DrawIcon( (int)Rect.left, (int)Rect.top, m_Rotate4 );
+		DrawRotationControl( pRenderer, Rect, AC_BOTTOM_LEFT );
 	}
 	else if( m_VisibleAdjustment == ADJUSTMENT_STRETCH )
 	{
 		if( m_MouseAction != ACTION_NONE )
+		{
+			pRenderer->SelectObject( pOldPen );
+			pRenderer->SelectObject( pOldBrush );
 			return;
+		}
 
 		bool bVertical = fabs( m_SelectionContainerRect.Height() ) > 0;
 		bool bHorizontal = fabs( m_SelectionContainerRect.Width() ) > 0;
 		bool bBoth = bHorizontal && bVertical;
 
-		CRect Rect;
+		CFRect Rect;
 
-		CBrush Brush( m_bAllowEdit ? COLOR_ADJUSTMENTKNOBS : COLOR_NONADJUSTMENTKNOBS );
 		GetAdjustmentControlRect( AC_TOP_LEFT, Rect );
 		Rect.right++; Rect.bottom++;
-		if( bBoth ) pDC->FillRect( &Rect, &Brush );
+		if( bBoth ) pRenderer->FillRect( &Rect, &Brush );
 		GetAdjustmentControlRect( AC_TOP_RIGHT, Rect );
 		Rect.right++; Rect.bottom++;
-		if( bBoth ) pDC->FillRect( &Rect, &Brush );
+		if( bBoth ) pRenderer->FillRect( &Rect, &Brush );
 		GetAdjustmentControlRect( AC_BOTTOM_RIGHT, Rect );
 		Rect.right++; Rect.bottom++;
-		if( bBoth ) pDC->FillRect( &Rect, &Brush );
+		if( bBoth ) pRenderer->FillRect( &Rect, &Brush );
 		GetAdjustmentControlRect( AC_BOTTOM_LEFT, Rect );
 		Rect.right++; Rect.bottom++;
-		if( bBoth ) pDC->FillRect( &Rect, &Brush );
+		if( bBoth ) pRenderer->FillRect( &Rect, &Brush );
 		GetAdjustmentControlRect( AC_TOP, Rect );
 		Rect.right++; Rect.bottom++;
-		if( bVertical ) pDC->FillRect( &Rect, &Brush );
+		if( bVertical ) pRenderer->FillRect( &Rect, &Brush );
 		GetAdjustmentControlRect( AC_RIGHT, Rect );
 		Rect.right++; Rect.bottom++;
-		if( bHorizontal ) pDC->FillRect( &Rect, &Brush );
+		if( bHorizontal ) pRenderer->FillRect( &Rect, &Brush );
 		GetAdjustmentControlRect( AC_BOTTOM, Rect );
 		Rect.right++; Rect.bottom++;
-		if( bVertical ) pDC->FillRect( &Rect, &Brush );
+		if( bVertical ) pRenderer->FillRect( &Rect, &Brush );
 		GetAdjustmentControlRect( AC_LEFT, Rect );
 		Rect.right++; Rect.bottom++;
-		if( bHorizontal ) pDC->FillRect( &Rect, &Brush );
+		if( bHorizontal ) pRenderer->FillRect( &Rect, &Brush );
 	}
+	pRenderer->SelectObject( pOldBrush );
+	pRenderer->SelectObject( pOldPen );
 }
 
 int CLinkageView::GetPrintPageCount( CDC *pDC, CPrintInfo *pPrintInfo, bool bPrintActualSize )

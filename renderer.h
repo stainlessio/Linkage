@@ -68,6 +68,7 @@ class CRenderer// : public CDC
 	//COLORREF SetPixel( double x, double y, COLORREF crColor );
 	//COLORREF SetPixel( CFPoint Point, COLORREF crColor ) { return SetPixel( Point.x, Point.y, crColor ); }
 	bool CreateCompatibleDC( CDC *pDC, CRect *prect = 0 );
+	int SetArcDirection( int Direction );
 
 	bool DrawArrow( CFPoint FromPoint, CFPoint ToPoint, double Width, double Length );
 	

@@ -202,6 +202,8 @@ class CFRect
 
 	CFPoint TopLeft( void ) { return CFPoint( left, top ); }
 	CFPoint BottomRight( void ) { return CFPoint( right, bottom ); }
+	CFPoint TopRight( void ) { return CFPoint( right, top ); }
+	CFPoint BottomLeft( void ) { return CFPoint( left, bottom ); }
 
 	void Normalize( void )
 	{

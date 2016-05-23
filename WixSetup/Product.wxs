@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
 
-	<?define PRODUCTVERSION="3.2.12"?>
+	<?define PRODUCTVERSION="3.3.0"?>
 	<?define UPGRADECODE="363E6270-4C3C-4022-80C5-32499430E4BE"?>
 
 	<Product Id="*" Name="Linkage" Language="1033" Codepage="1252" Version="$(var.PRODUCTVERSION)" 
@@ -142,7 +142,7 @@
 
 	<Fragment>
 		<Component Id="LinkageExecutable" Directory="INSTALLFOLDER" Guid="7AF9110C-E88C-4BBE-A510-1933A0798D8A">
-			<File Id="linkage.exe" Name="linkage.exe" DiskId="1" Vital="yes" Source="..\Release\linkage.exe" KeyPath="yes">
+			<File Id="linkage.exe" Name="linkage.exe" DiskId="1" Vital="yes" Source="..\$(var.Configuration)\linkage.exe" KeyPath="yes">
 				<Shortcut Id="ApplicationStartMenuShortcut"
 						  Advertise="yes"
 						  Directory="ApplicationProgramsFolder"
