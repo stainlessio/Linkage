@@ -9,6 +9,53 @@
 #include <dwrite.h>
 #endif
 
+class CCustomPenInfo
+{
+	#define MAX_CUSTOM_PATTERN 10
+	public:
+	CCustomPenInfo() 
+	{
+		memset( m_CustomPattern, 0, MAX_CUSTOM_PATTERN * sizeof( DWORD ) );
+		m_CustomCount = 0;
+		m_CustomWidth = 0;
+		m_CustomColor = 0;
+	}
+	
+	CCustomPenInfo( DWORD *pCustomPattern, int CustomCount, double CustomWidth, COLORREF CustomColor )
+	{
+		Set( pCustomPattern, CustomCount, CustomWidth, CustomColor );
+	}
+	void Set( DWORD *pCustomPattern, int CustomCount, double CustomWidth, COLORREF CustomColor )
+	{
+		m_bSelected = true;
+		memcpy( m_CustomPattern, pCustomPattern, CustomCount * sizeof( DWORD ) );
+		m_CustomCount = CustomCount;
+		m_CustomWidth = CustomWidth;
+		m_CustomColor = CustomColor;
+	}
+	bool Contains( DWORD *pCustomPattern, int CustomCount, double CustomWidth, COLORREF CustomColor )
+	{
+		if( CustomCount != m_CustomCount || CustomWidth != m_CustomWidth || CustomColor != m_CustomColor )
+			return false;
+		for( int Counter = 0; Counter < m_CustomCount && pCustomPattern != 0; ++Counter )
+		{
+			if( pCustomPattern[Counter] != m_CustomPattern[Counter] )
+				return false;
+		}
+		return true;
+	}
+	void Select( bool bSelect )
+	{
+		m_bSelected = bSelect;
+	}
+
+	bool m_bSelected;
+	DWORD m_CustomPattern[MAX_CUSTOM_PATTERN];
+	int m_CustomCount;
+	double m_CustomWidth;
+	COLORREF m_CustomColor;
+};
+
 static int ExpandPolygonCornerx( CFPoint &Point, CFPoint &PreviousPoint, CFPoint &NextPoint, double Distance, CFPoint &NewPoint1, CFPoint &NewPoint2 )
 {
 	// Returns two points that are the proper distance from the original and
@@ -369,7 +416,7 @@ class CRendererImplementation
 	}
 
 	//virtual void LinkageDrawExpandedPolygon( CFPoint *pPoints, double *pLineRadii, int PointCount, COLORREF Color, bool bFill, double ExpansionDistance ) = 0;
-	virtual CPen* SelectObject( CPen* pPen ) = 0;
+	virtual CPen* SelectObject( CPen* pPen, DWORD *pCustomPattern = 0, int CustomCount = 0, double CustomWidth = 0, COLORREF CustomColor = 0 ) = 0;
 	virtual CFont* SelectObject( CFont* pFont, double FontHeight ) = 0;
 	virtual CBitmap* SelectObject( CBitmap* pBitmap ) = 0;
 	virtual int SelectObject( CRgn* pRgn ) = 0;
@@ -745,7 +792,7 @@ class CGDIRenderer : public CRendererImplementation
 	//	return m_pDC->SetPixel( (int)x, (int)y, crColor );
 	//}
 
-	CPen* SelectObject( CPen* pPen )
+	CPen* SelectObject( CPen* pPen, DWORD *pCustomPattern = 0, int CustomCount = 0, double CustomWidth = 0, COLORREF CustomColor = 0 )
 	{
 		if( m_Scale <= 1 )
 			return m_pDC->SelectObject( pPen );
@@ -1107,7 +1154,7 @@ class CNullRenderer : public CRendererImplementation
 	//	return 0;
 	//}
 
-	CPen* SelectObject( CPen* pPen )
+	CPen* SelectObject( CPen* pPen, DWORD *pCustomPattern = 0, int CustomCount = 0, double CustomWidth = 0, COLORREF CustomColor = 0 )
 	{
 		return 0;
 	}
@@ -1536,7 +1583,7 @@ class CDXFRenderer : public CRendererImplementation
 		return bChangeDirection ? 1 : -1;
 	}
 
-	CPen* SelectObject( CPen* pPen )
+	CPen* SelectObject( CPen* pPen, DWORD *pCustomPattern = 0, int CustomCount = 0, double CustomWidth = 0, COLORREF CustomColor = 0 )
 	{
 		if( m_Scale <= 1 )
 			return m_pDC->SelectObject( pPen );
@@ -1692,8 +1739,11 @@ class CD2DRenderer : public CRendererImplementation
 		return pDWriteFactor;
 	}
 
+	CCustomPenInfo  m_CustomPenInfo;
 	CList<CPen*,CPen*> m_CreatedPens;
 	ID2D1StrokeStyle *m_pSolidLineStroke = 0;
+	ID2D1StrokeStyle *m_DashedLineStroke = 0;
+	ID2D1StrokeStyle *m_pCustomStroke = 0;
 	int m_ArcDirection;
 	CDC *m_pDC;
 	bool m_bIsPrinting;
@@ -1728,6 +1778,7 @@ class CD2DRenderer : public CRendererImplementation
 		ID2D1Factory* pD2D1Factory = GetD2D1Factory();
 
 		pD2D1Factory->CreateStrokeStyle( D2D1::StrokeStyleProperties( D2D1_CAP_STYLE_SQUARE, D2D1_CAP_STYLE_SQUARE), 0, 0, &m_pSolidLineStroke );
+		pD2D1Factory->CreateStrokeStyle( D2D1::StrokeStyleProperties( D2D1_CAP_STYLE_SQUARE, D2D1_CAP_STYLE_SQUARE, D2D1_CAP_STYLE_SQUARE, D2D1_LINE_JOIN_MITER, 10.f, D2D1_DASH_STYLE_DASH ), 0, 0, &m_DashedLineStroke );
 	}
 
 	virtual ~CD2DRenderer()
@@ -1743,8 +1794,14 @@ class CD2DRenderer : public CRendererImplementation
 		if( m_pDC != 0 )
 			delete m_pDC;
 
-		m_pSolidLineStroke->Release();
-		m_pRenderTarget->Release();
+		if( m_pSolidLineStroke != 0 )
+			m_pSolidLineStroke->Release();
+		if( m_DashedLineStroke != 0 )
+			m_DashedLineStroke->Release();
+		if( m_pCustomStroke != 0 )
+			m_pCustomStroke->Release();
+		if( m_pRenderTarget != 0 )
+			m_pRenderTarget->Release();
 	}
 
 	virtual void BeginDraw( void ) 
@@ -1975,31 +2032,41 @@ class CD2DRenderer : public CRendererImplementation
 		double y1 = y;
 		Scale( x1, y1 );
 
+		ID2D1StrokeStyle *pStrokeStyle = m_pSolidLineStroke;
+		float PenWidth;
+		D2D1_COLOR_F UseColor;
+		UseColor.a = 1;  // Opaque.
 		CPen* pPen = m_pDC->GetCurrentPen();
 		LOGPEN LogPen;
-		if( pPen->GetLogPen( &LogPen ) == 0 )
-			return FALSE;
-		COLORREF PenColor = LogPen.lopnColor;
-		float Red = GetRValue( PenColor ) / 255.0f;
-		float Green = GetGValue( PenColor ) / 255.0f;
-		float Blue = GetBValue( PenColor ) / 255.0f;
+		if( m_CustomPenInfo.m_bSelected )
+		{
+			pStrokeStyle = m_pCustomStroke;
+			PenWidth = (float)m_CustomPenInfo.m_CustomWidth;
+			UseColor.r = GetRValue( m_CustomPenInfo.m_CustomColor ) / 255.0f;;
+			UseColor.g = GetGValue( m_CustomPenInfo.m_CustomColor ) / 255.0f;;
+			UseColor.b = GetBValue( m_CustomPenInfo.m_CustomColor ) / 255.0f;;
+		}
+		else if( pPen->GetLogPen( &LogPen ) != 0 )
+		{
+			if( LogPen.lopnStyle == PS_DOT )
+				pStrokeStyle = m_DashedLineStroke;
+			PenWidth = (float)LogPen.lopnWidth.x;
+			UseColor.r = GetRValue( LogPen.lopnColor ) / 255.0f;;
+			UseColor.g = GetGValue( LogPen.lopnColor ) / 255.0f;;
+			UseColor.b = GetBValue( LogPen.lopnColor ) / 255.0f;;
+		}
+		else
+			return 0;
 
-		D2D1_COLOR_F UseColor;
-		UseColor.r = Red;
-		UseColor.g = Green;
-		UseColor.b = Blue;
-		UseColor.a = 1;  // Opaque.
-
-		CComPtr<ID2D1SolidColorBrush> pTempBrush = NULL;
-
+		CComPtr<ID2D1SolidColorBrush> pTempBrush = 0;
 		m_pRenderTarget->CreateSolidColorBrush( UseColor, &pTempBrush );
 
 		m_pRenderTarget->DrawLine(
         D2D1::Point2F( (float)m_CurrentPosition.x, (float)m_CurrentPosition.y ),
         D2D1::Point2F( (float)x1, (float)y1 ),
         pTempBrush,
-        (float)( LogPen.lopnWidth.x * m_DPIScale ),
-		m_pSolidLineStroke );
+        (float)(PenWidth * m_DPIScale ),
+		pStrokeStyle );
 
 		m_CurrentPosition.SetPoint( x1, y1 );
 
@@ -2143,22 +2210,33 @@ class CD2DRenderer : public CRendererImplementation
 		double StartAngle = GetAngle( Center, CFPoint( x3, y3 ) );
 		double EndAngle = GetAngle( Center, CFPoint( x4, y4 ) );
 
+		ID2D1StrokeStyle *pStrokeStyle = m_pSolidLineStroke;
+		float PenWidth;
+		D2D1_COLOR_F UseColor;
+		UseColor.a = 1;  // Opaque.
 		CPen* pPen = m_pDC->GetCurrentPen();
 		LOGPEN LogPen;
-		if( pPen->GetLogPen( &LogPen ) == 0 )
-			return FALSE;
-		COLORREF PenColor = LogPen.lopnColor;
-		float Red = GetRValue( PenColor ) / 255.0f;
-		float Green = GetGValue( PenColor ) / 255.0f;
-		float Blue = GetBValue( PenColor ) / 255.0f;
+		if( m_CustomPenInfo.m_bSelected )
+		{
+			pStrokeStyle = m_pCustomStroke;
+			PenWidth = (float)m_CustomPenInfo.m_CustomWidth;
+			UseColor.r = GetRValue( m_CustomPenInfo.m_CustomColor ) / 255.0f;;
+			UseColor.g = GetGValue( m_CustomPenInfo.m_CustomColor ) / 255.0f;;
+			UseColor.b = GetBValue( m_CustomPenInfo.m_CustomColor ) / 255.0f;;
+		}
+		else if( pPen->GetLogPen( &LogPen ) != 0 )
+		{
+			if( LogPen.lopnStyle == PS_DOT )
+				pStrokeStyle = m_DashedLineStroke;
+			PenWidth = (float)LogPen.lopnWidth.x;
+			UseColor.r = GetRValue( LogPen.lopnColor ) / 255.0f;;
+			UseColor.g = GetGValue( LogPen.lopnColor ) / 255.0f;;
+			UseColor.b = GetBValue( LogPen.lopnColor ) / 255.0f;;
+		}
+		else
+			return 0;
 
-		D2D1_COLOR_F UseColor;
-		UseColor.r = Red;
-		UseColor.g = Green;
-		UseColor.b = Blue;
-		UseColor.a = 1;  // Opaque.
-
-		CComPtr<ID2D1SolidColorBrush> pTempBrush = NULL;
+		CComPtr<ID2D1SolidColorBrush> pTempBrush = 0;
 		m_pRenderTarget->CreateSolidColorBrush( UseColor, &pTempBrush );
 
 		ID2D1PathGeometry *pCircleGeometry = 0;
@@ -2231,7 +2309,7 @@ class CD2DRenderer : public CRendererImplementation
 
 		pSink->Close();
 
-		m_pRenderTarget->DrawGeometry( pCircleGeometry, pTempBrush, (float)( LogPen.lopnWidth.x * m_DPIScale ), m_pSolidLineStroke );
+		m_pRenderTarget->DrawGeometry( pCircleGeometry, pTempBrush, (float)( LogPen.lopnWidth.x * m_DPIScale ), pStrokeStyle );
 
 		pSink->Release();
 		pCircleGeometry->Release();
@@ -2439,8 +2517,40 @@ class CD2DRenderer : public CRendererImplementation
 		FillRgn( Points, 4, pBrush );
 	}
 
-	CPen* SelectObject( CPen* pPen )
+	void SetUpCustomPen( void )
 	{
+		if( m_pCustomStroke != 0 )
+			m_pCustomStroke->Release();
+		m_pCustomStroke = 0;
+			
+		float *pStyle = new float[m_CustomPenInfo.m_CustomCount];
+		if( pStyle == 0 )
+			return;
+		for( int Counter = 0; Counter < m_CustomPenInfo.m_CustomCount; ++Counter )
+			pStyle[Counter] = (float)( ( m_CustomPenInfo.m_CustomPattern[Counter] + 2 ) * m_DPIScale ); // Add two to make it look more like the GDI version of this pen style.
+
+		ID2D1Factory* pD2D1Factory = GetD2D1Factory();
+		pD2D1Factory->CreateStrokeStyle( D2D1::StrokeStyleProperties( D2D1_CAP_STYLE_SQUARE, D2D1_CAP_STYLE_SQUARE, D2D1_CAP_STYLE_SQUARE, D2D1_LINE_JOIN_MITER, 10.f, D2D1_DASH_STYLE_CUSTOM ), 
+		                                 pStyle, m_CustomPenInfo.m_CustomCount, &m_pCustomStroke );
+	}
+
+	CPen* SelectObject( CPen* pPen, DWORD *pCustomPattern = 0, int CustomCount = 0, double CustomWidth = 0, COLORREF CustomColor = 0 )
+	{
+		if( pPen == 0 )
+			return 0;
+
+		if( pCustomPattern != 0 && CustomCount > 0 )
+		{
+			if( !m_CustomPenInfo.Contains( pCustomPattern, CustomCount, CustomWidth, CustomColor ) )
+			{
+				m_CustomPenInfo.Set( pCustomPattern, CustomCount, CustomWidth, CustomColor );
+				SetUpCustomPen();
+			}
+			m_CustomPenInfo.Select( true );
+		}
+		else
+			m_CustomPenInfo.Select( false );
+
 		if( m_Scale <= 1 )
 			return m_pDC->SelectObject( pPen );
 
@@ -2768,12 +2878,12 @@ void CRenderer::LinkageDrawExpandedPolygon( CFPoint *pPoints, double *pLineRadii
 	m_pImplementation->LinkageDrawExpandedPolygon( pPoints, pLineRadii, PointCount, Color, bFill, ExpansionDistance );
 }
 
-CPen* CRenderer::SelectObject( CPen* pPen )
+CPen* CRenderer::SelectObject( CPen* pPen, DWORD *pCustomPattern, int CustomCount, double CustomWidth, COLORREF CustomColor )
 {
 	if( m_pImplementation == 0 )
 		return 0;
 
-	return m_pImplementation->SelectObject( pPen );
+	return m_pImplementation->SelectObject( pPen, pCustomPattern, CustomCount, CustomWidth, CustomColor );
 }
 
 CFont* CRenderer::SelectObject( CFont* pFont, double FontHeight )

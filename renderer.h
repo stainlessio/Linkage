@@ -75,7 +75,7 @@ class CRenderer// : public CDC
 	bool DrawRect( double x1, double y1, double x2, double y2 );
 	bool DrawRect( double RotationAngle, double x1, double y1, double x2, double y2 );
 	
-	CPen* SelectObject( CPen* pPen );
+	CPen* SelectObject( CPen* pPen, DWORD *pCustomPattern = 0, int CustomCount = 0, double CustomWidth = 0, COLORREF CustomColor = 0 );
 	virtual CFont* SelectObject( CFont* pFont, double FontHeight );
 	CBitmap* SelectObject( CBitmap* pBitmap );
 	CBrush* SelectObject( CBrush* pBrush );

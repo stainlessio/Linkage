@@ -57,7 +57,7 @@ static COLORREF COLOR_ADJUSTMENTKNOBS = RGB( 0, 0, 0 );
 static COLORREF COLOR_BLACK = RGB( 0, 0, 0 );
 static COLORREF COLOR_NONADJUSTMENTKNOBS = RGB( 170, 170, 170 );
 static COLORREF COLOR_ALIGNMENTHINT = RGB( 170, 220, 170 );
-static COLORREF COLOR_SNAPHINT = RGB( 170, 170, 240 );
+static COLORREF COLOR_SNAPHINT = RGB( 50, 170, 240 );
 static COLORREF COLOR_SUPERHIGHLIGHT = RGB( 255, 255, 192 );
 static COLORREF COLOR_SUPERHIGHLIGHT2 = RGB( 255, 255, 128 );
 static COLORREF COLOR_TEXT = RGB( 24, 24, 24 );
@@ -5388,7 +5388,8 @@ void CLinkageView::DrawFasteners( CRenderer* pRenderer, unsigned int OnLayers, C
     DWORD Style[] = { 3, 1 };
 	CPen CustomPen;
 	CustomPen.CreatePen( PS_USERSTYLE, 1, &lBrush, 2, Style );
-	CPen *pOldPen = pRenderer->SelectObject( &CustomPen );
+
+	CPen *pOldPen = pRenderer->SelectObject( &CustomPen, Style, 2, 1, COLOR_MINORSELECTION );
 
 	POSITION Position = TempList.GetHeadPosition();
 	while( Position != 0 )
