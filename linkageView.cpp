@@ -2261,21 +2261,21 @@ void CLinkageView::DrawAnicrop( CRenderer *pRenderer )
 	if( !m_bShowAnicrop )
 		return;
 
-	int UseWidth = ( ANIMATIONWIDTH + 1 );
-	int UseHeight = ( ANIMATIONHEIGHT + 1 );
+	int UseWidth = ( ANIMATIONWIDTH + 1 ) / m_DPIScale;
+	int UseHeight = ( ANIMATIONHEIGHT + 1 ) / m_DPIScale;
 
-	int x = ( m_DrawingRect.Width() / 2 ) - ( UseWidth / 2 );
-	int y = ( m_DrawingRect.Height() / 2 ) - ( UseHeight / 2 );
+	int x = ( m_DrawingRect.Width() / 2  / m_DPIScale) - ( UseWidth / 2 );
+	int y = ( m_DrawingRect.Height() / 2 / m_DPIScale ) - ( UseHeight / 2 );
 
 	CPen Blue( PS_SOLID, 1, RGB( 196, 196, 255 ) );
 	CPen *pOldPen = pRenderer->SelectObject( &Blue );
 	pRenderer->DrawRect( x, y, x+UseWidth, y+UseHeight );
 
-	UseWidth = ( ANIMATIONWIDTH + 1 ) / 2;
-	UseHeight = ( ANIMATIONHEIGHT + 1 ) / 2;
+	UseWidth = ( ANIMATIONWIDTH + 1 ) / 2 / m_DPIScale;
+	UseHeight = ( ANIMATIONHEIGHT + 1 ) / 2 / m_DPIScale;
 
-	x = ( m_DrawingRect.Width() / 2 ) - ( UseWidth / 2 );
-	y = ( m_DrawingRect.Height() / 2 ) - ( UseHeight / 2 );
+	x = ( m_DrawingRect.Width() / 2 / m_DPIScale ) - ( UseWidth / 2 );
+	y = ( m_DrawingRect.Height() / 2 / m_DPIScale ) - ( UseHeight / 2 );
 
 	CPen BlueDots( PS_DOT, 1, RGB( 196, 196, 255 ) );
 	pRenderer->SelectObject( &BlueDots );
@@ -3170,7 +3170,7 @@ void CLinkageView::OnMechanismReset()
 
 DWORD TickCount;
 
-void CALLBACK TimeProc( UINT uID, UINT uMsg, DWORD dwUser, DWORD dw1, DWORD dw2 )
+void CALLBACK TimeProc( UINT uID, UINT uMsg, DWORD_PTR dwUser, DWORD_PTR dw1, DWORD_PTR dw2 )
 {
 	TickCount = GetTickCount();
 	CLinkageView* pView = (CLinkageView*)dwUser;

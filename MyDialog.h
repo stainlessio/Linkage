@@ -18,6 +18,8 @@ public:
 
 protected:
 
+	int m_DarkBottomSize;
+
 	void AFXAPI DDX_MyDoubleText( CDataExchange* pDX, int nIDC, double& value, int Precision );
 	BOOL AFXAPI MyAfxSimpleFloatParse(LPCTSTR lpszText, double& d);
 	void AFXAPI MyAfxTextFloatFormat(CDataExchange* pDX, int nIDC, void* pData, double value, int nSizeGcvt, int nSizeType);

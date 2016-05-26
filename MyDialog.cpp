@@ -23,6 +23,15 @@ BOOL CMyDialog::OnInitDialog()
 	if( !m_Label.IsEmpty() )
 		SetWindowText( m_Label );
 
+	#if defined( LINKAGE_USE_DIRECT2D )
+		CWindowDC DC( this );
+		int PPI = DC.GetDeviceCaps( LOGPIXELSX );
+		double DPIScale = (double)PPI / 96.0;
+		m_DarkBottomSize = (int)( DARKBOTTOM * ( DARKBOTTOM * DPIScale + 0.5 ) );
+	#else
+		m_DarkBottomSize = DARKBOTTOM;
+	#endif
+
 	return TRUE;
 }
 
@@ -36,7 +45,7 @@ HBRUSH CMyDialog::OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor)
 	GetClientRect( &ClientRect );
 	pWnd->GetWindowRect( &Rect );
 	ScreenToClient( &Rect );
-	if( Rect.top >= ClientRect.bottom - DARKBOTTOM )
+	if( Rect.top >= ClientRect.bottom - m_DarkBottomSize )
 		return (HBRUSH)DarkBrush.GetSafeHandle();
 
 	return (HBRUSH)Brush.GetSafeHandle();
@@ -47,17 +56,17 @@ BOOL CMyDialog::OnEraseBkgnd(CDC* pDC)
 	CRect ClientRect;
 	GetClientRect( &ClientRect );
 
-	pDC->PatBlt( ClientRect.left, ClientRect.top, ClientRect.right, ClientRect.bottom - DARKBOTTOM, WHITENESS );
+	pDC->PatBlt( ClientRect.left, ClientRect.top, ClientRect.right, ClientRect.bottom - m_DarkBottomSize, WHITENESS );
 
 	CBrush Brush( RGB( 240, 240, 240 ) );
-	CRect Rect( ClientRect.left, ClientRect.bottom - DARKBOTTOM, ClientRect.right, ClientRect.bottom );
+	CRect Rect( ClientRect.left, ClientRect.bottom - m_DarkBottomSize, ClientRect.right, ClientRect.bottom );
 
 	pDC->FillRect( &Rect, &Brush );
 
 	CPen Pen( PS_SOLID, 1, RGB( 223, 223, 223 ) );
 	CPen *pOldPen = pDC->SelectObject( &Pen );
-	pDC->MoveTo( ClientRect.left, ClientRect.bottom - DARKBOTTOM );
-	pDC->LineTo( ClientRect.right, ClientRect.bottom - DARKBOTTOM );
+	pDC->MoveTo( ClientRect.left, ClientRect.bottom - m_DarkBottomSize );
+	pDC->LineTo( ClientRect.right, ClientRect.bottom - m_DarkBottomSize );
 	pDC->SelectObject( pOldPen );
 
 	return TRUE;
