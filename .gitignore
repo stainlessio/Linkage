@@ -11,10 +11,16 @@
 *.userprefs
 
 # Build results
-[Dd]ebug/
-[Dd]ebugPublic/
-[Rr]elease/
-[Rr]eleases/
+Debug/
+Release/
+DebugDirect2D/
+ReleaseDirect2D/
+WixSetup/Debug/
+WixSetup/Release/
+WixSetup/DebugDirect2D/
+WixSetup/ReleaseDirect2D/
+WixSetup/bin
+WixSetup/obj
 x64/
 x86/
 build/

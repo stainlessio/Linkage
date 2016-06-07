@@ -29,7 +29,9 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWndEx)
 	ON_COMMAND(ID_FILE_HELPDOC, &CMainFrame::OnHelpUserguide)
 	ON_COMMAND(ID_FILE_HELPABOUT, &CMainFrame::OnHelpAbout)
 	ON_COMMAND(ID_RIBBON_SAMPLE_GALLERY, &CMainFrame::OnSelectSample)
+	ON_WM_SETCURSOR()
 	ON_WM_DROPFILES()
+	ON_WM_TIMER()
 END_MESSAGE_MAP()
 
 // CMainFrame construction/destruction
@@ -67,6 +69,8 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	OnApplicationLook( theApp.m_nAppLook );
 
 	m_wndRibbonBar.Create(this);
+
+
 	InitializeRibbon();
 
 	if (!m_wndStatusBar.Create(this))
@@ -648,7 +652,13 @@ void CMainFrame::InitializeRibbon()
 	m_PanelImages.SetImageSize(CSize(16, 16));
 	m_PanelImages.Load(IDB_BUTTONS);
 
+
 	//m_PanelImagesList.Create( IDB_BUTTONS, 16, 1, ILC_COLOR32 );
+
+	m_RibbonInitializingCounter = 0;
+
+	SetTimer( 0, 1, 0 );
+	return;
 
 	CreateMainCategory();
 	CreateHomeCategory();
@@ -852,3 +862,32 @@ void CMainFrame::OnDropFiles(HDROP hDropInfo)
 {
 	CFrameWndEx::OnDropFiles(hDropInfo);
 }
+
+
+void CMainFrame::OnTimer(UINT_PTR nIDEvent)
+{
+	switch( m_RibbonInitializingCounter )
+	{
+		case 0: CreateMainCategory(); break;
+		case 1: CreateHomeCategory(); break;
+		case 2: CreatePrintingCategory(); break;
+		case 3: CreateHelpCategory(); break;
+		case 4: CreateHelpButtons(); break;
+		case 5: CreateQuickAccessCommands(); break;
+		case 6: KillTimer( nIDEvent ); SetCursor( AfxGetApp()->LoadStandardCursor( IDC_ARROW ) ); break;
+	}
+	++m_RibbonInitializingCounter;
+}
+
+BOOL CMainFrame::OnSetCursor( CWnd* pWnd, UINT nHitTest, UINT message )
+{
+	if( m_RibbonInitializingCounter < 6 )
+	{
+		SetCursor( AfxGetApp()->LoadStandardCursor( IDC_WAIT ) );
+		return TRUE;
+	}
+
+	return CWnd::OnSetCursor( pWnd, nHitTest, message );
+}
+
+

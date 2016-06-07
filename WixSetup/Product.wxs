@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
 
-	<?define PRODUCTVERSION="3.3.0"?>
+	<?define PRODUCTVERSION="3.3.2"?>
 	<?define UPGRADECODE="363E6270-4C3C-4022-80C5-32499430E4BE"?>
 
 	<Product Id="*" Name="Linkage" Language="1033" Codepage="1252" Version="$(var.PRODUCTVERSION)" 

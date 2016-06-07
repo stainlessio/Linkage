@@ -86,6 +86,8 @@ private:
 	void AppendMenuItem( CMFCRibbonButton *pButton, UINT StringID, UINT ID, int BitmapIndex );
 	void AppendMenuCheck( CMFCRibbonButton *pButton, UINT StringID, UINT ID );
 
+	int m_RibbonInitializingCounter;
+
 // Generated message map functions
 protected:
 	afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
@@ -96,6 +98,7 @@ protected:
 	afx_msg void OnHelpUserguide();
 	afx_msg void OnHelpAbout();
 	afx_msg void OnSelectSample();
+	afx_msg BOOL OnSetCursor( CWnd* pWnd, UINT nHitTest, UINT message );
 	DECLARE_MESSAGE_MAP()
 
 	CMFCOutlookBarTabCtrl* FindOutlookParent(CWnd* pWnd);
@@ -104,6 +107,7 @@ protected:
 	CMFCRibbonGallery*	m_pSampleGallery;
 public:
 	afx_msg void OnDropFiles(HDROP hDropInfo);
+	afx_msg void OnTimer(UINT_PTR nIDEvent);
 };
 
 

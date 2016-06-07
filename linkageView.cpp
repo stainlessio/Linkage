@@ -47,8 +47,8 @@ static const int GRAB_DISTANCE = 6;
 
 static const int FRAMES_PER_SECONDS = 30;
 
-static const int ANIMATIONWIDTH = 960;
-static const int ANIMATIONHEIGHT = 540;
+static const int ANIMATIONWIDTH = 1280;
+static const int ANIMATIONHEIGHT = 720;
 
 static const int OFFSET_INCREMENT = 25;
 static const int RADIUS_MEASUREMENT_OFFSET = 9;
@@ -71,6 +71,7 @@ static COLORREF COLOR_GROUND = RGB( 100, 100, 100 );
 static COLORREF COLOR_MINORSELECTION = RGB( 190, 190, 190 );
 static COLORREF COLOR_LASTSELECTION = RGB( 196, 96, 96 );
 static COLORREF COLOR_MAJORSELECTION = RGB( 255, 200, 200 );
+static COLORREF COLOR_ANICROP = RGB( 196, 196, 255 );
 
 static const int CONNECTORRADIUS = 5;
 static const int CONNECTORTRIANGLE = 6;
@@ -2243,14 +2244,13 @@ void CLinkageView::OnDraw( CDC* pDC, CPrintInfo *pPrintInfo )
 
 		PrepareRenderer( VideoRenderer, &VideoRect, &VideoBitmap, pDC, 4.0, false, 0.0, 1.0, true, true, false, 0 );
 
-		// Adjust the offset to get the image properly positioned within the video area
-		// since drawing is done of the video area only.
-		int xAnimation = ( m_DrawingRect.Width() / 2 ) - ( ( ANIMATIONWIDTH + 1 ) / 2 );
-		int yAnimatiom = ( m_DrawingRect.Height() / 2 ) - ( ( ANIMATIONHEIGHT + 1 ) / 2 );
-		m_ScrollPosition.x += xAnimation;
-		m_ScrollPosition.y += yAnimatiom;
+		m_Zoom = m_ScreenZoom * m_DPIScale;
+		double SaveDPIScale = m_DPIScale;
+		m_DPIScale = 1.0;
 
 		DoDraw( &VideoRenderer );
+
+		m_DPIScale = SaveDPIScale;
 
 		SaveVideoFrame( &VideoRenderer, VideoRect );
 	}
@@ -2261,24 +2261,24 @@ void CLinkageView::DrawAnicrop( CRenderer *pRenderer )
 	if( !m_bShowAnicrop )
 		return;
 
-	int UseWidth = ( ANIMATIONWIDTH + 1 ) / m_DPIScale;
-	int UseHeight = ( ANIMATIONHEIGHT + 1 ) / m_DPIScale;
+	double UseWidth = ( ANIMATIONWIDTH + 1 ) / m_DPIScale;  // the renderer will scale up the rectangle and it will end up the proper pixel size.
+	double UseHeight = ( ANIMATIONHEIGHT + 1 ) / m_DPIScale;  // the renderer will scale up the rectangle and it wil end up the proper pixel size.
 
-	int x = ( m_DrawingRect.Width() / 2  / m_DPIScale) - ( UseWidth / 2 );
-	int y = ( m_DrawingRect.Height() / 2 / m_DPIScale ) - ( UseHeight / 2 );
+	double x = ( m_DrawingRect.Width() / 2  / m_DPIScale) - ( UseWidth / 2 );
+	double y = ( m_DrawingRect.Height() / 2 / m_DPIScale ) - ( UseHeight / 2 );
 
-	CPen Blue( PS_SOLID, 1, RGB( 196, 196, 255 ) );
+	CPen Blue( PS_SOLID, 1, COLOR_ANICROP );
 	CPen *pOldPen = pRenderer->SelectObject( &Blue );
 	pRenderer->DrawRect( x, y, x+UseWidth, y+UseHeight );
 
-	UseWidth = ( ANIMATIONWIDTH + 1 ) / 2 / m_DPIScale;
-	UseHeight = ( ANIMATIONHEIGHT + 1 ) / 2 / m_DPIScale;
+	//UseWidth = ( ANIMATIONWIDTH + 1 ) / 2 / m_DPIScale;
+	//UseHeight = ( ANIMATIONHEIGHT + 1 ) / 2 / m_DPIScale;
 
-	x = ( m_DrawingRect.Width() / 2 / m_DPIScale ) - ( UseWidth / 2 );
-	y = ( m_DrawingRect.Height() / 2 / m_DPIScale ) - ( UseHeight / 2 );
+	//x = ( m_DrawingRect.Width() / 2 / m_DPIScale ) - ( UseWidth / 2 );
+	//y = ( m_DrawingRect.Height() / 2 / m_DPIScale ) - ( UseHeight / 2 );
 
-	CPen BlueDots( PS_DOT, 1, RGB( 196, 196, 255 ) );
-	pRenderer->SelectObject( &BlueDots );
+	//CPen BlueDots( PS_DOT, 1, RGB( 196, 196, 255 ) );
+	//pRenderer->SelectObject( &BlueDots );
 	//pRenderer->DrawRect( x, y, x+UseWidth, y+UseHeight );
 
 	pRenderer->SelectObject( pOldPen );
@@ -8351,7 +8351,13 @@ bool CLinkageView::SaveAsImage( const char *pFileName, int RenderWidth, int Rend
 
 	PrepareRenderer( Renderer, &ImageRect, &MemoryBitmap, pDC, ScaleFactor, true, MarginScale, 1.0, false, true, false, 0 );
 
+	m_Zoom = m_ScreenZoom * m_DPIScale;
+	double SaveDPIScale = m_DPIScale;
+	m_DPIScale = 1.0;
+
 	DoDraw( &Renderer );
+
+	m_DPIScale = SaveDPIScale;
 
 	CDC ShrunkDC;
 	CBitmap ShrunkBitmap;

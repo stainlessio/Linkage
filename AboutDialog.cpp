@@ -13,7 +13,14 @@ IMPLEMENT_DYNAMIC(CAboutDialog, CMyDialog)
 CAboutDialog::CAboutDialog(CWnd* pParent /*=NULL*/)
 	: CMyDialog( pParent, CAboutDialog::IDD )
 {
-	m_BigFont.CreateFont( -12, 0, 0, 0, FW_EXTRABOLD, 0, 0, 0, 0, 0, 0, ANTIALIASED_QUALITY, 0, "arial" );
+	#if defined( LINKAGE_USE_DIRECT2D )
+		CWindowDC DC( this );
+		int PPI = DC.GetDeviceCaps( LOGPIXELSX );
+		double DPIScale = (double)PPI / 96.0;
+	#else
+		double DPIScale = 1.0;
+	#endif
+	m_BigFont.CreateFont( -12 * DPIScale, 0, 0, 0, FW_EXTRABOLD, 0, 0, 0, 0, 0, 0, ANTIALIASED_QUALITY, 0, "arial" );
 }
 
 CAboutDialog::~CAboutDialog()

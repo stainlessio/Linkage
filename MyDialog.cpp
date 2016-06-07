@@ -27,7 +27,7 @@ BOOL CMyDialog::OnInitDialog()
 		CWindowDC DC( this );
 		int PPI = DC.GetDeviceCaps( LOGPIXELSX );
 		double DPIScale = (double)PPI / 96.0;
-		m_DarkBottomSize = (int)( DARKBOTTOM * ( DARKBOTTOM * DPIScale + 0.5 ) );
+		m_DarkBottomSize = (int)( DARKBOTTOM * DPIScale + 0.5 );
 	#else
 		m_DarkBottomSize = DARKBOTTOM;
 	#endif
